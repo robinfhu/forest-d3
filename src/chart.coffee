@@ -16,13 +16,34 @@ chartProperties = [
 
 
         @container domContainer
+        @svg = @createSvg()
+
     render: ->
-        svg = document.createElement 'svg'
+        @svg.append('rect')
+        .attr('width', @width)
+        .attr('height', @height)
+
+    calcDimensions: ->
         container = @container()
         if container?
-            exists = container.querySelector 'svg'
-            unless exists?
-                container.appendChild svg
+            bounds = container.getBoundingClientRect()
 
+            @height = bounds.height
+            @width = bounds.width
+
+    createSvg: ->
+        container = @container()
+        if container?
+            exists = d3.select(container).select 'svg'
+            if exists.empty()
+                @calcDimensions()
+
+                return d3.select(container).append('svg')
+                .attr('width', @width)
+                .attr('height', @height)
+            else
+                return exists 
+
+        return null
 
         

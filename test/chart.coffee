@@ -10,6 +10,8 @@ describe 'Chart', ->
 
         beforeEach ->
             container = document.createElement 'div'
+            container.style.width = '500px'
+            container.style.height = '400px'
             document.body.appendChild container 
 
         afterEach ->
@@ -27,10 +29,10 @@ describe 'Chart', ->
             chart = new ForestD3.Chart container 
 
             chart.render.should.exist
-            chart.render()
 
-            container.querySelector('svg').should.exist
+            svg = container.querySelector('svg')
+            svg.should.exist 
 
-            chart.render()
-
-            container.querySelectorAll('svg').length.should.equal 1
+            svg.getAttribute('width').should.equal '500'
+            svg.getAttribute('height').should.equal '400'
+            

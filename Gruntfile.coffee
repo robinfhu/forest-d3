@@ -16,6 +16,10 @@ module.exports = (grunt)->
                         'src/main.coffee'
                         'src/chart.coffee'
                     ]
+
+                    'build/app.js': [
+                        'examples/app.coffee'
+                    ]
         karma:
             client:
                 options:
@@ -38,5 +42,5 @@ module.exports = (grunt)->
     grunt.loadNpmTasks 'grunt-karma'
 
     grunt.registerTask 'test', ['coffee', 'karma']
-    grunt.registerTask 'default', ['coffee', 'jade']
+    grunt.registerTask 'default', ['coffee', 'karma','jade']
 
