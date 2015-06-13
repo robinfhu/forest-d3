@@ -6,6 +6,10 @@ module.exports = (grunt)->
                     pretty: true
                 files:
                     'build/index.html': ['examples/index.jade']
+        stylus:
+            client:
+                files:
+                    'dist/forest-d3.css': ['style/*.styl']
 
         coffee:
             options:
@@ -33,14 +37,16 @@ module.exports = (grunt)->
                         'test/*.coffee': 'coffee'
                     files: [
                         'node_modules/d3/d3.js'
+                        'node_modules/jquery/dist/jquery.js'
                         'dist/*.js'
                         'test/*.coffee'
                     ]
 
     grunt.loadNpmTasks 'grunt-contrib-coffee'
     grunt.loadNpmTasks 'grunt-contrib-jade'
+    grunt.loadNpmTasks 'grunt-contrib-stylus'
     grunt.loadNpmTasks 'grunt-karma'
 
     grunt.registerTask 'test', ['coffee', 'karma']
-    grunt.registerTask 'default', ['coffee', 'karma','jade']
+    grunt.registerTask 'default', ['coffee', 'stylus', 'karma','jade']
 
