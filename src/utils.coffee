@@ -1,4 +1,5 @@
-@ForestD3.Utils =
+@ForestD3.Utils = do ->
+    colors20 = d3.scale.category20().range()
     ###
     Calculates the minimum and maximum point across all series'.
     Useful for setting the domain for a d3.scale()
@@ -41,3 +42,14 @@
 
         x: xExt
         y: yExt
+
+    ###
+    Adds a numeric _index to each series, which is used to uniquely
+    identify it.
+    ###
+    indexify: (data)->
+        data.map (d, i)->
+            d._index = i
+            d
+
+    defaultColor: (i)-> colors20[i % colors20.length]

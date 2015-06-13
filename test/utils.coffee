@@ -67,3 +67,19 @@ describe 'Utilities', ->
             result.should.deep.equal
                 x: [0, 1]
                 y: [0, 1]
+
+    describe 'Indexify', ->
+        it 'adds _index to each series', ->
+            data = [
+                values: []
+            ,
+                values: []
+            ,
+                values: []
+            ]
+
+            result = ForestD3.Utils.indexify data
+
+            for d, i in data
+                d._index.should.equal i
+

@@ -1,8 +1,8 @@
 chartProperties = [
-    ['container']
     ['getX', (d,i)-> d[0] ]
     ['getY', (d,i)-> d[1] ]
     ['autoResize', true]
+    ['color', ForestD3.Utils.defaultColor]
 ]
 
 @ForestD3.Chart = class Chart
@@ -24,10 +24,9 @@ chartProperties = [
 
 
         @container domContainer
-        @svg = @createSvg()
 
-        @xAxis = d3.svg.axis()
-        @yAxis = d3.svg.axis()
+        @xAxis = d3.svg.axis().tickPadding(10)
+        @yAxis = d3.svg.axis().tickPadding(10)
 
         ###
         Auto resize the chart if user resizes the browser window.
@@ -35,6 +34,26 @@ chartProperties = [
         window.onresize = =>
             if @autoResize()
                 @render()
+
+    ###
+    Set chart data.
+    ###
+    data: (d)->
+        unless d?
+            return @chartData
+        else
+            d = ForestD3.Utils.indexify d
+            @chartData = d
+            return @
+
+    container: (d)->
+        unless d?
+            return @properties['container']
+        else
+            @properties['container'] = d
+            @svg = @createSvg()
+
+            return @
 
     ###
     Create an <svg> element to start rendering the chart.
@@ -69,7 +88,8 @@ chartProperties = [
 
         seriesGroups.enter()
             .append('g')
-            .classed('series', true)
+            .attr('class', (d, i)-> "series series-#{d.key or i}")
+            .style('fill', (d, i)=> d.color or @color()(d._index))
 
         points = seriesGroups
             .selectAll('circle.point')
@@ -93,14 +113,6 @@ chartProperties = [
             .attr('r', 7)
 
         @
-
-    ###
-    Set chart data.
-    ###
-    data: (d)->
-        @chartData = d
-        @
-
     ###
     Get the chart's dimensions, based on the parent container <div>.
     Calculate chart margins and canvas dimensions.

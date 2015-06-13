@@ -41,7 +41,6 @@ describe 'Chart', ->
             it 'draws a single point', ->
                 sampleData = [
                     key: 'series1'
-                    label: 'Series 1'
                     values: [
                         [0,0]
                     ]
@@ -66,11 +65,10 @@ describe 'Chart', ->
                 canvas = $(container).find('svg g.canvas')
                 canvas.length.should.equal 1
 
-            it 'renders an xAxis', ->
+            it 'renders axes', ->
                 chart = new ForestD3.Chart container
                 sampleData = [
                     key: 'series1'
-                    label: 'Series 1'
                     values: [
                         [0,0]
                         [1,1]
@@ -83,3 +81,33 @@ describe 'Chart', ->
 
                 yTicks = $(container).find('.y-axis .tick')
                 yTicks.length.should.be.greaterThan 0
+
+            it 'renders more than one series', ->
+                chart = new ForestD3.Chart container
+
+                sampleData = [
+                    key: 'foo'
+                    values: [
+                        [0,0]
+                    ]
+                ,
+                    key: 'bar'
+                    values: [
+                        [1,1]
+                    ]
+                ,
+                    key: 'maz'
+                    values: [
+                        [2,2]
+                    ]
+                ]
+
+                chart.data(sampleData).render()
+
+                series = $(container).find('g.series')
+                series.length.should.equal 3, 'three groups'
+
+                series.eq(0)[0].getAttribute('class').should.contain 'series-foo'
+                series.eq(1)[0].getAttribute('class').should.contain 'series-bar'
+                series.eq(2)[0].getAttribute('class').should.contain 'series-maz'
+
