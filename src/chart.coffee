@@ -52,12 +52,38 @@ chartProperties = [
     and series points.
     ###
     render: ->
+        return @ unless @svg?
         return @ unless @chartData?
         @updateDimensions()
         @updateChartFrame()
+        @updateChartScale()
 
-        
-        
+        seriesGroups = @canvas
+            .selectAll('g.series')
+            .data(@chartData, (d)-> d.key)
+
+        seriesGroups.enter()
+            .append('g')
+            .classed('series', true)
+
+        points = seriesGroups
+            .selectAll('circle.point')
+            .data((d)-> d.values)
+
+        points.enter()
+            .append('circle')
+            .classed('point', true)
+            .attr('cx', (d,i)=> @xScale d[0])
+            .attr('cy', (d,i)=> @yScale d[1])
+            .attr('r',0)
+
+        points
+            .transition()
+            .ease('quad')
+            .attr('cx',(d,i)=> @xScale d[0])
+            .attr('cy',(d,i)=> @yScale d[1])
+            .attr('r', 7)
+            
         @
 
     ###
@@ -100,15 +126,19 @@ chartProperties = [
             .attr('width', @width)
             .attr('height', @height)
  
-        canvas = @svg.selectAll('g.canvas').data([0])
+        @canvas = @svg.selectAll('g.canvas').data([0])
 
-        canvas.enter().append('g')
+        @canvas.enter().append('g')
             .classed('canvas', true)
             .attr('transform',"translate(#{@margin.left}, 0)")
             .append('rect')
             .classed('canvas-backdrop', true)
 
-        canvas.select('rect.canvas-backdrop')
+        @canvas.select('rect.canvas-backdrop')
             .attr('width', @width - @margin.left)
             .attr('height', @height - @margin.bottom)
+
+    updateChartScale: ->
+        @yScale = d3.scale.linear().domain([0,1]).range([@canvasHeight, 0])
+        @xScale = d3.scale.linear().domain([0,1]).range([0, @canvasWidth])
      

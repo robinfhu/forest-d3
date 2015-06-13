@@ -3,9 +3,9 @@ chart = new ForestD3.Chart container
 
 data = [
     key: 'series1'
-    values: [
-        [0,0]
-    ]
+    values: do ->
+        for i in [0...50]
+            [Math.random(), Math.random()]
 ]
 
 chart.data(data).render()
