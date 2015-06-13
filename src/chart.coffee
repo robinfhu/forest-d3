@@ -24,6 +24,9 @@ chartProperties = [
         @container domContainer
         @svg = @createSvg()
 
+        @xAxis = d3.svg.axis()
+        @yAxis = d3.svg.axis()
+
         ###
         Auto resize the chart if user resizes the browser window.
         ###
@@ -55,8 +58,9 @@ chartProperties = [
         return @ unless @svg?
         return @ unless @chartData?
         @updateDimensions()
-        @updateChartFrame()
         @updateChartScale()
+        @updateChartFrame()
+        
 
         seriesGroups = @canvas
             .selectAll('g.series')
@@ -107,17 +111,19 @@ chartProperties = [
 
             @margin = 
                 left: 80
-                bottom: 40
-                right: 0
-                top: 0
+                bottom: 50
+                right: 20
+                top: 40
 
-            @canvasHeight = @height - @margin.bottom
-            @canvasWidth = @width - @margin.left
+            @canvasHeight = @height - @margin.bottom - @margin.top
+            @canvasWidth = @width - @margin.left - @margin.right
 
     ###
-    Draws the chart frame. Things like backdrop and axes and titles.
+    Draws the chart frame. Things like backdrop and canvas.
     ###
     updateChartFrame: ->
+        # Put a rectangle in background to serve as a backdrop.
+
         backdrop = @svg.selectAll('rect.backdrop').data([0])
         backdrop.enter()
             .append('rect')
@@ -125,20 +131,45 @@ chartProperties = [
         backdrop
             .attr('width', @width)
             .attr('height', @height)
- 
+
+        # Add axes
+        @xAxis.scale(@xScale).tickSize(-@canvasHeight, 1)
+        xAxisGroup = @svg.selectAll('g.x-axis').data([0])
+        xAxisGroup.enter()
+            .append('g')
+            .attr('class','x-axis axis')
+
+        xAxisGroup.attr('transform', "translate(#{@margin.left}, #{@canvasHeight + @margin.top})")
+
+        @yAxis.scale(@yScale).orient('left').tickSize(-@canvasWidth, 1)
+        yAxisGroup = @svg.selectAll('g.y-axis').data([0])
+        yAxisGroup.enter()
+            .append('g')
+            .attr('class','y-axis axis')
+
+        yAxisGroup.attr('transform', "translate(#{@margin.left}, #{@margin.top})")
+
+
+        xAxisGroup.transition().call @xAxis
+        yAxisGroup.transition().call @yAxis
+
+        # Create a canvas, where all data points will be plotted.
         @canvas = @svg.selectAll('g.canvas').data([0])
 
         @canvas.enter().append('g')
             .classed('canvas', true)
-            .attr('transform',"translate(#{@margin.left}, 0)")
+            .attr('transform',"translate(#{@margin.left}, #{@margin.top})")
             .append('rect')
             .classed('canvas-backdrop', true)
 
         @canvas.select('rect.canvas-backdrop')
-            .attr('width', @width - @margin.left)
-            .attr('height', @height - @margin.bottom)
+            .attr('width', @canvasWidth)
+            .attr('height', @canvasHeight)
 
     updateChartScale: ->
         @yScale = d3.scale.linear().domain([0,1]).range([@canvasHeight, 0])
         @xScale = d3.scale.linear().domain([0,1]).range([0, @canvasWidth])
+
+
+
      

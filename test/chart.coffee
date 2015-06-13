@@ -38,7 +38,7 @@ describe 'Chart', ->
             $(container).hasClass('forest-d3').should.be.true
 
         describe 'Scatter Chart', ->
-            it.skip 'draws a single point', ->
+            it 'draws a single point', ->
                 sampleData = [
                     key: 'series1'
                     label: 'Series 1'
@@ -65,3 +65,20 @@ describe 'Chart', ->
 
                 canvas = $(container).find('svg g.canvas')
                 canvas.length.should.equal 1
+
+            it 'renders an xAxis', ->
+                chart = new ForestD3.Chart container 
+                sampleData = [
+                    key: 'series1'
+                    label: 'Series 1'
+                    values: [
+                        [0,0]
+                    ]
+                ]
+                chart.data(sampleData).render()
+
+                xTicks = $(container).find('.x-axis .tick')
+                xTicks.length.should.be.greaterThan 0
+
+                yTicks = $(container).find('.y-axis .tick')
+                yTicks.length.should.be.greaterThan 0
