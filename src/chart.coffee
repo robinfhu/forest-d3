@@ -15,9 +15,9 @@ chartProperties = [
                 (d)=>
                     unless d?
                         return @properties[prop]
-                        
+
                     else
-                        @properties[prop] = d 
+                        @properties[prop] = d
                         return @
 
 
@@ -46,7 +46,7 @@ chartProperties = [
             if exists.empty()
                 return d3.select(container).append('svg')
             else
-                return exists 
+                return exists
 
         return null
 
@@ -60,7 +60,7 @@ chartProperties = [
         @updateDimensions()
         @updateChartScale()
         @updateChartFrame()
-        
+
 
         seriesGroups = @canvas
             .selectAll('g.series')
@@ -87,7 +87,7 @@ chartProperties = [
             .attr('cx',(d,i)=> @xScale d[0])
             .attr('cy',(d,i)=> @yScale d[1])
             .attr('r', 7)
-            
+
         @
 
     ###
@@ -109,7 +109,7 @@ chartProperties = [
             @height = bounds.height
             @width = bounds.width
 
-            @margin = 
+            @margin =
                 left: 80
                 bottom: 50
                 right: 20
@@ -139,7 +139,10 @@ chartProperties = [
             .append('g')
             .attr('class','x-axis axis')
 
-        xAxisGroup.attr('transform', "translate(#{@margin.left}, #{@canvasHeight + @margin.top})")
+        xAxisGroup.attr(
+            'transform',
+            "translate(#{@margin.left}, #{@canvasHeight + @margin.top})"
+        )
 
         @yAxis.scale(@yScale).orient('left').tickSize(-@canvasWidth, 1)
         yAxisGroup = @svg.selectAll('g.y-axis').data([0])
@@ -147,7 +150,10 @@ chartProperties = [
             .append('g')
             .attr('class','y-axis axis')
 
-        yAxisGroup.attr('transform', "translate(#{@margin.left}, #{@margin.top})")
+        yAxisGroup.attr(
+            'transform',
+            "translate(#{@margin.left}, #{@margin.top})"
+        )
 
 
         xAxisGroup.transition().call @xAxis
@@ -172,4 +178,3 @@ chartProperties = [
 
 
 
-     

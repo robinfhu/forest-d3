@@ -11,6 +11,13 @@ module.exports = (grunt)->
                 files:
                     'dist/forest-d3.css': ['style/*.styl']
 
+        coffeelint:
+            client:
+                files: 
+                    src: ['src/*.coffee']
+                options:
+                    configFile: 'coffeelint.json'
+
         coffee:
             options:
                 bare: false
@@ -43,10 +50,11 @@ module.exports = (grunt)->
                     ]
 
     grunt.loadNpmTasks 'grunt-contrib-coffee'
+    grunt.loadNpmTasks 'grunt-coffeelint'
     grunt.loadNpmTasks 'grunt-contrib-jade'
     grunt.loadNpmTasks 'grunt-contrib-stylus'
     grunt.loadNpmTasks 'grunt-karma'
 
     grunt.registerTask 'test', ['coffee', 'karma']
-    grunt.registerTask 'default', ['coffee', 'stylus', 'karma','jade']
+    grunt.registerTask 'default', ['coffeelint','coffee', 'stylus', 'karma','jade']
 
