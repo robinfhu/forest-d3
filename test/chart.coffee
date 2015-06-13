@@ -12,7 +12,7 @@ describe 'Chart', ->
             container = document.createElement 'div'
             container.style.width = '500px'
             container.style.height = '400px'
-            document.body.appendChild container 
+            document.body.appendChild container
 
         afterEach ->
             document.body.removeChild container
@@ -26,12 +26,12 @@ describe 'Chart', ->
             chart.container().querySelector.should.exist
 
         it 'can render an <svg> element (only once)', ->
-            chart = new ForestD3.Chart container 
+            chart = new ForestD3.Chart container
 
             chart.render.should.exist
 
             svg = container.querySelector('svg')
-            svg.should.exist 
+            svg.should.exist
 
         it 'applies forest-d3 class to container', ->
             chart = new ForestD3.Chart container
@@ -48,7 +48,7 @@ describe 'Chart', ->
                 ]
 
                 chart = new ForestD3.Chart container
-                chart.data.should.exist 
+                chart.data.should.exist
 
                 chart.data(sampleData).render()
 
@@ -67,12 +67,13 @@ describe 'Chart', ->
                 canvas.length.should.equal 1
 
             it 'renders an xAxis', ->
-                chart = new ForestD3.Chart container 
+                chart = new ForestD3.Chart container
                 sampleData = [
                     key: 'series1'
                     label: 'Series 1'
                     values: [
                         [0,0]
+                        [1,1]
                     ]
                 ]
                 chart.data(sampleData).render()

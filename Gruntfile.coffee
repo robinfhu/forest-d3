@@ -13,7 +13,7 @@ module.exports = (grunt)->
 
         coffeelint:
             client:
-                files: 
+                files:
                     src: ['src/*.coffee']
                 options:
                     configFile: 'coffeelint.json'
@@ -22,9 +22,10 @@ module.exports = (grunt)->
             options:
                 bare: false
             client:
-                files: 
+                files:
                     'dist/forest-d3.js': [
                         'src/main.coffee'
+                        'src/utils.coffee'
                         'src/chart.coffee'
                     ]
 

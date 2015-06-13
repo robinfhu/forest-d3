@@ -1,5 +1,7 @@
 chartProperties = [
-    ['container'],
+    ['container']
+    ['getX', (d,i)-> d[0] ]
+    ['getY', (d,i)-> d[1] ]
     ['autoResize', true]
 ]
 
@@ -61,7 +63,6 @@ chartProperties = [
         @updateChartScale()
         @updateChartFrame()
 
-
         seriesGroups = @canvas
             .selectAll('g.series')
             .data(@chartData, (d)-> d.key)
@@ -74,18 +75,21 @@ chartProperties = [
             .selectAll('circle.point')
             .data((d)-> d.values)
 
+        x = @getX()
+        y = @getY()
         points.enter()
             .append('circle')
             .classed('point', true)
-            .attr('cx', (d,i)=> @xScale d[0])
-            .attr('cy', (d,i)=> @yScale d[1])
+            .attr('cx', @canvasWidth / 2)
+            .attr('cy', @canvasHeight / 2)
             .attr('r',0)
 
         points
             .transition()
+            .delay((d,i)-> i * 10)
             .ease('quad')
-            .attr('cx',(d,i)=> @xScale d[0])
-            .attr('cy',(d,i)=> @yScale d[1])
+            .attr('cx',(d,i)=> @xScale x(d,i))
+            .attr('cy',(d,i)=> @yScale y(d,i))
             .attr('r', 7)
 
         @
@@ -113,7 +117,7 @@ chartProperties = [
                 left: 80
                 bottom: 50
                 right: 20
-                top: 40
+                top: 20
 
             @canvasHeight = @height - @margin.bottom - @margin.top
             @canvasWidth = @width - @margin.left - @margin.right
@@ -173,8 +177,6 @@ chartProperties = [
             .attr('height', @canvasHeight)
 
     updateChartScale: ->
-        @yScale = d3.scale.linear().domain([0,1]).range([@canvasHeight, 0])
-        @xScale = d3.scale.linear().domain([0,1]).range([0, @canvasWidth])
-
-
-
+        extent = ForestD3.Utils.extent @chartData
+        @yScale = d3.scale.linear().domain(extent.y).range([@canvasHeight, 0])
+        @xScale = d3.scale.linear().domain(extent.x).range([0, @canvasWidth])
