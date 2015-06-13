@@ -3,6 +3,7 @@ chart = new ForestD3.Chart container
 
 data = [
     key: 'series1'
+    label: 'Consumer Discretionary'
     values: do ->
         for i in [0...100]
             if i % 2 is 0
@@ -12,11 +13,13 @@ data = [
 
 ,
     key: 'series2'
+    label: 'Industrials'
     values: do ->
         for i in [0...30]
             [Math.random()*10 - 5, Math.random()*10 - 5]
 ,
     key: 'series3'
+    label: 'Telecommunications'
     color: '#fff'
     values: do ->
         for i in [0...30]

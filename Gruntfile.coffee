@@ -26,6 +26,7 @@ module.exports = (grunt)->
                     'dist/forest-d3.js': [
                         'src/main.coffee'
                         'src/utils.coffee'
+                        'src/data.coffee'
                         'src/chart.coffee'
                     ]
 

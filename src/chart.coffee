@@ -27,6 +27,7 @@ chartProperties = [
 
         @xAxis = d3.svg.axis().tickPadding(10)
         @yAxis = d3.svg.axis().tickPadding(10)
+        @seriesColor = (d)=> d.color or @color()(d._index)
 
         ###
         Auto resize the chart if user resizes the browser window.
@@ -40,7 +41,7 @@ chartProperties = [
     ###
     data: (d)->
         unless d?
-            return @chartData
+            return ForestD3.DataAPI.call @, @chartData
         else
             d = ForestD3.Utils.indexify d
             @chartData = d
@@ -84,12 +85,12 @@ chartProperties = [
 
         seriesGroups = @canvas
             .selectAll('g.series')
-            .data(@chartData, (d)-> d.key)
+            .data(@data().visible(), (d)-> d.key)
 
         seriesGroups.enter()
             .append('g')
             .attr('class', (d, i)-> "series series-#{d.key or i}")
-            .style('fill', (d, i)=> d.color or @color()(d._index))
+            .style('fill', @seriesColor)
 
         points = seriesGroups
             .selectAll('circle.point')
@@ -189,6 +190,6 @@ chartProperties = [
             .attr('height', @canvasHeight)
 
     updateChartScale: ->
-        extent = ForestD3.Utils.extent @chartData
+        extent = ForestD3.Utils.extent @data().visible()
         @yScale = d3.scale.linear().domain(extent.y).range([@canvasHeight, 0])
         @xScale = d3.scale.linear().domain(extent.x).range([0, @canvasWidth])
