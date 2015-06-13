@@ -17,8 +17,17 @@
   },
   "homepage": "https://github.com/robinfhu/forest-d3",
   "devDependencies": {
+    "d3": "^3.5.5",
     "grunt": "^0.4.5",
     "grunt-contrib-coffee": "^0.13.0",
-    "grunt-contrib-jade": "^0.14.1"
+    "grunt-contrib-jade": "^0.14.1",
+    "grunt-karma": "^0.11.0",
+    "karma": "^0.12.36",
+    "karma-coffee-preprocessor": "^0.2.1",
+    "karma-firefox-launcher": "^0.1.6",
+    "karma-junit-reporter": "^0.2.2",
+    "karma-mocha": "^0.1.10",
+    "karma-sinon-chai": "^1.0.0",
+    "mocha": "^2.2.5"
   }
 }
