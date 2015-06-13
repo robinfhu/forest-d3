@@ -31,18 +31,47 @@ chartProperties = [
             if @autoResize()
                 @render()
 
+    ###
+    Create an <svg> element to start rendering the chart.
+    ###
+    createSvg: ->
+        container = @container()
+        if container?
+            exists = d3.select(container)
+            .classed('forest-d3',true)
+            .select 'svg'
+            if exists.empty()
+                return d3.select(container).append('svg')
+            else
+                return exists 
+
+        return null
+
+    ###
+    Main rendering logic.  Here we should update the chart frame, axes
+    and series points.
+    ###
     render: ->
         return @ unless @chartData?
-        @calcDimensions()
+        @updateDimensions()
         @updateChartFrame()
 
+        
+        
         @
 
+    ###
+    Set chart data.
+    ###
     data: (d)->
         @chartData = d
         @
 
-    calcDimensions: ->
+    ###
+    Get the chart's dimensions, based on the parent container <div>.
+    Calculate chart margins and canvas dimensions.
+    ###
+    updateDimensions: ->
         container = @container()
         if container?
             bounds = container.getBoundingClientRect()
@@ -59,19 +88,9 @@ chartProperties = [
             @canvasHeight = @height - @margin.bottom
             @canvasWidth = @width - @margin.left
 
-    createSvg: ->
-        container = @container()
-        if container?
-            exists = d3.select(container)
-            .classed('forest-d3',true)
-            .select 'svg'
-            if exists.empty()
-                return d3.select(container).append('svg')
-            else
-                return exists 
-
-        return null
-
+    ###
+    Draws the chart frame. Things like backdrop and axes and titles.
+    ###
     updateChartFrame: ->
         backdrop = @svg.selectAll('rect.backdrop').data([0])
         backdrop.enter()
