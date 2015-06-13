@@ -1,12 +1,16 @@
 chartProperties = [
-    'container'
+    ['container'],
+    ['autoResize', true]
 ]
 
 @ForestD3.Chart = class Chart
     constructor: (domContainer)->
         @properties = {}
 
-        for prop in chartProperties
+        for propPair in chartProperties
+            [prop, defaultVal] = propPair
+            @properties[prop] = defaultVal
+
             @[prop] = do (prop)=>
                 (d)=>
                     unless d?
@@ -19,10 +23,18 @@ chartProperties = [
 
         @container domContainer
         @svg = @createSvg()
-        @createChartFrame @svg
+
+        ###
+        Auto resize the chart if user resizes the browser window.
+        ###
+        window.onresize = =>
+            if @autoResize()
+                @render()
 
     render: ->
         return @ unless @chartData?
+        @calcDimensions()
+        @updateChartFrame()
 
         @
 
@@ -38,6 +50,15 @@ chartProperties = [
             @height = bounds.height
             @width = bounds.width
 
+            @margin = 
+                left: 80
+                bottom: 40
+                right: 0
+                top: 0
+
+            @canvasHeight = @height - @margin.bottom
+            @canvasWidth = @width - @margin.left
+
     createSvg: ->
         container = @container()
         if container?
@@ -45,40 +66,30 @@ chartProperties = [
             .classed('forest-d3',true)
             .select 'svg'
             if exists.empty()
-                @calcDimensions()
-
                 return d3.select(container).append('svg')
-                .attr('width', @width)
-                .attr('height', @height)
             else
                 return exists 
 
         return null
 
-    createChartFrame: (svg)->
-        return unless svg?
-        unless @frameCreated
-            svg.append('rect')
-            .classed('backdrop',true)
+    updateChartFrame: ->
+        backdrop = @svg.selectAll('rect.backdrop').data([0])
+        backdrop.enter()
+            .append('rect')
+            .classed('backdrop', true)
+        backdrop
             .attr('width', @width)
             .attr('height', @height)
+ 
+        canvas = @svg.selectAll('g.canvas').data([0])
 
-            @margin = 
-                left: 80
-                bottom: 40
-                right: 0
-                top: 0
-
-            canvas = svg.append('g')
+        canvas.enter().append('g')
             .classed('canvas', true)
             .attr('transform',"translate(#{@margin.left}, 0)")
-            
-            canvas.append('rect')
+            .append('rect')
+            .classed('canvas-backdrop', true)
+
+        canvas.select('rect.canvas-backdrop')
             .attr('width', @width - @margin.left)
             .attr('height', @height - @margin.bottom)
-
-
-            @frameCreated = true
-
-
-        
+     

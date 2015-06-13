@@ -33,9 +33,6 @@ describe 'Chart', ->
             svg = container.querySelector('svg')
             svg.should.exist 
 
-            svg.getAttribute('width').should.equal '500'
-            svg.getAttribute('height').should.equal '400'
-
         it 'applies forest-d3 class to container', ->
             chart = new ForestD3.Chart container
             $(container).hasClass('forest-d3').should.be.true
@@ -61,7 +58,7 @@ describe 'Chart', ->
             it 'renders the chart frame once', ->
                 chart = new ForestD3.Chart container
 
-                chart.render().render()
+                chart.data([]).render().render()
 
                 rect = $(container).find('svg rect.backdrop')
                 rect.length.should.equal 1
