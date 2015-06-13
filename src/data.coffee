@@ -26,3 +26,5 @@
 
     visible: ->
         data.filter (d)-> not d.hidden
+
+    render: -> chart.render()
