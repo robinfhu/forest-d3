@@ -104,12 +104,12 @@ describe 'Chart', ->
 
                 chart.data(sampleData).render()
 
-                series = $(container).find('g.series')
+                series = $(container).find('g.chart-item')
                 series.length.should.equal 3, 'three groups'
 
-                series.eq(0)[0].getAttribute('class').should.contain 'series-foo'
-                series.eq(1)[0].getAttribute('class').should.contain 'series-bar'
-                series.eq(2)[0].getAttribute('class').should.contain 'series-maz'
+                series.eq(0)[0].getAttribute('class').should.contain 'item-foo'
+                series.eq(1)[0].getAttribute('class').should.contain 'item-bar'
+                series.eq(2)[0].getAttribute('class').should.contain 'item-maz'
 
             it 'does not render hidden series', (done)->
                 chart = new ForestD3.Chart container
@@ -135,20 +135,20 @@ describe 'Chart', ->
                 chart.data().hide(['bar'])
                 chart.render()
 
-                series = $(container).find('g.series')
+                series = $(container).find('g.chart-item')
                 series.length.should.equal 2, 'two series only'
                 series.find('.series-bar').length.should.equal 0
 
                 chart.data().show('bar')
                 chart.render()
 
-                series = $(container).find('g.series')
+                series = $(container).find('g.chart-item')
                 series.length.should.equal 3, 'three now'
 
                 chart.data().hide('maz')
                 chart.render()
                 setTimeout ->
-                    series = $(container).find('g.series')
+                    series = $(container).find('g.chart-item')
                     series.length.should.equal 2, 'back to two series only'
                     done()
                 , 300

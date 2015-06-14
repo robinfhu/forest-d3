@@ -88,24 +88,24 @@ chartProperties = [
         @updateChartScale()
         @updateChartFrame()
 
-        seriesGroups = @canvas
-            .selectAll('g.series')
+        chartItems = @canvas
+            .selectAll('g.chart-item')
             .data(@data().visible(), (d)-> d.key)
 
-        seriesGroups.enter()
+        chartItems.enter()
             .append('g')
-            .attr('class', (d, i)-> "series series-#{d.key or i}")
+            .attr('class', (d, i)-> "chart-item item-#{d.key or i}")
 
-        seriesGroups
+        chartItems
             .style('fill', @seriesColor)
 
-        seriesGroups.exit()
+        chartItems.exit()
             .transition()
             .style('opacity', 0)
             .remove()
 
         chart = @
-        seriesGroups.each (d,i)->
+        chartItems.each (d,i)->
 
             points = d3.select(@)
                 .selectAll('circle.point')
