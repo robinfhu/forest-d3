@@ -7,25 +7,34 @@ data = [
     key: 'series1'
     label: 'Consumer Discretionary'
     values: do ->
-        for i in [0...100]
-            if i % 2 is 0
-                [Math.random()*6 + 4 + Math.random()*2, Math.random()*6 + 4 + Math.random()*2]
-            else
-                [Math.random()*-6 - 4, Math.random()*-6 - 4]
+        result = []
+        for i in [-5...5]
+            for j in [0...10]
+                result.push [i - Math.random(), Math.random()*6 + 1]
+
+        result
 
 ,
     key: 'series2'
     label: 'Industrials'
     values: do ->
-        for i in [0...30]
-            [Math.random()*10 - 5, Math.random()*10 - 5]
+        result = []
+        for i in [-5...5]
+            for j in [0...10]
+                result.push [i, Math.random()*-4]
+
+        result
 ,
     key: 'series3'
     label: 'Telecommunications'
-    color: '#fff'
+    color: '#f09822'
     values: do ->
-        for i in [0...30]
-            [Math.random()*-6 - 4, Math.random()*4]
+        result = []
+        for i in [-5...5]
+            for j in [0...10]
+                result.push [i, Math.random()*-3 + 1]
+
+        result
 ]
 
 chart.data(data).render()

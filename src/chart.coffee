@@ -3,6 +3,7 @@ chartProperties = [
     ['getY', (d,i)-> d[1] ]
     ['autoResize', true]
     ['color', ForestD3.Utils.defaultColor]
+    ['pointSize', 4]
 ]
 
 @ForestD3.Chart = class Chart
@@ -126,7 +127,7 @@ chartProperties = [
                 .ease('quad')
                 .attr('cx',(d,i)-> chart.xScale x(d,i))
                 .attr('cy',(d,i)-> chart.yScale y(d,i))
-                .attr('r', 7)
+                .attr('r', chart.pointSize())
 
         @renderPlugins()
 
