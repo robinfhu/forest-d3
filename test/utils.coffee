@@ -68,6 +68,28 @@ describe 'Utilities', ->
                 x: [0, 1]
                 y: [0, 1]
 
+        it 'factors in chart markers as part of the computation', ->
+            data = [
+                values: [
+                    [0, 5]
+                    [-3, 8]
+                ]
+            ,
+                type: 'marker'
+                axis: 'y'
+                value: 10
+            ,
+                type: 'marker'
+                axis: 'x'
+                value: 1
+            ]
+
+            result = extent data
+
+            result.should.deep.equal
+                x: [-3, 1]
+                y: [5, 10]
+
     describe 'Indexify', ->
         it 'adds _index to each series', ->
             data = [

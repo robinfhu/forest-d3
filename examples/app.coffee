@@ -6,6 +6,7 @@ chart.addPlugin legend
 data = [
     key: 'series1'
     label: 'Consumer Discretionary'
+    type: 'scatter'
     values: do ->
         result = []
         for i in [-5...5]
@@ -35,6 +36,12 @@ data = [
                 result.push [i, Math.random()*-3 + 1]
 
         result
+,
+    key: 'marker1'
+    label: 'Performance Threshold'
+    type: 'marker'
+    axis: 'y'
+    value: 5.75
 ]
 
 chart.data(data).render()

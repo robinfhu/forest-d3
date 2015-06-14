@@ -109,27 +109,8 @@ chartProperties = [
 
         chart = @
         chartItems.each (d,i)->
-
-            points = d3.select(@)
-                .selectAll('circle.point')
-                .data((d)-> d.values)
-
-            x = chart.getX()
-            y = chart.getY()
-            points.enter()
-                .append('circle')
-                .classed('point', true)
-                .attr('cx', chart.canvasWidth / 2)
-                .attr('cy', chart.canvasHeight / 2)
-                .attr('r',0)
-
-            points
-                .transition()
-                .delay((d,i)-> i * 10)
-                .ease('quad')
-                .attr('cx',(d,i)-> chart.xScale x(d,i))
-                .attr('cy',(d,i)-> chart.yScale y(d,i))
-                .attr('r', chart.pointSize())
+            if d.type is 'scatter' or not d.type?
+                ForestD3.ChartItem.scatter.call chart, d3.select(@)
 
         @renderPlugins()
 

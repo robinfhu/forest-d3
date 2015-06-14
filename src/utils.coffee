@@ -23,7 +23,10 @@
             }
 
         allPoints = data.map (series)->
-            series.values
+            if series.values?
+                series.values
+            else
+                []
 
         allPoints = d3.merge allPoints
 
@@ -36,6 +39,16 @@
         roundOff = (d,i)->
             return Math.floor(d) if i is 0
             return Math.ceil(d)
+
+        # Factor in any markers
+        data.filter((d)-> d.type is 'marker').forEach (marker)->
+            if marker.axis is 'x'
+                xExt.push marker.value
+            else
+                yExt.push marker.value
+
+        xExt = d3.extent xExt
+        yExt = d3.extent yExt
 
         xExt = xExt.map roundOff
         yExt = yExt.map roundOff
