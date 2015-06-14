@@ -4,6 +4,8 @@ chartProperties = [
     ['autoResize', true]
     ['color', ForestD3.Utils.defaultColor]
     ['pointSize', 4]
+    ['xPadding', 0.1]
+    ['yPadding', 0.1]
 ]
 
 @ForestD3.Chart = class Chart
@@ -208,7 +210,12 @@ chartProperties = [
             .attr('height', @canvasHeight)
 
     updateChartScale: ->
-        extent = ForestD3.Utils.extent @data().visible()
+        extent = ForestD3.Utils.extent @data().visible(), @getX(), @getY()
+        extent = ForestD3.Utils.extentPadding extent, {
+            x: @xPadding()
+            y: @yPadding()
+        }
+
         @yScale = d3.scale.linear().domain(extent.y).range([@canvasHeight, 0])
         @xScale = d3.scale.linear().domain(extent.x).range([0, @canvasWidth])
 

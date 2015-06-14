@@ -44,6 +44,35 @@
         y: yExt
 
     ###
+    Increases an extent by a certain percentage. Useful for padding the
+    edges of a chart so the points are not right against the axis.
+
+    extent: Object of form:
+        {
+            x: [-10, 10]
+            y: [-1, 1]
+        }
+
+    padding: Object of form:
+        {
+            x: 0.1    # percentage to pad by
+            y: 0.05
+        }
+    ###
+    extentPadding: (extent, padding)->
+        result = {}
+
+        for key, domain of extent
+            padPercent = padding[key]
+            if padPercent?
+                amount = Math.abs(domain[0] - domain[1]) * padPercent
+                amount /= 2
+
+                result[key] = [domain[0] - amount, domain[1] + amount]
+
+
+        result
+    ###
     Adds a numeric _index to each series, which is used to uniquely
     identify it.
     ###

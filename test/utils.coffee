@@ -83,3 +83,19 @@ describe 'Utilities', ->
             for d, i in data
                 d._index.should.equal i
 
+    describe 'extentPadding', ->
+        it 'increases the extent by a certain percentage', ->
+            xyExtent =
+                x: [-10, 10]
+                y: [2, 5]
+
+            padding =
+                x: 0.1   # 10 percent
+                y: 0.05  # 5 percent
+
+            newExtent = ForestD3.Utils.extentPadding xyExtent, padding
+
+            newExtent.should.deep.equal
+                x: [-11, 11]
+                y: [1.925, 5.075]
+
