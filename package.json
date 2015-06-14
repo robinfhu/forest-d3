@@ -4,7 +4,8 @@
   "description": "A charting library",
   "main": "index.js",
   "scripts": {
-    "test": "grunt"
+    "test": "grunt",
+    "start": "node ./node_modules/http-server/bin/http-server"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
     "grunt-contrib-jade": "^0.14.1",
     "grunt-contrib-stylus": "^0.21.0",
     "grunt-karma": "^0.11.0",
+    "http-server": "^0.8.0",
     "jquery": "^2.1.4",
     "karma": "^0.12.36",
     "karma-coffee-preprocessor": "^0.2.1",
