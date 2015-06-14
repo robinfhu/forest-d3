@@ -6,7 +6,13 @@ It acts as a plugin to a main chart instance.
 @ForestD3.Legend = class Legend
     constructor: (domContainer)->
         @name = 'legend'
-        @container = d3.select(domContainer).classed('forest-d3 legend', true)
+
+        if domContainer.select?
+            @container = domContainer
+        else
+            @container = d3.select domContainer
+
+        @container.classed('forest-d3 legend', true)
 
     chart: (chart)->
         @chartInstance = chart

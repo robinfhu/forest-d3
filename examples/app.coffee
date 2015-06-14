@@ -1,8 +1,5 @@
-container = document.getElementById 'example'
-legendContainer = document.getElementById 'legend'
-
-chart = new ForestD3.Chart container
-legend = new ForestD3.Legend legendContainer
+chart = new ForestD3.Chart d3.select('#example')
+legend = new ForestD3.Legend d3.select('#legend')
 
 chart.addPlugin legend
 

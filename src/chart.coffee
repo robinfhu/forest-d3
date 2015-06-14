@@ -52,6 +52,10 @@ chartProperties = [
         unless d?
             return @properties['container']
         else
+            if d.select?
+                # This is a d3 selection
+                d = d.node()
+
             @properties['container'] = d
             @svg = @createSvg()
 
@@ -91,6 +95,8 @@ chartProperties = [
         seriesGroups.enter()
             .append('g')
             .attr('class', (d, i)-> "series series-#{d.key or i}")
+
+        seriesGroups
             .style('fill', @seriesColor)
 
         seriesGroups.exit().remove()
