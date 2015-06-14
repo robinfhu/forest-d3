@@ -27,6 +27,7 @@ module.exports = (grunt)->
                         'src/main.coffee'
                         'src/utils.coffee'
                         'src/data.coffee'
+                        'src/plugins/*.coffee'
                         'src/chart.coffee'
                     ]
 
@@ -57,6 +58,7 @@ module.exports = (grunt)->
     grunt.loadNpmTasks 'grunt-contrib-stylus'
     grunt.loadNpmTasks 'grunt-karma'
 
+    grunt.registerTask 'examples', ['coffee', 'stylus', 'jade']
     grunt.registerTask 'test', ['coffee', 'karma']
     grunt.registerTask 'default', ['coffeelint','coffee', 'stylus', 'karma','jade']
 

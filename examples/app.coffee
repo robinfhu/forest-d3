@@ -1,5 +1,10 @@
 container = document.getElementById 'example'
+legendContainer = document.getElementById 'legend'
+
 chart = new ForestD3.Chart container
+legend = new ForestD3.Legend legendContainer
+
+chart.addPlugin legend
 
 data = [
     key: 'series1'

@@ -28,6 +28,7 @@ chartProperties = [
         @xAxis = d3.svg.axis().tickPadding(10)
         @yAxis = d3.svg.axis().tickPadding(10)
         @seriesColor = (d)=> d.color or @color()(d._index)
+        @plugins = {}
 
         ###
         Auto resize the chart if user resizes the browser window.
@@ -113,6 +114,8 @@ chartProperties = [
             .attr('cy',(d,i)=> @yScale y(d,i))
             .attr('r', 7)
 
+        @renderPlugins()
+
         @
     ###
     Get the chart's dimensions, based on the parent container <div>.
@@ -193,3 +196,17 @@ chartProperties = [
         extent = ForestD3.Utils.extent @data().visible()
         @yScale = d3.scale.linear().domain(extent.y).range([@canvasHeight, 0])
         @xScale = d3.scale.linear().domain(extent.x).range([0, @canvasWidth])
+
+    addPlugin: (plugin)->
+        @plugins[plugin.name] = plugin
+
+        @
+
+    renderPlugins: ->
+        for key, plugin of @plugins
+            if plugin.chart?
+                plugin.chart @
+
+            if plugin.render?
+                plugin.render()
+
