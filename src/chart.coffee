@@ -93,6 +93,8 @@ chartProperties = [
             .attr('class', (d, i)-> "series series-#{d.key or i}")
             .style('fill', @seriesColor)
 
+        seriesGroups.exit().remove()
+
         points = seriesGroups
             .selectAll('circle.point')
             .data((d)-> d.values)

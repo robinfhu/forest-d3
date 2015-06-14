@@ -69,6 +69,39 @@ describe 'Data API', ->
         visible = api.visible()
         visible.length.should.equal 2
 
+        api.toggle('series2')
+
+        visible = api.visible()
+        visible.length.should.equal 1
+
+    it 'has methods for showOnly and showAll data', ->
+        data = [
+            key: 'series1'
+            label: 'Hello'
+            values: []
+        ,
+            key: 'series2'
+            label: 'World'
+            values: []
+        ,
+            key: 'series3'
+            color: '#00f'
+            label: 'Foo'
+            values: []
+        ]
+
+        api = ForestD3.DataAPI data
+
+        api.showOnly 'series2'
+        visible = api.visible()
+        visible.length.should.equal 1
+        visible[0].key.should.equal 'series2'
+
+        api.showAll()
+        visible = api.visible()
+        visible.length.should.equal 3
+
+
     it 'has method to get visible data only', ->
         data = [
             key: 'series1'

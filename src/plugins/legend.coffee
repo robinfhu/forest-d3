@@ -23,6 +23,10 @@ It acts as a plugin to a main chart instance.
             .append('div')
             .classed('item', true)
 
+        items.on 'click', (d)=> @chartInstance.data().toggle(d.key).render()
+
+        items.classed('disabled', (d)-> d.hidden)
+
         colorSquares = items
             .selectAll('span.color-square')
             .data((d)-> [d])

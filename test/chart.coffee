@@ -111,3 +111,41 @@ describe 'Chart', ->
                 series.eq(1)[0].getAttribute('class').should.contain 'series-bar'
                 series.eq(2)[0].getAttribute('class').should.contain 'series-maz'
 
+            it 'does not render hidden series', ->
+                chart = new ForestD3.Chart container
+
+                sampleData = [
+                    key: 'foo'
+                    values: [
+                        [0,0]
+                    ]
+                ,
+                    key: 'bar'
+                    values: [
+                        [1,1]
+                    ]
+                ,
+                    key: 'maz'
+                    values: [
+                        [2,2]
+                    ]
+                ]
+
+                chart.data(sampleData)
+                chart.data().hide(['bar'])
+                chart.render()
+
+                series = $(container).find('g.series')
+                series.length.should.equal 2, 'two series only'
+                series.find('.series-bar').length.should.equal 0
+
+                chart.data().show('bar')
+                chart.render()
+
+                series = $(container).find('g.series')
+                series.length.should.equal 3, 'three now'
+
+                chart.data().hide('maz')
+                chart.render()
+                series = $(container).find('g.series')
+                series.length.should.equal 2, 'back to two series only'

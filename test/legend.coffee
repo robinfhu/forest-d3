@@ -60,3 +60,14 @@ describe 'Plugin: Legend', ->
 
         items = $(legendContainer).find('.item')
         items.length.should.equal 3, 'three legend items'
+
+    it 'renders via chart plugin API', ->
+        chart.data sampleData
+        legend = new ForestD3.Legend legendContainer
+        chart.addPlugin legend
+
+        chart.render()
+        chart.data().hide('hello').render()
+
+        items = $(legendContainer).find('.item')
+        items.eq(0).hasClass('disabled').should.be.true
