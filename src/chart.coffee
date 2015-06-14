@@ -115,8 +115,8 @@ chartProperties = [
                 .transition()
                 .delay((d,i)-> i * 10)
                 .ease('quad')
-                .attr('cx',(d,i)=> chart.xScale x(d,i))
-                .attr('cy',(d,i)=> chart.yScale y(d,i))
+                .attr('cx',(d,i)-> chart.xScale x(d,i))
+                .attr('cy',(d,i)-> chart.yScale y(d,i))
                 .attr('r', 7)
 
         @renderPlugins()
