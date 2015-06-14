@@ -95,26 +95,29 @@ chartProperties = [
 
         seriesGroups.exit().remove()
 
-        points = seriesGroups
-            .selectAll('circle.point')
-            .data((d)-> d.values)
+        chart = @
+        seriesGroups.each (d,i)->
 
-        x = @getX()
-        y = @getY()
-        points.enter()
-            .append('circle')
-            .classed('point', true)
-            .attr('cx', @canvasWidth / 2)
-            .attr('cy', @canvasHeight / 2)
-            .attr('r',0)
+            points = d3.select(@)
+                .selectAll('circle.point')
+                .data((d)-> d.values)
 
-        points
-            .transition()
-            .delay((d,i)-> i * 10)
-            .ease('quad')
-            .attr('cx',(d,i)=> @xScale x(d,i))
-            .attr('cy',(d,i)=> @yScale y(d,i))
-            .attr('r', 7)
+            x = chart.getX()
+            y = chart.getY()
+            points.enter()
+                .append('circle')
+                .classed('point', true)
+                .attr('cx', chart.canvasWidth / 2)
+                .attr('cy', chart.canvasHeight / 2)
+                .attr('r',0)
+
+            points
+                .transition()
+                .delay((d,i)-> i * 10)
+                .ease('quad')
+                .attr('cx',(d,i)=> chart.xScale x(d,i))
+                .attr('cy',(d,i)=> chart.yScale y(d,i))
+                .attr('r', 7)
 
         @renderPlugins()
 
