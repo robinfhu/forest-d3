@@ -46,6 +46,9 @@ describe 'Plugin: Legend', ->
         items.eq(1).text().should.contain 'Good Bye'
         items.eq(2).text().should.contain 'Good Bye Again'
 
+        items.eq(2).find('.color-square')
+        .css('background-color').should.equal 'rgb(0, 0, 0)'
+
     it 'renders via chart plugin API', ->
         chart.data sampleData
         legend = new ForestD3.Legend legendContainer

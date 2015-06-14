@@ -31,6 +31,7 @@ It acts as a plugin to a main chart instance.
             .enter()
             .append('span')
             .classed('color-square', true)
+            .style('background-color', (d)-> d.color)
 
         labels = items
             .selectAll('span.description')
