@@ -111,7 +111,7 @@ describe 'Chart', ->
                 series.eq(1)[0].getAttribute('class').should.contain 'series-bar'
                 series.eq(2)[0].getAttribute('class').should.contain 'series-maz'
 
-            it 'does not render hidden series', ->
+            it 'does not render hidden series', (done)->
                 chart = new ForestD3.Chart container
 
                 sampleData = [
@@ -147,5 +147,8 @@ describe 'Chart', ->
 
                 chart.data().hide('maz')
                 chart.render()
-                series = $(container).find('g.series')
-                series.length.should.equal 2, 'back to two series only'
+                setTimeout ->
+                    series = $(container).find('g.series')
+                    series.length.should.equal 2, 'back to two series only'
+                    done()
+                , 300

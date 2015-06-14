@@ -99,7 +99,10 @@ chartProperties = [
         seriesGroups
             .style('fill', @seriesColor)
 
-        seriesGroups.exit().remove()
+        seriesGroups.exit()
+            .transition()
+            .style('opacity', 0)
+            .remove()
 
         chart = @
         seriesGroups.each (d,i)->
