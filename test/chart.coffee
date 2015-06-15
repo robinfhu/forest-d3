@@ -204,3 +204,19 @@ describe 'Chart', ->
                     .should.equal line[0].getAttribute('x2')
                     done()
                 , 300
+
+        describe 'Regions', ->
+            it 'can render an x-axis region', ->
+                data = [
+                    key: 'region1'
+                    type: 'region'
+                    label: 'Tolerance'
+                    axis: 'x'
+                    values: [-1, 1]
+                ]
+
+                chart = new ForestD3.Chart container
+                chart.data(data).render()
+
+                rect = $(container).find('g.chart-item rect')
+                rect.length.should.equal 1, 'one rectangle'

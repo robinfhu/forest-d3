@@ -90,6 +90,28 @@ describe 'Utilities', ->
                 x: [-3, 1]
                 y: [5, 10]
 
+        it 'factors in region values as part of the computation', ->
+            data = [
+                values: [
+                    [0, 5]
+                    [-3, 8]
+                ]
+            ,
+                type: 'region'
+                axis: 'x'
+                values: [-4, 1]
+            ,
+                type: 'region'
+                axis: 'y'
+                values: [3, 9]
+            ]
+
+            result = extent data
+
+            result.should.deep.equal
+                x: [-4, 1]
+                y: [3, 9]
+
     describe 'Indexify', ->
         it 'adds _index to each series', ->
             data = [

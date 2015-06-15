@@ -48,6 +48,12 @@ data = [
     type: 'marker'
     axis: 'x'
     value: 1.07
+,
+    key: 'region1'
+    label: 'Tolerance'
+    type: 'region'
+    axis: 'x'
+    values: [-2.6, -0.9]
 ]
 
 chart.data(data).render()

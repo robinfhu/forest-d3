@@ -23,7 +23,7 @@
             }
 
         allPoints = data.map (series)->
-            if series.values?
+            if series.values? and series.type isnt 'region'
                 series.values
             else
                 []
@@ -46,6 +46,13 @@
                 xExt.push marker.value
             else
                 yExt.push marker.value
+
+        # Factor in any regions
+        data.filter((d)-> d.type is 'region').forEach (region)->
+            if region.axis is 'x'
+                xExt = xExt.concat region.values
+            else
+                yExt = yExt.concat region.values
 
         xExt = d3.extent xExt
         yExt = d3.extent yExt

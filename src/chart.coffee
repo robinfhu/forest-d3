@@ -119,9 +119,12 @@ chartProperties = [
             else if (d.type is 'marker') or (not d.type? and d.value?)
                 renderFn = ForestD3.ChartItem.markerLine
                 colorItem = false
+            else if d.type is 'region'
+                renderFn = ForestD3.ChartItem.region
+                colorItem = false
 
             if colorItem
-                chartItem.style('fill', chart.seriesColor)
+                chartItem.style 'fill', chart.seriesColor
 
             renderFn.call chart, chartItem, d
 
