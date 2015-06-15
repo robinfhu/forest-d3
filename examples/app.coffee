@@ -1,7 +1,10 @@
 chart = new ForestD3.Chart d3.select('#example')
 legend = new ForestD3.Legend d3.select('#legend')
 
-chart.addPlugin legend
+chart
+    .xLabel('Independent Variable')
+    .yLabel('Manufacture Error')
+    .addPlugin(legend)
 
 data = [
     key: 'series1'

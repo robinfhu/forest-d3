@@ -6,6 +6,8 @@ chartProperties = [
     ['pointSize', 4]
     ['xPadding', 0.1]
     ['yPadding', 0.1]
+    ['xLabel', '']
+    ['yLabel', '']
 ]
 
 @ForestD3.Chart = class Chart
@@ -189,7 +191,6 @@ chartProperties = [
             "translate(#{@margin.left}, #{@margin.top})"
         )
 
-
         xAxisGroup.transition().call @xAxis
         yAxisGroup.transition().call @yAxis
 
@@ -205,6 +206,34 @@ chartProperties = [
         @canvas.select('rect.canvas-backdrop')
             .attr('width', @canvasWidth)
             .attr('height', @canvasHeight)
+
+        # Add axes labels
+        axesLabels = @canvas.selectAll('g.axes-labels').data([0])
+        axesLabels.enter().append('g').classed('axes-labels', true)
+
+        xAxisLabel = axesLabels.selectAll('text.x-axis').data([@xLabel()])
+        xAxisLabel
+            .enter()
+            .append('text')
+            .classed('x-axis', true)
+            .attr('text-anchor', 'end')
+            .attr('x', 0)
+            .attr('y', @canvasHeight)
+
+        xAxisLabel
+            .text((d)-> d)
+            .transition()
+            .attr('x', @canvasWidth)
+
+        yAxisLabel = axesLabels.selectAll('text.y-axis').data([@yLabel()])
+        yAxisLabel
+            .enter()
+            .append('text')
+            .classed('y-axis', true)
+            .attr('text-anchor', 'end')
+            .attr('transform', 'translate(10,0) rotate(-90 0 0)')
+
+        yAxisLabel.text((d)-> d)
 
     updateChartScale: ->
         extent = ForestD3.Utils.extent @data().visible(), @getX(), @getY()

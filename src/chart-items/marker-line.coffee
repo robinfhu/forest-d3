@@ -5,12 +5,12 @@ Draws a horizontal or vertical line at the specified x or y location.
     chart = @
 
     line = selection.selectAll('line.marker').data((d)-> [d.value])
-    label = selection.selectAll('text.label').data([selectionData.label])
+    label = selection.selectAll('text.marker-label').data([selectionData.label])
 
     labelEnter = label
         .enter()
         .append('text')
-        .classed('label', true)
+        .classed('marker-label', true)
         .text((d)-> d)
         .attr('x', 0)
         .attr('y', 0)
@@ -63,5 +63,7 @@ Draws a horizontal or vertical line at the specified x or y location.
             .attr('y2', y)
 
         label
+            .attr('text-anchor', 'end')
             .transition()
+            .attr('x', chart.canvasWidth)
             .attr('y', y + labelPadding)
