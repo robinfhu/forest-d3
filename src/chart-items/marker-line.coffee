@@ -7,7 +7,7 @@ Draws a horizontal or vertical line at the specified x or y location.
     line = selection.selectAll('line.marker').data((d)-> [d.value])
     label = selection.selectAll('text.label').data([selectionData.label])
 
-    label
+    labelEnter = label
         .enter()
         .append('text')
         .classed('label', true)
@@ -37,10 +37,12 @@ Draws a horizontal or vertical line at the specified x or y location.
         # Rotates the x marker label 90 degrees.
         labelRotate = "rotate(-90 #{x} #{chart.canvasHeight})"
         labelOffset = "translate(0 #{-labelPadding})"
+
+        labelEnter.attr('transform', labelRotate)
         label
-            .attr('transform', "#{labelRotate} #{labelOffset}")
             .attr('y', chart.canvasHeight)
             .transition()
+            .attr('transform', "#{labelRotate} #{labelOffset}")
             .attr('x', x)
 
     else
