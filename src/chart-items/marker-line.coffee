@@ -27,9 +27,9 @@ Draws a horizontal or vertical line at the specified x or y location.
             .attr('x1', 0)
             .attr('x2', 0)
             .attr('y1', 0)
-            .attr('y2', chart.canvasHeight)
 
         line
+            .attr('y2', chart.canvasHeight)
             .transition()
             .attr('x1', x)
             .attr('x2', x)
@@ -53,11 +53,11 @@ Draws a horizontal or vertical line at the specified x or y location.
             .append('line')
             .classed('marker', true)
             .attr('x1', 0)
-            .attr('x2', chart.canvasWidth)
             .attr('y1', 0)
             .attr('y2', 0)
 
         line
+            .attr('x2', chart.canvasWidth)
             .transition()
             .attr('y1', y)
             .attr('y2', y)
