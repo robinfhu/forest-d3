@@ -50,6 +50,7 @@ module.exports = (grunt)->
                         'node_modules/d3/d3.js'
                         'node_modules/jquery/dist/jquery.js'
                         'dist/*.js'
+                        'dist/*.css'
                         'test/*.coffee'
                     ]
 
