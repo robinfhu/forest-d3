@@ -13,6 +13,72 @@ Author:  Robin Hu
     version: '1.0.0'
   };
 
+  this.ForestD3.ChartItem = {};
+
+}).call(this);
+
+
+/*
+Draws a horizontal or vertical line at the specified x or y location.
+ */
+
+(function() {
+  this.ForestD3.ChartItem.markerLine = function(selection, selectionData) {
+    var chart, label, labelOffset, labelPadding, labelRotate, line, x, y;
+    chart = this;
+    line = selection.selectAll('line.marker').data(function(d) {
+      return [d.value];
+    });
+    label = selection.selectAll('text.label').data([selectionData.label]);
+    label.enter().append('text').classed('label', true).text(function(d) {
+      return d;
+    }).attr('x', 0).attr('y', 0);
+    labelPadding = 10;
+    if (selectionData.axis === 'x') {
+      x = chart.xScale(selectionData.value);
+      line.enter().append('line').classed('marker', true).attr('x1', 0).attr('x2', 0).attr('y1', 0).attr('y2', chart.canvasHeight);
+      line.transition().attr('x1', x).attr('x2', x);
+      labelRotate = "rotate(-90 " + x + " " + chart.canvasHeight + ")";
+      labelOffset = "translate(0 " + (-labelPadding) + ")";
+      return label.attr('transform', labelRotate + " " + labelOffset).attr('y', chart.canvasHeight).transition().attr('x', x);
+    } else {
+      y = chart.yScale(selectionData.value);
+      line.enter().append('line').classed('marker', true).attr('x1', 0).attr('x2', chart.canvasWidth).attr('y1', 0).attr('y2', 0);
+      line.transition().attr('y1', y).attr('y2', y);
+      return label.transition().attr('y', y + labelPadding);
+    }
+  };
+
+}).call(this);
+
+
+/*
+Function responsible for rendering a scatter plot inside a d3 selection.
+Must have reference to a chart instance.
+
+Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
+ */
+
+(function() {
+  this.ForestD3.ChartItem.scatter = function(selection, selectionData) {
+    var chart, points, x, y;
+    chart = this;
+    points = selection.selectAll('circle.point').data(function(d) {
+      return d.values;
+    });
+    x = chart.getX();
+    y = chart.getY();
+    points.enter().append('circle').classed('point', true).attr('cx', chart.canvasWidth / 2).attr('cy', chart.canvasHeight / 2).attr('r', 0);
+    points.exit().remove();
+    return points.transition().delay(function(d, i) {
+      return i * 10;
+    }).ease('quad').attr('cx', function(d, i) {
+      return chart.xScale(x(d, i));
+    }).attr('cy', function(d, i) {
+      return chart.yScale(y(d, i));
+    }).attr('r', chart.pointSize());
+  };
+
 }).call(this);
 
 (function() {
@@ -45,7 +111,11 @@ Author:  Robin Hu
           };
         }
         allPoints = data.map(function(series) {
-          return series.values;
+          if (series.values != null) {
+            return series.values;
+          } else {
+            return [];
+          }
         });
         allPoints = d3.merge(allPoints);
         if (x == null) {
@@ -66,12 +136,54 @@ Author:  Robin Hu
           }
           return Math.ceil(d);
         };
+        data.filter(function(d) {
+          return d.type === 'marker';
+        }).forEach(function(marker) {
+          if (marker.axis === 'x') {
+            return xExt.push(marker.value);
+          } else {
+            return yExt.push(marker.value);
+          }
+        });
+        xExt = d3.extent(xExt);
+        yExt = d3.extent(yExt);
         xExt = xExt.map(roundOff);
         yExt = yExt.map(roundOff);
         return {
           x: xExt,
           y: yExt
         };
+      },
+
+      /*
+      Increases an extent by a certain percentage. Useful for padding the
+      edges of a chart so the points are not right against the axis.
+      
+      extent: Object of form:
+          {
+              x: [-10, 10]
+              y: [-1, 1]
+          }
+      
+      padding: Object of form:
+          {
+              x: 0.1    # percentage to pad by
+              y: 0.05
+          }
+       */
+      extentPadding: function(extent, padding) {
+        var amount, domain, key, padPercent, result;
+        result = {};
+        for (key in extent) {
+          domain = extent[key];
+          padPercent = padding[key];
+          if (padPercent != null) {
+            amount = Math.abs(domain[0] - domain[1]) * padPercent;
+            amount /= 2;
+            result[key] = [domain[0] - amount, domain[1] + amount];
+          }
+        }
+        return result;
       },
 
       /*
@@ -263,7 +375,7 @@ It acts as a plugin to a main chart instance.
       'getY', function(d, i) {
         return d[1];
       }
-    ], ['autoResize', true], ['color', ForestD3.Utils.defaultColor]
+    ], ['autoResize', true], ['color', ForestD3.Utils.defaultColor], ['pointSize', 4], ['xPadding', 0.1], ['yPadding', 0.1]
   ];
 
   this.ForestD3.Chart = Chart = (function() {
@@ -363,7 +475,7 @@ It acts as a plugin to a main chart instance.
      */
 
     Chart.prototype.render = function() {
-      var chart, seriesGroups;
+      var chart, chartItems;
       if (this.svg == null) {
         return this;
       }
@@ -373,30 +485,36 @@ It acts as a plugin to a main chart instance.
       this.updateDimensions();
       this.updateChartScale();
       this.updateChartFrame();
-      seriesGroups = this.canvas.selectAll('g.series').data(this.data().visible(), function(d) {
+      chartItems = this.canvas.selectAll('g.chart-item').data(this.data().visible(), function(d) {
         return d.key;
       });
-      seriesGroups.enter().append('g').attr('class', function(d, i) {
-        return "series series-" + (d.key || i);
+      chartItems.enter().append('g').attr('class', function(d, i) {
+        return "chart-item item-" + (d.key || i);
       });
-      seriesGroups.style('fill', this.seriesColor);
-      seriesGroups.exit().remove();
+      chartItems.exit().transition().style('opacity', 0).remove();
       chart = this;
-      seriesGroups.each(function(d, i) {
-        var points, x, y;
-        points = d3.select(this).selectAll('circle.point').data(function(d) {
-          return d.values;
-        });
-        x = chart.getX();
-        y = chart.getY();
-        points.enter().append('circle').classed('point', true).attr('cx', chart.canvasWidth / 2).attr('cy', chart.canvasHeight / 2).attr('r', 0);
-        return points.transition().delay(function(d, i) {
-          return i * 10;
-        }).ease('quad').attr('cx', function(d, i) {
-          return chart.xScale(x(d, i));
-        }).attr('cy', function(d, i) {
-          return chart.yScale(y(d, i));
-        }).attr('r', 7);
+
+      /*
+      Main render loop. Loops through the data array, and depending on the
+      'type' attribute, renders a different kind of chart element.
+       */
+      chartItems.each(function(d, i) {
+        var chartItem, colorItem, renderFn;
+        renderFn = function() {
+          return 0;
+        };
+        colorItem = true;
+        chartItem = d3.select(this);
+        if ((d.type === 'scatter') || ((d.type == null) && (d.values != null))) {
+          renderFn = ForestD3.ChartItem.scatter;
+        } else if ((d.type === 'marker') || ((d.type == null) && (d.value != null))) {
+          renderFn = ForestD3.ChartItem.markerLine;
+          colorItem = false;
+        }
+        if (colorItem) {
+          chartItem.style('fill', chart.seriesColor);
+        }
+        return renderFn.call(chart, chartItem, d);
       });
       this.renderPlugins();
       return this;
@@ -453,7 +571,11 @@ It acts as a plugin to a main chart instance.
 
     Chart.prototype.updateChartScale = function() {
       var extent;
-      extent = ForestD3.Utils.extent(this.data().visible());
+      extent = ForestD3.Utils.extent(this.data().visible(), this.getX(), this.getY());
+      extent = ForestD3.Utils.extentPadding(extent, {
+        x: this.xPadding(),
+        y: this.yPadding()
+      });
       this.yScale = d3.scale.linear().domain(extent.y).range([this.canvasHeight, 0]);
       return this.xScale = d3.scale.linear().domain(extent.x).range([0, this.canvasWidth]);
     };
