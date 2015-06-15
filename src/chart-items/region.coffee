@@ -28,7 +28,7 @@ region.
             .transition()
             .attr('width', width)
     else
-        y = chart.yScale start
+        y = chart.yScale end
         height = Math.abs(chart.yScale(start) - chart.yScale(end))
         regionEnter
             .attr('height', 0)
