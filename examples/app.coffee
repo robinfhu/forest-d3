@@ -54,6 +54,12 @@ data = [
     type: 'region'
     axis: 'x'
     values: [-2.6, -0.9]
+,
+    key: 'region2'
+    label: 'Tolerance'
+    type: 'region'
+    axis: 'y'
+    values: [3.8, 5.67]
 ]
 
 chart.data(data).render()

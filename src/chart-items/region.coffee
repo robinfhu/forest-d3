@@ -12,11 +12,10 @@ region.
         .append('rect')
         .classed('region', true)
 
+    start = d3.min selectionData.values
+    end = d3.max selectionData.values
 
     if selectionData.axis is 'x'
-        start = d3.min selectionData.values
-        end = d3.max selectionData.values
-
         x = chart.xScale start
         width = Math.abs(chart.xScale(start) - chart.xScale(end))
         regionEnter
@@ -28,3 +27,15 @@ region.
             .attr('height', chart.canvasHeight)
             .transition()
             .attr('width', width)
+    else
+        y = chart.yScale start
+        height = Math.abs(chart.yScale(start) - chart.yScale(end))
+        regionEnter
+            .attr('height', 0)
+
+        region
+            .attr('x', 0)
+            .attr('y', y)
+            .transition()
+            .attr('width', chart.canvasWidth)
+            .attr('height', height)
