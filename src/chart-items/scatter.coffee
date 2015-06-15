@@ -5,7 +5,7 @@ Must have reference to a chart instance.
 Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
 
 ###
-@ForestD3.ChartItem.scatter = (selection)->
+@ForestD3.ChartItem.scatter = (selection, selectionData)->
     chart = @
 
     points = selection

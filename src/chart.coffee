@@ -99,18 +99,31 @@ chartProperties = [
             .append('g')
             .attr('class', (d, i)-> "chart-item item-#{d.key or i}")
 
-        chartItems
-            .style('fill', @seriesColor)
-
         chartItems.exit()
             .transition()
             .style('opacity', 0)
             .remove()
 
         chart = @
+        ###
+        Main render loop. Loops through the data array, and depending on the
+        'type' attribute, renders a different kind of chart element.
+        ###
         chartItems.each (d,i)->
-            if d.type is 'scatter' or not d.type?
-                ForestD3.ChartItem.scatter.call chart, d3.select(@)
+            renderFn = -> 0
+            colorItem = true
+
+            chartItem = d3.select @
+            if (d.type is 'scatter') or (not d.type? and d.values?)
+                renderFn = ForestD3.ChartItem.scatter
+            else if (d.type is 'marker') or (not d.type? and d.value?)
+                renderFn = ForestD3.ChartItem.markerLine
+                colorItem = false
+
+            if colorItem
+                chartItem.style('fill', chart.seriesColor)
+
+            renderFn.call chart, chartItem, d
 
         @renderPlugins()
 

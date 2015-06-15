@@ -152,3 +152,55 @@ describe 'Chart', ->
                     series.length.should.equal 2, 'back to two series only'
                     done()
                 , 300
+
+        describe 'Marker Lines', ->
+            it 'can render horizontal line (y-axis marker)', (done)->
+                data = [
+                    key: 'marker1'
+                    label: 'Threshold'
+                    type: 'marker'
+                    value: 0
+                    axis: 'y'
+                ]
+
+                chart = new ForestD3.Chart container
+                chart.data(data).render()
+
+                chartItems = $(container).find('g.chart-item')
+                chartItems.length.should.equal 1
+
+                line = chartItems.eq(0).find('line')
+                line.length.should.equal 1, 'line exists'
+
+                text = chartItems.eq(0).find('text')
+                text.text().should.contain 'Threshold'
+
+                setTimeout ->
+                    line[0].getAttribute('x1').should.equal '0'
+                    line[0].getAttribute('y1')
+                    .should.equal line[0].getAttribute('y2')
+                    done()
+                , 300
+
+            it 'can render horizontal line (x-axis marker)', (done)->
+                data = [
+                    key: 'marker1'
+                    type: 'marker'
+                    label: 'Threshold'
+                    value: 0
+                    axis: 'x'
+                ]
+
+                chart = new ForestD3.Chart container
+                chart.data(data).render()
+
+                line = $(container).find('g.chart-item line')
+                text = $(container).find('g.chart-item text')
+                text.text().should.contain 'Threshold'
+
+                setTimeout ->
+                    line[0].getAttribute('y1').should.equal '0'
+                    line[0].getAttribute('x1')
+                    .should.equal line[0].getAttribute('x2')
+                    done()
+                , 300

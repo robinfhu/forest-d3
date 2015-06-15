@@ -42,6 +42,12 @@ data = [
     type: 'marker'
     axis: 'y'
     value: 5.75
+,
+    key: 'marker2'
+    label: 'Performance Threshold'
+    type: 'marker'
+    axis: 'x'
+    value: 1.07
 ]
 
 chart.data(data).render()
