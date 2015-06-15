@@ -66,6 +66,9 @@
   stroke-opacity: 0.5;
   stroke-dasharray: 5;
 }
+.forest-d3 .marker-label {
+  font-size: 11px;
+}
 
 .forest-d3 rect.region {
   fill-opacity: 0.15;

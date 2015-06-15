@@ -29,8 +29,8 @@ Draws a horizontal or vertical line at the specified x or y location.
     line = selection.selectAll('line.marker').data(function(d) {
       return [d.value];
     });
-    label = selection.selectAll('text.label').data([selectionData.label]);
-    labelEnter = label.enter().append('text').classed('label', true).text(function(d) {
+    label = selection.selectAll('text.marker-label').data([selectionData.label]);
+    labelEnter = label.enter().append('text').classed('marker-label', true).text(function(d) {
       return d;
     }).attr('x', 0).attr('y', 0);
     labelPadding = 10;
@@ -46,7 +46,7 @@ Draws a horizontal or vertical line at the specified x or y location.
       y = chart.yScale(selectionData.value);
       line.enter().append('line').classed('marker', true).attr('x1', 0).attr('y1', 0).attr('y2', 0);
       line.attr('x2', chart.canvasWidth).transition().attr('y1', y).attr('y2', y);
-      return label.transition().attr('y', y + labelPadding);
+      return label.attr('text-anchor', 'end').transition().attr('x', chart.canvasWidth).attr('y', y + labelPadding);
     }
   };
 
@@ -414,7 +414,7 @@ It acts as a plugin to a main chart instance.
       'getY', function(d, i) {
         return d[1];
       }
-    ], ['autoResize', true], ['color', ForestD3.Utils.defaultColor], ['pointSize', 4], ['xPadding', 0.1], ['yPadding', 0.1]
+    ], ['autoResize', true], ['color', ForestD3.Utils.defaultColor], ['pointSize', 4], ['xPadding', 0.1], ['yPadding', 0.1], ['xLabel', ''], ['yLabel', '']
   ];
 
   this.ForestD3.Chart = Chart = (function() {
@@ -592,7 +592,7 @@ It acts as a plugin to a main chart instance.
      */
 
     Chart.prototype.updateChartFrame = function() {
-      var backdrop, xAxisGroup, yAxisGroup;
+      var axesLabels, backdrop, xAxisGroup, xAxisLabel, yAxisGroup, yAxisLabel;
       backdrop = this.svg.selectAll('rect.backdrop').data([0]);
       backdrop.enter().append('rect').classed('backdrop', true);
       backdrop.attr('width', this.width).attr('height', this.height);
@@ -608,7 +608,19 @@ It acts as a plugin to a main chart instance.
       yAxisGroup.transition().call(this.yAxis);
       this.canvas = this.svg.selectAll('g.canvas').data([0]);
       this.canvas.enter().append('g').classed('canvas', true).attr('transform', "translate(" + this.margin.left + ", " + this.margin.top + ")").append('rect').classed('canvas-backdrop', true);
-      return this.canvas.select('rect.canvas-backdrop').attr('width', this.canvasWidth).attr('height', this.canvasHeight);
+      this.canvas.select('rect.canvas-backdrop').attr('width', this.canvasWidth).attr('height', this.canvasHeight);
+      axesLabels = this.canvas.selectAll('g.axes-labels').data([0]);
+      axesLabels.enter().append('g').classed('axes-labels', true);
+      xAxisLabel = axesLabels.selectAll('text.x-axis').data([this.xLabel()]);
+      xAxisLabel.enter().append('text').classed('x-axis', true).attr('text-anchor', 'end').attr('x', 0).attr('y', this.canvasHeight);
+      xAxisLabel.text(function(d) {
+        return d;
+      }).transition().attr('x', this.canvasWidth);
+      yAxisLabel = axesLabels.selectAll('text.y-axis').data([this.yLabel()]);
+      yAxisLabel.enter().append('text').classed('y-axis', true).attr('text-anchor', 'end').attr('transform', 'translate(10,0) rotate(-90 0 0)');
+      return yAxisLabel.text(function(d) {
+        return d;
+      });
     };
 
     Chart.prototype.updateChartScale = function() {
