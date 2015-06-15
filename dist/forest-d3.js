@@ -24,28 +24,58 @@ Draws a horizontal or vertical line at the specified x or y location.
 
 (function() {
   this.ForestD3.ChartItem.markerLine = function(selection, selectionData) {
-    var chart, label, labelOffset, labelPadding, labelRotate, line, x, y;
+    var chart, label, labelEnter, labelOffset, labelPadding, labelRotate, line, x, y;
     chart = this;
     line = selection.selectAll('line.marker').data(function(d) {
       return [d.value];
     });
     label = selection.selectAll('text.label').data([selectionData.label]);
-    label.enter().append('text').classed('label', true).text(function(d) {
+    labelEnter = label.enter().append('text').classed('label', true).text(function(d) {
       return d;
     }).attr('x', 0).attr('y', 0);
     labelPadding = 10;
     if (selectionData.axis === 'x') {
       x = chart.xScale(selectionData.value);
-      line.enter().append('line').classed('marker', true).attr('x1', 0).attr('x2', 0).attr('y1', 0).attr('y2', chart.canvasHeight);
-      line.transition().attr('x1', x).attr('x2', x);
+      line.enter().append('line').classed('marker', true).attr('x1', 0).attr('x2', 0).attr('y1', 0);
+      line.attr('y2', chart.canvasHeight).transition().attr('x1', x).attr('x2', x);
       labelRotate = "rotate(-90 " + x + " " + chart.canvasHeight + ")";
       labelOffset = "translate(0 " + (-labelPadding) + ")";
-      return label.attr('transform', labelRotate + " " + labelOffset).attr('y', chart.canvasHeight).transition().attr('x', x);
+      labelEnter.attr('transform', labelRotate);
+      return label.attr('y', chart.canvasHeight).transition().attr('transform', labelRotate + " " + labelOffset).attr('x', x);
     } else {
       y = chart.yScale(selectionData.value);
-      line.enter().append('line').classed('marker', true).attr('x1', 0).attr('x2', chart.canvasWidth).attr('y1', 0).attr('y2', 0);
-      line.transition().attr('y1', y).attr('y2', y);
+      line.enter().append('line').classed('marker', true).attr('x1', 0).attr('y1', 0).attr('y2', 0);
+      line.attr('x2', chart.canvasWidth).transition().attr('y1', y).attr('y2', y);
       return label.transition().attr('y', y + labelPadding);
+    }
+  };
+
+}).call(this);
+
+
+/*
+Draws a transparent rectangle across the canvas signifying an important
+region.
+ */
+
+(function() {
+  this.ForestD3.ChartItem.region = function(selection, selectionData) {
+    var chart, end, height, region, regionEnter, start, width, x, y;
+    chart = this;
+    region = selection.selectAll('rect.region').data([selectionData]);
+    regionEnter = region.enter().append('rect').classed('region', true);
+    start = d3.min(selectionData.values);
+    end = d3.max(selectionData.values);
+    if (selectionData.axis === 'x') {
+      x = chart.xScale(start);
+      width = Math.abs(chart.xScale(start) - chart.xScale(end));
+      regionEnter.attr('width', 0);
+      return region.attr('x', x).attr('y', 0).attr('height', chart.canvasHeight).transition().attr('width', width);
+    } else {
+      y = chart.yScale(start);
+      height = Math.abs(chart.yScale(start) - chart.yScale(end));
+      regionEnter.attr('height', 0);
+      return region.attr('x', 0).attr('y', y).transition().attr('width', chart.canvasWidth).attr('height', height);
     }
   };
 
@@ -111,7 +141,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
           };
         }
         allPoints = data.map(function(series) {
-          if (series.values != null) {
+          if ((series.values != null) && series.type !== 'region') {
             return series.values;
           } else {
             return [];
@@ -143,6 +173,15 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
             return xExt.push(marker.value);
           } else {
             return yExt.push(marker.value);
+          }
+        });
+        data.filter(function(d) {
+          return d.type === 'region';
+        }).forEach(function(region) {
+          if (region.axis === 'x') {
+            return xExt = xExt.concat(region.values);
+          } else {
+            return yExt = yExt.concat(region.values);
           }
         });
         xExt = d3.extent(xExt);
@@ -509,6 +548,9 @@ It acts as a plugin to a main chart instance.
           renderFn = ForestD3.ChartItem.scatter;
         } else if ((d.type === 'marker') || ((d.type == null) && (d.value != null))) {
           renderFn = ForestD3.ChartItem.markerLine;
+          colorItem = false;
+        } else if (d.type === 'region') {
+          renderFn = ForestD3.ChartItem.region;
           colorItem = false;
         }
         if (colorItem) {

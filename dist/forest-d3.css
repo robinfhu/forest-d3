@@ -1,3 +1,72 @@
-.forest-d3 svg{width:100%;height:100%}.forest-d3 rect.backdrop{opacity:0}.forest-d3 .axis .tick line{stroke:#848ded;stroke-opacity:.07}.forest-d3 .axis > path{fill:#cdd2f3}.forest-d3 .canvas > rect{fill-opacity:.1;fill:#bcbcf2}.forest-d3 .canvas circle.point{fill-opacity:.8}
-.forest-d3.legend .item{min-width:200px;padding-bottom:10px;cursor:pointer;border-bottom:solid 1px transparent;}.forest-d3.legend .item:hover{border-bottom:solid 1px #ccc;}.forest-d3.legend .item:hover .show-only{display:inline-block}.forest-d3.legend .item.disabled{color:#ccc;font-style:italic;}.forest-d3.legend .item.disabled .color-square{opacity:.5}.forest-d3.legend .item .color-square{position:relative;top:4px;display:inline-block;width:18px;height:18px;margin-right:8px;border:solid 1px #ccc;border-radius:3px}.forest-d3.legend .item .show-only{display:none;margin-left:15px}.forest-d3.legend .button{cursor:pointer;color:#22f;}.forest-d3.legend .button:hover{text-decoration:underline}
-.forest-d3 line.marker{stroke:#000;stroke-opacity:.5;stroke-dasharray:5}
+.forest-d3 svg {
+  width: 100%;
+  height: 100%;
+}
+.forest-d3 rect.backdrop {
+  opacity: 0;
+}
+.forest-d3 .axis .tick line {
+  stroke: #848ded;
+  stroke-opacity: 0.07;
+}
+.forest-d3 .axis > path {
+  fill: #cdd2f3;
+}
+.forest-d3 .canvas > rect {
+  fill-opacity: 0.1;
+  fill: #bcbcf2;
+}
+.forest-d3 .canvas circle.point {
+  fill-opacity: 0.8;
+}
+
+.forest-d3.legend .item {
+  min-width: 200px;
+  padding-bottom: 10px;
+  cursor: pointer;
+  border-bottom: solid 1px transparent;
+}
+.forest-d3.legend .item:hover {
+  border-bottom: solid 1px #ccc;
+}
+.forest-d3.legend .item:hover .show-only {
+  display: inline-block;
+}
+.forest-d3.legend .item.disabled {
+  color: #ccc;
+  font-style: italic;
+}
+.forest-d3.legend .item.disabled .color-square {
+  opacity: 0.5;
+}
+.forest-d3.legend .item .color-square {
+  position: relative;
+  top: 4px;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  border: solid 1px #ccc;
+  border-radius: 3px;
+}
+.forest-d3.legend .item .show-only {
+  display: none;
+  margin-left: 15px;
+}
+.forest-d3.legend .button {
+  cursor: pointer;
+  color: #22f;
+}
+.forest-d3.legend .button:hover {
+  text-decoration: underline;
+}
+
+.forest-d3 line.marker {
+  stroke: #000;
+  stroke-opacity: 0.5;
+  stroke-dasharray: 5;
+}
+
+.forest-d3 rect.region {
+  fill-opacity: 0.15;
+}

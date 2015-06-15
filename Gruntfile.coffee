@@ -10,6 +10,8 @@ module.exports = (grunt)->
             client:
                 files:
                     'dist/forest-d3.css': ['style/*.styl']
+                options:
+                    compress: false
 
         coffeelint:
             client:
