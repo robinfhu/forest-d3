@@ -27,10 +27,16 @@ html(lang="en")
                         a(href="line.html") Line Chart
 
             .row
-                .col-xs-8(style=" height: 700px;")
+                .col-xs-8
                     h3.text-center #{title}
-                    #example(style="height: 100%;")
+                    #example(style="height: 700px;")
                 .col-xs-2
                     #legend(style="margin-top:250px;")
 
+            footer
+                .text-center
+                    small &copy; 2015 Robin Hu
+
         script(src="#{exampleCode}")
+
+
