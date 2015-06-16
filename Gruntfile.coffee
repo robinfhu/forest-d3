@@ -1,9 +1,12 @@
 module.exports = (grunt)->
     grunt.initConfig
         jade:
-            examples:
+            homepage:
                 options:
                     pretty: true
+                    data:
+                        exampleCode: 'app.js'
+                        title: 'Basic Chart'
                 files:
                     'build/index.html': ['examples/index.jade']
         stylus:

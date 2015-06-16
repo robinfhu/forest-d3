@@ -14,9 +14,9 @@ html(lang="en")
         .container-fluid
             .row
                 .col-xs-8(style=" height: 700px;")
-                    h3.text-center Chart Title
+                    h3.text-center #{title}
                     #example(style="height: 100%;")
                 .col-xs-2
                     #legend(style="margin-top:250px;")
 
-        script(src="app.js")
+        script(src="#{exampleCode}")
