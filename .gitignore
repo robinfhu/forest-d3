@@ -1,3 +1,4 @@
 node_modules
-build
+demo/forest-d3.js
+demo/forest-d3.css
 karma.xml

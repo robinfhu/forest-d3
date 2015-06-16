@@ -3,15 +3,29 @@ html(lang="en")
     head
         title Forest D3 - By Robin Hu
 
-        script(src="../node_modules/d3/d3.js", charset="utf-8")
-        script(src="../dist/forest-d3.js")
-        link(rel="stylesheet", href="../dist/forest-d3.css")
-        link(rel="stylesheet", href="../node_modules/bootstrap/dist/css/bootstrap.css")
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js", charset="utf-8")
+        script(src="forest-d3.js")
+        link(rel="stylesheet", href="forest-d3.css")
+        link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css")
 
     body
-        h1 Forest D3 Example
-
         .container-fluid
+            .page-header
+                h1
+                    | Forest D3
+                    small &nbsp;&nbsp; A javascript charting library by Robin Hu
+
+
+                h3
+                    a(href="https://github.com/robinfhu/forest-d3") Source Code
+
+            .row
+                ul.nav.nav-pills
+                    li
+                        a(href="index.html") Basic Chart
+                    li
+                        a(href="line.html") Line Chart
+
             .row
                 .col-xs-8(style=" height: 700px;")
                     h3.text-center #{title}

@@ -8,7 +8,7 @@ module.exports = (grunt)->
                         exampleCode: 'app.js'
                         title: 'Basic Chart'
                 files:
-                    'build/index.html': ['examples/index.jade']
+                    'demo/index.html': ['examples/index.jade']
             linechart:
                 options:
                     pretty: true
@@ -16,7 +16,16 @@ module.exports = (grunt)->
                         exampleCode: 'app-line.js'
                         title: 'Line Chart'
                 files:
-                    'build/line.html': ['examples/index.jade']
+                    'demo/line.html': ['examples/index.jade']
+
+        copy:
+            demo:
+                cwd: 'dist/'
+                src: '*'
+                dest: 'demo/'
+                expand: true
+                flatten: true
+
         stylus:
             client:
                 files:
@@ -48,7 +57,7 @@ module.exports = (grunt)->
                 expand: true
                 flatten: true
                 src: 'examples/*.coffee'
-                dest: 'build/'
+                dest: 'demo/'
                 ext: '.js'
 
         karma:
@@ -74,9 +83,10 @@ module.exports = (grunt)->
     grunt.loadNpmTasks 'grunt-coffeelint'
     grunt.loadNpmTasks 'grunt-contrib-jade'
     grunt.loadNpmTasks 'grunt-contrib-stylus'
+    grunt.loadNpmTasks 'grunt-contrib-copy'
     grunt.loadNpmTasks 'grunt-karma'
 
-    grunt.registerTask 'examples', ['coffee', 'stylus', 'jade']
+    grunt.registerTask 'examples', ['coffee', 'stylus', 'jade', 'copy']
     grunt.registerTask 'test', ['coffee', 'karma']
-    grunt.registerTask 'default', ['coffeelint','coffee', 'stylus', 'karma','jade']
+    grunt.registerTask 'default', ['coffeelint','examples', 'karma']
 
