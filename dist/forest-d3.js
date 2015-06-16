@@ -72,7 +72,7 @@ region.
       regionEnter.attr('width', 0);
       return region.attr('x', x).attr('y', 0).attr('height', chart.canvasHeight).transition().attr('width', width);
     } else {
-      y = chart.yScale(start);
+      y = chart.yScale(end);
       height = Math.abs(chart.yScale(start) - chart.yScale(end));
       regionEnter.attr('height', 0);
       return region.attr('x', 0).attr('y', y).transition().attr('width', chart.canvasWidth).attr('height', height);
