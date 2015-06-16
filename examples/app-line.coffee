@@ -38,4 +38,12 @@ data = [
 
 ]
 
+chart.yAxis.tickFormat(d3.format('$,.2f'))
+chart.xAxis.tickFormat((d)->
+    date = data[0].values[d]?[0]
+    if date?
+        d3.time.format('%Y-%m-%d')(new Date date)
+    else
+        ''
+)
 chart.data(data).render()

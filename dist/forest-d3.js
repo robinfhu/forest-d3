@@ -23,13 +23,17 @@ Author:  Robin Hu
     chart = this;
     selection.style('stroke', chart.seriesColor);
     path = selection.selectAll('path.line').data([selectionData.values]);
-    path.enter().append('path').classed('line', true);
+    path.enter().append('path').classed('line', true).attr('d', d3.svg.line().interpolate('linear').x(function(d, i) {
+      return chart.xScale(chart.getX()(d, i));
+    }).y(function() {
+      return chart.canvasHeight;
+    }));
     lineFn = d3.svg.line().interpolate('linear').x(function(d, i) {
       return chart.xScale(chart.getX()(d, i));
     }).y(function(d, i) {
       return chart.yScale(chart.getY()(d, i));
     });
-    return path.transition().attr('d', lineFn);
+    return path.transition().duration(800).attr('d', lineFn);
   };
 
 }).call(this);
