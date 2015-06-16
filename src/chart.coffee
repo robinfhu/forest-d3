@@ -165,7 +165,10 @@ chartProperties = [
             .attr('height', @height)
 
         # Add axes
-        @xAxis.scale(@xScale).tickSize(-@canvasHeight, 1)
+        # TODO: Auto generate this xTicks number based on tickFormat.
+        xTicks = Math.abs(@xScale.range()[0] - @xScale.range()[1]) / 100
+        @xAxis.scale(@xScale).tickSize(-@canvasHeight, 1).ticks(xTicks)
+
         xAxisGroup = @svg.selectAll('g.x-axis').data([0])
         xAxisGroup.enter()
             .append('g')

@@ -616,11 +616,12 @@ It acts as a plugin to a main chart instance.
      */
 
     Chart.prototype.updateChartFrame = function() {
-      var axesLabels, backdrop, xAxisGroup, xAxisLabel, yAxisGroup, yAxisLabel;
+      var axesLabels, backdrop, xAxisGroup, xAxisLabel, xTicks, yAxisGroup, yAxisLabel;
       backdrop = this.svg.selectAll('rect.backdrop').data([0]);
       backdrop.enter().append('rect').classed('backdrop', true);
       backdrop.attr('width', this.width).attr('height', this.height);
-      this.xAxis.scale(this.xScale).tickSize(-this.canvasHeight, 1);
+      xTicks = Math.abs(this.xScale.range()[0] - this.xScale.range()[1]) / 100;
+      this.xAxis.scale(this.xScale).tickSize(-this.canvasHeight, 1).ticks(xTicks);
       xAxisGroup = this.svg.selectAll('g.x-axis').data([0]);
       xAxisGroup.enter().append('g').attr('class', 'x-axis axis');
       xAxisGroup.attr('transform', "translate(" + this.margin.left + ", " + (this.canvasHeight + this.margin.top) + ")");
