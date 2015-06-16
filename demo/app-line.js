@@ -36,6 +36,18 @@
       label: 'MSFT',
       type: 'line',
       values: getStocks(303.12, 0.002)
+    }, {
+      key: 'marker1',
+      label: 'Profit',
+      type: 'marker',
+      axis: 'y',
+      value: 305.1
+    }, {
+      key: 'region1',
+      label: 'Election Season',
+      type: 'region',
+      axis: 'x',
+      values: [50, 90]
     }
   ];
 
