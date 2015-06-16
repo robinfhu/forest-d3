@@ -9,6 +9,14 @@ module.exports = (grunt)->
                         title: 'Basic Chart'
                 files:
                     'build/index.html': ['examples/index.jade']
+            linechart:
+                options:
+                    pretty: true
+                    data:
+                        exampleCode: 'app-line.js'
+                        title: 'Line Chart'
+                files:
+                    'build/line.html': ['examples/index.jade']
         stylus:
             client:
                 files:
@@ -36,10 +44,13 @@ module.exports = (grunt)->
                         'src/plugins/*.coffee'
                         'src/chart.coffee'
                     ]
+            examples:
+                expand: true
+                flatten: true
+                src: 'examples/*.coffee'
+                dest: 'build/'
+                ext: '.js'
 
-                    'build/app.js': [
-                        'examples/app.coffee'
-                    ]
         karma:
             client:
                 options:
