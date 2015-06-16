@@ -113,20 +113,16 @@ chartProperties = [
         ###
         chartItems.each (d,i)->
             renderFn = -> 0
-            colorItem = true
 
             chartItem = d3.select @
             if (d.type is 'scatter') or (not d.type? and d.values?)
                 renderFn = ForestD3.ChartItem.scatter
+            else if d.type is 'line'
+                renderFn = ForestD3.ChartItem.line
             else if (d.type is 'marker') or (not d.type? and d.value?)
                 renderFn = ForestD3.ChartItem.markerLine
-                colorItem = false
             else if d.type is 'region'
                 renderFn = ForestD3.ChartItem.region
-                colorItem = false
-
-            if colorItem
-                chartItem.style 'fill', chart.seriesColor
 
             renderFn.call chart, chartItem, d
 

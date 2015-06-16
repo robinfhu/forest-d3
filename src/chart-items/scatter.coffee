@@ -8,6 +8,8 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
 @ForestD3.ChartItem.scatter = (selection, selectionData)->
     chart = @
 
+    selection.style 'fill', chart.seriesColor
+
     points = selection
         .selectAll('circle.point')
         .data((d)-> d.values)

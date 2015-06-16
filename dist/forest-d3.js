@@ -17,6 +17,23 @@ Author:  Robin Hu
 
 }).call(this);
 
+(function() {
+  this.ForestD3.ChartItem.line = function(selection, selectionData) {
+    var chart, lineFn, path;
+    chart = this;
+    selection.style('stroke', chart.seriesColor);
+    path = selection.selectAll('path.line').data([selectionData.values]);
+    path.enter().append('path').classed('line', true);
+    lineFn = d3.svg.line().interpolate('linear').x(function(d, i) {
+      return chart.xScale(chart.getX()(d, i));
+    }).y(function(d, i) {
+      return chart.yScale(chart.getY()(d, i));
+    });
+    return path.transition().attr('d', lineFn);
+  };
+
+}).call(this);
+
 
 /*
 Draws a horizontal or vertical line at the specified x or y location.
@@ -93,6 +110,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
   this.ForestD3.ChartItem.scatter = function(selection, selectionData) {
     var chart, points, x, y;
     chart = this;
+    selection.style('fill', chart.seriesColor);
     points = selection.selectAll('circle.point').data(function(d) {
       return d.values;
     });
@@ -132,7 +150,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
           }
        */
       extent: function(data, x, y) {
-        var allPoints, defaultExtent, roundOff, xExt, yExt;
+        var defaultExtent, roundOff, xAllPoints, xExt, yAllPoints, yExt;
         defaultExtent = [-1, 1];
         if (!data || data.length === 0) {
           return {
@@ -140,14 +158,6 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
             y: defaultExtent
           };
         }
-        allPoints = data.map(function(series) {
-          if ((series.values != null) && series.type !== 'region') {
-            return series.values;
-          } else {
-            return [];
-          }
-        });
-        allPoints = d3.merge(allPoints);
         if (x == null) {
           x = function(d, i) {
             return d[0];
@@ -158,8 +168,22 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
             return d[1];
           };
         }
-        xExt = d3.extent(allPoints, x);
-        yExt = d3.extent(allPoints, y);
+        xAllPoints = data.map(function(series) {
+          if ((series.values != null) && series.type !== 'region') {
+            return d3.extent(series.values, x);
+          } else {
+            return [];
+          }
+        });
+        yAllPoints = data.map(function(series) {
+          if ((series.values != null) && series.type !== 'region') {
+            return d3.extent(series.values, y);
+          } else {
+            return [];
+          }
+        });
+        xExt = d3.extent(d3.merge(xAllPoints));
+        yExt = d3.extent(d3.merge(yAllPoints));
         roundOff = function(d, i) {
           if (i === 0) {
             return Math.floor(d);
@@ -538,23 +562,19 @@ It acts as a plugin to a main chart instance.
       'type' attribute, renders a different kind of chart element.
        */
       chartItems.each(function(d, i) {
-        var chartItem, colorItem, renderFn;
+        var chartItem, renderFn;
         renderFn = function() {
           return 0;
         };
-        colorItem = true;
         chartItem = d3.select(this);
         if ((d.type === 'scatter') || ((d.type == null) && (d.values != null))) {
           renderFn = ForestD3.ChartItem.scatter;
+        } else if (d.type === 'line') {
+          renderFn = ForestD3.ChartItem.line;
         } else if ((d.type === 'marker') || ((d.type == null) && (d.value != null))) {
           renderFn = ForestD3.ChartItem.markerLine;
-          colorItem = false;
         } else if (d.type === 'region') {
           renderFn = ForestD3.ChartItem.region;
-          colorItem = false;
-        }
-        if (colorItem) {
-          chartItem.style('fill', chart.seriesColor);
         }
         return renderFn.call(chart, chartItem, d);
       });

@@ -112,6 +112,26 @@ describe 'Utilities', ->
                 x: [-4, 1]
                 y: [3, 9]
 
+        it 'handles case where getter returns index', ->
+            data = [
+                values: [
+                    [1,1]
+                    [2,2]
+                ]
+            ,
+                values: [
+                    [3,3]
+                    [4,4]
+                ]
+            ]
+
+            getX = (d,i)-> i
+            result = extent data, getX
+
+            result.should.deep.equal
+                x: [0,1]
+                y: [1,4]
+
     describe 'Indexify', ->
         it 'adds _index to each series', ->
             data = [

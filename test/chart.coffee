@@ -220,3 +220,21 @@ describe 'Chart', ->
 
                 rect = $(container).find('g.chart-item rect')
                 rect.length.should.equal 1, 'one rectangle'
+
+        describe 'Line Chart', ->
+            it 'can render an SVG line', ->
+                data = [
+                    key: 'line1'
+                    type: 'line'
+                    values: [
+                        [0,0]
+                        [1,1]
+                        [2,4]
+                    ]
+                ]
+
+                chart = new ForestD3.Chart container
+                chart.data(data).render()
+
+                line = $(container).find('g.chart-item path')
+                line.length.should.equal 1, 'path exists'

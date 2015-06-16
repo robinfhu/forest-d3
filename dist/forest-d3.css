@@ -61,6 +61,12 @@
   text-decoration: underline;
 }
 
+.forest-d3 path.line {
+  fill: none;
+  stroke-opacity: 0.8;
+  stroke-width: 2;
+}
+
 .forest-d3 line.marker {
   stroke: #000;
   stroke-opacity: 0.5;

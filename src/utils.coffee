@@ -22,19 +22,23 @@
                 y: defaultExtent
             }
 
-        allPoints = data.map (series)->
-            if series.values? and series.type isnt 'region'
-                series.values
-            else
-                []
-
-        allPoints = d3.merge allPoints
-
         x ?= (d,i)-> d[0]
         y ?= (d,i)-> d[1]
 
-        xExt = d3.extent allPoints, x
-        yExt = d3.extent allPoints, y
+        xAllPoints = data.map (series)->
+            if series.values? and series.type isnt 'region'
+                d3.extent series.values, x
+            else
+                []
+
+        yAllPoints = data.map (series)->
+            if series.values? and series.type isnt 'region'
+                d3.extent series.values, y
+            else
+                []
+
+        xExt = d3.extent d3.merge xAllPoints
+        yExt = d3.extent d3.merge yAllPoints
 
         roundOff = (d,i)->
             return Math.floor(d) if i is 0
