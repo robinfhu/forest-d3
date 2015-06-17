@@ -155,3 +155,14 @@
         index
 
     defaultColor: (i)-> colors20[i % colors20.length]
+
+    debounce: (fn, delay)->
+        promise = null
+        ->
+            args = arguments
+            window.clearTimeout promise
+
+            promise = window.setTimeout =>
+                promise = null
+                fn.apply @, args
+            , delay
