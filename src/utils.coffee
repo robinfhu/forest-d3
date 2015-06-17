@@ -132,14 +132,23 @@
         return null if values.length is 0
         return 0 if values.length is 1
 
+        if search >= values[values.length - 1]
+            return values.length-1
+
+        if search <= values[0]
+            return 0
+
         bisect = (vals, sch)->
-            for d,i in vals
-                val = getX d,i
+            lo = 0
+            hi = vals.length
+            while lo < hi
+                mid = (lo + hi) >>> 1
+                if vals[mid] < sch
+                    lo = mid + 1
+                else
+                    hi = mid
 
-                if val >= sch
-                    return i
-
-            return vals.length
+            lo
 
         index = bisect values,search
 

@@ -303,16 +303,25 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         if (values.length === 1) {
           return 0;
         }
+        if (search >= values[values.length - 1]) {
+          return values.length - 1;
+        }
+        if (search <= values[0]) {
+          return 0;
+        }
         bisect = function(vals, sch) {
-          var d, i, j, len, val;
-          for (i = j = 0, len = vals.length; j < len; i = ++j) {
-            d = vals[i];
-            val = getX(d, i);
-            if (val >= sch) {
-              return i;
+          var hi, lo, mid;
+          lo = 0;
+          hi = vals.length;
+          while (lo < hi) {
+            mid = (lo + hi) >>> 1;
+            if (vals[mid] < sch) {
+              lo = mid + 1;
+            } else {
+              hi = mid;
             }
           }
-          return vals.length;
+          return lo;
         };
         index = bisect(values, search);
         index = d3.min([index, values.length - 1]);
@@ -328,6 +337,21 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
       },
       defaultColor: function(i) {
         return colors20[i % colors20.length];
+      },
+      debounce: function(fn, delay) {
+        var promise;
+        promise = null;
+        return function() {
+          var args;
+          args = arguments;
+          window.clearTimeout(promise);
+          return promise = window.setTimeout((function(_this) {
+            return function() {
+              promise = null;
+              return fn.apply(_this, args);
+            };
+          })(this), delay);
+        };
       }
     };
   })();
@@ -777,13 +801,18 @@ It acts as a plugin to a main chart instance.
      */
 
     Chart.prototype.updateTooltip = function(mouse, clientMouse) {
-      var line, xPos, yPos;
+      var line, x, xPos, xValues, yPos;
       line = this.canvas.select('line.guideline');
       if (mouse == null) {
         line.transition().delay(250).style('opacity', 0);
         return this.tooltip.hide();
       } else {
         xPos = mouse[0], yPos = mouse[1];
+        xValues = this.data().xValues();
+        x = ForestD3.Utils.smartBisect(xValues, this.xScale.invert(xPos), function(d) {
+          return d;
+        });
+        xPos = this.xScale(x);
         line.attr('x1', xPos).attr('x2', xPos).transition().style('opacity', 0.5);
         return this.tooltip.render(this.data().get(), clientMouse);
       }

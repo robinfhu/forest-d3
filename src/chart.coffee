@@ -286,6 +286,17 @@ chartProperties = [
 
         else
             [xPos, yPos] = mouse
+
+            xValues = @data().xValues()
+
+            x = ForestD3.Utils.smartBisect(
+                xValues,
+                @xScale.invert(xPos),
+                (d)-> d
+            )
+
+            xPos = @xScale x
+
             line
                 .attr('x1', xPos)
                 .attr('x2', xPos)
