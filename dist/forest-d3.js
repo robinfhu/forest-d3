@@ -479,6 +479,40 @@ It acts as a plugin to a main chart instance.
 }).call(this);
 
 (function() {
+  var Tooltip;
+
+  this.ForestD3.Tooltip = Tooltip = (function() {
+    function Tooltip() {
+      this.container = null;
+    }
+
+    Tooltip.prototype.render = function(data, clientMouse) {
+      var xPos, yPos;
+      if (this.container == null) {
+        this.container = document.createElement('div');
+        document.body.appendChild(this.container);
+      }
+      xPos = clientMouse[0], yPos = clientMouse[1];
+      xPos += window.pageXOffset;
+      yPos += window.pageYOffset;
+      return d3.select(this.container).classed('forest-d3 tooltip-box', true).style('left', xPos + "px").style('top', yPos + "px").transition().style('opacity', 1);
+    };
+
+    Tooltip.prototype.hide = function() {
+      return d3.select(this.container).transition().delay(250).style('opacity', 0);
+    };
+
+    Tooltip.prototype.cleanUp = function() {
+      return document.body.removeChild(this.container);
+    };
+
+    return Tooltip;
+
+  })();
+
+}).call(this);
+
+(function() {
   var Chart, chartProperties;
 
   chartProperties = [
@@ -490,7 +524,7 @@ It acts as a plugin to a main chart instance.
       'getY', function(d, i) {
         return d[1];
       }
-    ], ['autoResize', true], ['color', ForestD3.Utils.defaultColor], ['pointSize', 4], ['xPadding', 0.1], ['yPadding', 0.1], ['xLabel', ''], ['yLabel', '']
+    ], ['autoResize', true], ['color', ForestD3.Utils.defaultColor], ['pointSize', 4], ['xPadding', 0.1], ['yPadding', 0.1], ['xLabel', ''], ['yLabel', ''], ['showTooltip', true]
   ];
 
   this.ForestD3.Chart = Chart = (function() {
@@ -515,6 +549,7 @@ It acts as a plugin to a main chart instance.
         })(this)(prop);
       }
       this.container(domContainer);
+      this.tooltip = new ForestD3.Tooltip();
       this.xAxis = d3.svg.axis().tickPadding(10);
       this.yAxis = d3.svg.axis().tickPadding(10);
       this.seriesColor = (function(_this) {
@@ -685,9 +720,9 @@ It acts as a plugin to a main chart instance.
       canvasEnter.append('rect').classed('canvas-backdrop', true);
       chart = this;
       this.canvas.select('rect.canvas-backdrop').attr('width', this.canvasWidth).attr('height', this.canvasHeight).on('mousemove', function() {
-        return chart.updateGuideline(d3.mouse(this));
+        return chart.updateTooltip(d3.mouse(this), [d3.event.clientX, d3.event.clientY]);
       }).on('mouseout', function() {
-        return chart.updateGuideline(null);
+        return chart.updateTooltip(null);
       });
       canvasEnter.append('line').classed('guideline', true).style('opacity', 0);
       this.canvas.select('line.guideline').attr('y1', 0).attr('y2', this.canvasHeight);
@@ -718,19 +753,21 @@ It acts as a plugin to a main chart instance.
 
 
     /*
-    Updates where the guideline is.
+    Updates where the guideline and tooltip is.
     
     mouse should be an array of two things: [mouse x , mouse y]
      */
 
-    Chart.prototype.updateGuideline = function(mouse) {
+    Chart.prototype.updateTooltip = function(mouse, clientMouse) {
       var line, xPos, yPos;
       line = this.canvas.select('line.guideline');
       if (mouse == null) {
-        return line.transition().delay(250).style('opacity', 0);
+        line.transition().delay(250).style('opacity', 0);
+        return this.tooltip.hide();
       } else {
         xPos = mouse[0], yPos = mouse[1];
-        return line.attr('x1', xPos).attr('x2', xPos).transition().style('opacity', 0.5);
+        line.attr('x1', xPos).attr('x2', xPos).transition().style('opacity', 0.5);
+        return this.tooltip.render(this.data().get(), clientMouse);
       }
     };
 

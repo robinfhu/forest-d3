@@ -8,6 +8,7 @@ chartProperties = [
     ['yPadding', 0.1]
     ['xLabel', '']
     ['yLabel', '']
+    ['showTooltip', true]
 ]
 
 @ForestD3.Chart = class Chart
@@ -30,6 +31,7 @@ chartProperties = [
 
         @container domContainer
 
+        @tooltip = new ForestD3.Tooltip()
         @xAxis = d3.svg.axis().tickPadding(10)
         @yAxis = d3.svg.axis().tickPadding(10)
         @seriesColor = (d)=> d.color or @color()(d._index)
@@ -209,9 +211,14 @@ chartProperties = [
         @canvas.select('rect.canvas-backdrop')
             .attr('width', @canvasWidth)
             .attr('height', @canvasHeight)
-            # Attach mouse handlers to update the guideline
-            .on('mousemove', -> chart.updateGuideline d3.mouse(@))
-            .on('mouseout', -> chart.updateGuideline null)
+            # Attach mouse handlers to update the guideline and tooltip
+            .on('mousemove', ->
+                chart.updateTooltip(
+                    d3.mouse(@),
+                    [d3.event.clientX, d3.event.clientY]
+                )
+            )
+            .on('mouseout', -> chart.updateTooltip null)
 
         # Add a guideline
         canvasEnter
@@ -262,11 +269,11 @@ chartProperties = [
         @xScale = d3.scale.linear().domain(extent.x).range([0, @canvasWidth])
 
     ###
-    Updates where the guideline is.
+    Updates where the guideline and tooltip is.
 
     mouse should be an array of two things: [mouse x , mouse y]
     ###
-    updateGuideline: (mouse)->
+    updateTooltip: (mouse, clientMouse)->
         line = @canvas.select('line.guideline')
         unless mouse?
             # Hide guideline from view if 'null' passed in
@@ -274,6 +281,9 @@ chartProperties = [
                 .transition()
                 .delay(250)
                 .style('opacity', 0)
+
+            @tooltip.hide()
+
         else
             [xPos, yPos] = mouse
             line
@@ -281,6 +291,8 @@ chartProperties = [
                 .attr('x2', xPos)
                 .transition()
                 .style('opacity', 0.5)
+
+            @tooltip.render @data().get(), clientMouse
 
     addPlugin: (plugin)->
         @plugins[plugin.name] = plugin
