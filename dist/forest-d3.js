@@ -266,6 +266,12 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
       },
 
       /*
+      TODO: Add data normalization routine
+      It should fill in missing gaps and sort the data in ascending order.
+       */
+      normalize: function(data) {},
+
+      /*
       Utility class that uses d3.bisect to find the index in a given array,
       where a search value can be inserted.
       This is different from normal bisectLeft; this function finds the nearest
@@ -349,15 +355,15 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         });
       },
       hide: function(keys, flag) {
-        var d, i, len, ref;
+        var d, j, len, ref;
         if (flag == null) {
           flag = true;
         }
         if (!(keys instanceof Array)) {
           keys = [keys];
         }
-        for (i = 0, len = data.length; i < len; i++) {
-          d = data[i];
+        for (j = 0, len = data.length; j < len; j++) {
+          d = data[j];
           if (ref = d.key, indexOf.call(keys, ref) >= 0) {
             d.hidden = flag;
           }
@@ -368,12 +374,12 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         return this.hide(keys, false);
       },
       toggle: function(keys) {
-        var d, i, len, ref;
+        var d, j, len, ref;
         if (!(keys instanceof Array)) {
           keys = [keys];
         }
-        for (i = 0, len = data.length; i < len; i++) {
-          d = data[i];
+        for (j = 0, len = data.length; j < len; j++) {
+          d = data[j];
           if (ref = d.key, indexOf.call(keys, ref) >= 0) {
             d.hidden = !d.hidden;
           }
@@ -381,17 +387,17 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         return this;
       },
       showOnly: function(key) {
-        var d, i, len;
-        for (i = 0, len = data.length; i < len; i++) {
-          d = data[i];
+        var d, j, len;
+        for (j = 0, len = data.length; j < len; j++) {
+          d = data[j];
           d.hidden = !(d.key === key);
         }
         return this;
       },
       showAll: function() {
-        var d, i, len;
-        for (i = 0, len = data.length; i < len; i++) {
-          d = data[i];
+        var d, j, len;
+        for (j = 0, len = data.length; j < len; j++) {
+          d = data[j];
           d.hidden = false;
         }
         return this;
@@ -399,6 +405,18 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
       visible: function() {
         return data.filter(function(d) {
           return !d.hidden;
+        });
+      },
+      xValues: function() {
+        var dataObjs;
+        dataObjs = data.filter(function(d) {
+          return (d.values != null) && d.type !== 'region';
+        });
+        if (dataObjs[0] == null) {
+          return [];
+        }
+        return dataObjs[0].values.map(function(d, i) {
+          return chart.getX()(d, i);
         });
       },
       render: function() {

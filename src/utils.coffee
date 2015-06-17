@@ -106,6 +106,12 @@
             d
 
     ###
+    TODO: Add data normalization routine
+    It should fill in missing gaps and sort the data in ascending order.
+    ###
+    normalize: (data)->
+
+    ###
     Utility class that uses d3.bisect to find the index in a given array,
     where a search value can be inserted.
     This is different from normal bisectLeft; this function finds the nearest

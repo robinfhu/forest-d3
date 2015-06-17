@@ -126,3 +126,38 @@ describe 'Data API', ->
         visible = chart.data().visible()
         visible.length.should.equal 1
         visible[0].key.should.equal 'series1'
+
+    it 'has method to get list of x values', ->
+        data = [
+            values: [
+                [2, 10]
+                [80, 100]
+                [90, 101]
+            ]
+        ]
+        chart = new ForestD3.Chart()
+        chart.data(data)
+
+        chart.data().xValues().should.deep.equal [2, 80, 90]
+
+        data = [
+            value: [1,2]
+        ]
+
+        chart.data(data)
+
+        chart.data().xValues().should.deep.equal []
+
+        chart.getX (d,i)-> i
+
+        data = [
+            values: [
+                [2, 10]
+                [80, 100]
+                [90, 101]
+            ]
+        ]
+
+        chart.data(data)
+
+        chart.data().xValues().should.deep.equal [0,1,2]
