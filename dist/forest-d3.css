@@ -4,6 +4,7 @@
 }
 .forest-d3 rect.backdrop {
   opacity: 0;
+  pointer-events: all;
 }
 .forest-d3 .axis .tick line {
   stroke: #848ded;
@@ -12,12 +13,18 @@
 .forest-d3 .axis > path {
   fill: #cdd2f3;
 }
+.forest-d3 .axes-labels {
+  pointer-events: none;
+}
 .forest-d3 .canvas > rect {
   fill-opacity: 0.1;
   fill: #bcbcf2;
 }
 .forest-d3 .canvas circle.point {
   fill-opacity: 0.8;
+}
+.forest-d3 .canvas .chart-item {
+  pointer-events: none;
 }
 
 .forest-d3.legend .item {
@@ -65,6 +72,7 @@
   fill: none;
   stroke-opacity: 0.8;
   stroke-width: 2;
+  pointer-events: none;
 }
 
 .forest-d3 line.marker {

@@ -6,6 +6,7 @@
     rect
         &.backdrop
             opacity 0
+            pointer-events all
 
     .axis
         .tick
@@ -16,6 +17,9 @@
         > path
             fill #CDD2F3
 
+    .axes-labels
+        pointer-events none
+
     .canvas
         & > rect
             fill-opacity 0.1
@@ -24,3 +28,6 @@
         circle
             &.point
                 fill-opacity 0.8
+
+        .chart-item
+            pointer-events none

@@ -205,6 +205,7 @@ chartProperties = [
         @canvas.select('rect.canvas-backdrop')
             .attr('width', @canvasWidth)
             .attr('height', @canvasHeight)
+            .on('mousemove', -> console.log(d3.mouse(@)))
 
         # Add axes labels
         axesLabels = @canvas.selectAll('g.axes-labels').data([0])

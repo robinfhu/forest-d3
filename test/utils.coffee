@@ -163,3 +163,28 @@ describe 'Utilities', ->
                 x: [-11, 11]
                 y: [1.925, 5.075]
 
+    describe 'smartBisect', ->
+        smartBisect = null
+        getX = (d,i)-> i
+        beforeEach -> smartBisect = ForestD3.Utils.smartBisect
+
+        it 'handles basic case', ->
+            data = [0, 1, 2, 3, 4, 5]
+
+            tests = [
+                [0,0]
+                [2,2]
+                [2.5, 3]
+                [2.51, 3]
+                [5, 5]
+                [7, 5]
+                [-1, 0]
+            ]
+
+            for test, i in tests
+                [search, expected] = test
+
+                result = smartBisect data, search, getX
+
+                result.should.equal expected, "Test case #{i}"
+

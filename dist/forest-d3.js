@@ -19,16 +19,17 @@ Author:  Robin Hu
 
 (function() {
   this.ForestD3.ChartItem.line = function(selection, selectionData) {
-    var chart, lineFn, path;
+    var chart, interpolate, lineFn, path;
     chart = this;
     selection.style('stroke', chart.seriesColor);
     path = selection.selectAll('path.line').data([selectionData.values]);
-    path.enter().append('path').classed('line', true).attr('d', d3.svg.line().interpolate(selectionData.interpolate || 'linear').x(function(d, i) {
+    interpolate = selectionData.interpolate || 'linear';
+    path.enter().append('path').classed('line', true).attr('d', d3.svg.line().interpolate(interpolate).x(function(d, i) {
       return chart.xScale(chart.getX()(d, i));
     }).y(function() {
       return chart.canvasHeight;
     }));
-    lineFn = d3.svg.line().interpolate(selectionData.interpolate || 'linear').x(function(d, i) {
+    lineFn = d3.svg.line().interpolate(interpolate).x(function(d, i) {
       return chart.xScale(chart.getX()(d, i));
     }).y(function(d, i) {
       return chart.yScale(chart.getY()(d, i));
@@ -262,6 +263,62 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
           d._index = i;
           return d;
         });
+      },
+
+      /*
+      Utility class that uses d3.bisect to find the index in a given array,
+      where a search value can be inserted.
+      This is different from normal bisectLeft; this function finds the nearest
+      index to insert the search value.
+      For instance, lets say your array is [1,2,3,5,10,30], and you search for 28.
+      Normal d3.bisectLeft will return 4, because 28 is inserted after the number
+      10.
+      
+      But smartBisect will return 5
+      because 28 is closer to 30 than 10.
+      Has the following known issues:
+         * Will not work if the data points move backwards (ie, 10,9,8,7, etc) or
+         if the data points are in random order.
+         * Won't work if there are duplicate x coordinate values.
+       */
+      smartBisect: function(values, search, getX) {
+        var bisect, index, nextVal, prevIndex, prevVal;
+        if (getX == null) {
+          getX = function(d) {
+            return d[0];
+          };
+        }
+        if (!(values instanceof Array)) {
+          return null;
+        }
+        if (values.length === 0) {
+          return null;
+        }
+        if (values.length === 1) {
+          return 0;
+        }
+        bisect = function(vals, sch) {
+          var d, i, j, len, val;
+          for (i = j = 0, len = vals.length; j < len; i = ++j) {
+            d = vals[i];
+            val = getX(d, i);
+            if (val >= sch) {
+              return i;
+            }
+          }
+          return vals.length;
+        };
+        index = bisect(values, search);
+        index = d3.min([index, values.length - 1]);
+        if (index > 0) {
+          prevIndex = index - 1;
+          prevVal = getX(values[prevIndex], prevIndex);
+          nextVal = getX(values[index], index);
+          if (Math.abs(search - prevVal) < Math.abs(search - nextVal)) {
+            index = prevIndex;
+          }
+        }
+        return index;
       },
       defaultColor: function(i) {
         return colors20[i % colors20.length];
@@ -624,7 +681,9 @@ It acts as a plugin to a main chart instance.
       yAxisGroup.transition().call(this.yAxis);
       this.canvas = this.svg.selectAll('g.canvas').data([0]);
       this.canvas.enter().append('g').classed('canvas', true).attr('transform', "translate(" + this.margin.left + ", " + this.margin.top + ")").append('rect').classed('canvas-backdrop', true);
-      this.canvas.select('rect.canvas-backdrop').attr('width', this.canvasWidth).attr('height', this.canvasHeight);
+      this.canvas.select('rect.canvas-backdrop').attr('width', this.canvasWidth).attr('height', this.canvasHeight).on('mousemove', function() {
+        return console.log(d3.mouse(this));
+      });
       axesLabels = this.canvas.selectAll('g.axes-labels').data([0]);
       axesLabels.enter().append('g').classed('axes-labels', true);
       xAxisLabel = axesLabels.selectAll('text.x-axis').data([this.xLabel()]);
