@@ -315,7 +315,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
           hi = vals.length;
           while (lo < hi) {
             mid = (lo + hi) >>> 1;
-            if (vals[mid] < sch) {
+            if (getX(vals[mid], mid) < sch) {
               lo = mid + 1;
             } else {
               hi = mid;
