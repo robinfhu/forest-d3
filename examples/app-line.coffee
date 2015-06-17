@@ -29,6 +29,7 @@ data = [
     key: 'series1'
     label: 'AAPL'
     type: 'line'
+    interpolate: 'basis'
     values: getStocks(301.43, 0.0015)
 ,
     key: 'series2'

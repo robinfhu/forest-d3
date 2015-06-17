@@ -23,12 +23,12 @@ Author:  Robin Hu
     chart = this;
     selection.style('stroke', chart.seriesColor);
     path = selection.selectAll('path.line').data([selectionData.values]);
-    path.enter().append('path').classed('line', true).attr('d', d3.svg.line().interpolate('linear').x(function(d, i) {
+    path.enter().append('path').classed('line', true).attr('d', d3.svg.line().interpolate(selectionData.interpolate || 'linear').x(function(d, i) {
       return chart.xScale(chart.getX()(d, i));
     }).y(function() {
       return chart.canvasHeight;
     }));
-    lineFn = d3.svg.line().interpolate('linear').x(function(d, i) {
+    lineFn = d3.svg.line().interpolate(selectionData.interpolate || 'linear').x(function(d, i) {
       return chart.xScale(chart.getX()(d, i));
     }).y(function(d, i) {
       return chart.yScale(chart.getY()(d, i));
