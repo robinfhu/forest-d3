@@ -32,7 +32,7 @@ It acts as a plugin to a main chart instance.
         data = @chartInstance.data().displayInfo()
 
         items = @container.selectAll('div.item').data(data, (d)-> d.key)
-        items
+        itemsEnter = items
             .enter()
             .append('div')
             .classed('item', true)
@@ -41,32 +41,17 @@ It acts as a plugin to a main chart instance.
 
         items.classed('disabled', (d)-> d.hidden)
 
-        colorSquares = items
-            .selectAll('span.color-square')
-            .data((d)-> [d])
-
-        colorSquares
-            .enter()
+        itemsEnter
             .append('span')
             .classed('color-square', true)
             .style('background-color', (d)-> d.color)
 
-        labels = items
-            .selectAll('span.description')
-            .data((d)-> [d])
-
-        labels
-            .enter()
+        itemsEnter
             .append('span')
             .classed('description', true)
             .text((d)-> d.label)
 
-        onlyButton = items
-            .selectAll('span.show-only')
-            .data((d)-> [d])
-
-        onlyButton
-            .enter()
+        itemsEnter
             .append('span')
             .classed('show-only button', true)
             .text('only')

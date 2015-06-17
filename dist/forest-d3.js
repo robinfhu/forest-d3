@@ -378,7 +378,7 @@ It acts as a plugin to a main chart instance.
     };
 
     Legend.prototype.render = function() {
-      var colorSquares, data, items, labels, onlyButton, showAll;
+      var data, items, itemsEnter, showAll;
       if (this.chartInstance == null) {
         return;
       }
@@ -392,7 +392,7 @@ It acts as a plugin to a main chart instance.
       items = this.container.selectAll('div.item').data(data, function(d) {
         return d.key;
       });
-      items.enter().append('div').classed('item', true);
+      itemsEnter = items.enter().append('div').classed('item', true);
       items.on('click', (function(_this) {
         return function(d) {
           return _this.chartInstance.data().toggle(d.key).render();
@@ -401,22 +401,13 @@ It acts as a plugin to a main chart instance.
       items.classed('disabled', function(d) {
         return d.hidden;
       });
-      colorSquares = items.selectAll('span.color-square').data(function(d) {
-        return [d];
-      });
-      colorSquares.enter().append('span').classed('color-square', true).style('background-color', function(d) {
+      itemsEnter.append('span').classed('color-square', true).style('background-color', function(d) {
         return d.color;
       });
-      labels = items.selectAll('span.description').data(function(d) {
-        return [d];
-      });
-      labels.enter().append('span').classed('description', true).text(function(d) {
+      itemsEnter.append('span').classed('description', true).text(function(d) {
         return d.label;
       });
-      onlyButton = items.selectAll('span.show-only').data(function(d) {
-        return [d];
-      });
-      return onlyButton.enter().append('span').classed('show-only button', true).text('only').on('click', (function(_this) {
+      return itemsEnter.append('span').classed('show-only button', true).text('only').on('click', (function(_this) {
         return function(d) {
           d3.event.stopPropagation();
           return _this.chartInstance.data().showOnly(d.key).render();
