@@ -664,7 +664,7 @@ It acts as a plugin to a main chart instance.
      */
 
     Chart.prototype.updateChartFrame = function() {
-      var axesLabels, backdrop, xAxisGroup, xAxisLabel, xTicks, yAxisGroup, yAxisLabel;
+      var axesLabels, backdrop, canvasEnter, chart, xAxisGroup, xAxisLabel, xTicks, yAxisGroup, yAxisLabel;
       backdrop = this.svg.selectAll('rect.backdrop').data([0]);
       backdrop.enter().append('rect').classed('backdrop', true);
       backdrop.attr('width', this.width).attr('height', this.height);
@@ -680,10 +680,17 @@ It acts as a plugin to a main chart instance.
       xAxisGroup.transition().call(this.xAxis);
       yAxisGroup.transition().call(this.yAxis);
       this.canvas = this.svg.selectAll('g.canvas').data([0]);
-      this.canvas.enter().append('g').classed('canvas', true).attr('transform', "translate(" + this.margin.left + ", " + this.margin.top + ")").append('rect').classed('canvas-backdrop', true);
+      canvasEnter = this.canvas.enter().append('g').classed('canvas', true);
+      this.canvas.attr('transform', "translate(" + this.margin.left + ", " + this.margin.top + ")");
+      canvasEnter.append('rect').classed('canvas-backdrop', true);
+      chart = this;
       this.canvas.select('rect.canvas-backdrop').attr('width', this.canvasWidth).attr('height', this.canvasHeight).on('mousemove', function() {
-        return console.log(d3.mouse(this));
+        return chart.updateGuideline(d3.mouse(this));
+      }).on('mouseout', function() {
+        return chart.updateGuideline(null);
       });
+      canvasEnter.append('line').classed('guideline', true).style('opacity', 0);
+      this.canvas.select('line.guideline').attr('y1', 0).attr('y2', this.canvasHeight);
       axesLabels = this.canvas.selectAll('g.axes-labels').data([0]);
       axesLabels.enter().append('g').classed('axes-labels', true);
       xAxisLabel = axesLabels.selectAll('text.x-axis').data([this.xLabel()]);
@@ -707,6 +714,24 @@ It acts as a plugin to a main chart instance.
       });
       this.yScale = d3.scale.linear().domain(extent.y).range([this.canvasHeight, 0]);
       return this.xScale = d3.scale.linear().domain(extent.x).range([0, this.canvasWidth]);
+    };
+
+
+    /*
+    Updates where the guideline is.
+    
+    mouse should be an array of two things: [mouse x , mouse y]
+     */
+
+    Chart.prototype.updateGuideline = function(mouse) {
+      var line, xPos, yPos;
+      line = this.canvas.select('line.guideline');
+      if (mouse == null) {
+        return line.transition().delay(250).style('opacity', 0);
+      } else {
+        xPos = mouse[0], yPos = mouse[1];
+        return line.attr('x1', xPos).attr('x2', xPos).transition().style('opacity', 0.5);
+      }
     };
 
     Chart.prototype.addPlugin = function(plugin) {

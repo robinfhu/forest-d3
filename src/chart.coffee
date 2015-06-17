@@ -196,16 +196,32 @@ chartProperties = [
         # Create a canvas, where all data points will be plotted.
         @canvas = @svg.selectAll('g.canvas').data([0])
 
-        @canvas.enter().append('g')
-            .classed('canvas', true)
+        canvasEnter = @canvas.enter().append('g').classed('canvas', true)
+
+        @canvas
             .attr('transform',"translate(#{@margin.left}, #{@margin.top})")
+
+        canvasEnter
             .append('rect')
             .classed('canvas-backdrop', true)
 
+        chart = @
         @canvas.select('rect.canvas-backdrop')
             .attr('width', @canvasWidth)
             .attr('height', @canvasHeight)
-            .on('mousemove', -> console.log(d3.mouse(@)))
+            # Attach mouse handlers to update the guideline
+            .on('mousemove', -> chart.updateGuideline d3.mouse(@))
+            .on('mouseout', -> chart.updateGuideline null)
+
+        # Add a guideline
+        canvasEnter
+            .append('line')
+            .classed('guideline', true)
+            .style('opacity', 0)
+
+        @canvas.select('line.guideline')
+            .attr('y1', 0)
+            .attr('y2', @canvasHeight)
 
         # Add axes labels
         axesLabels = @canvas.selectAll('g.axes-labels').data([0])
@@ -244,6 +260,27 @@ chartProperties = [
 
         @yScale = d3.scale.linear().domain(extent.y).range([@canvasHeight, 0])
         @xScale = d3.scale.linear().domain(extent.x).range([0, @canvasWidth])
+
+    ###
+    Updates where the guideline is.
+
+    mouse should be an array of two things: [mouse x , mouse y]
+    ###
+    updateGuideline: (mouse)->
+        line = @canvas.select('line.guideline')
+        unless mouse?
+            # Hide guideline from view if 'null' passed in
+            line
+                .transition()
+                .delay(250)
+                .style('opacity', 0)
+        else
+            [xPos, yPos] = mouse
+            line
+                .attr('x1', xPos)
+                .attr('x2', xPos)
+                .transition()
+                .style('opacity', 0.5)
 
     addPlugin: (plugin)->
         @plugins[plugin.name] = plugin
