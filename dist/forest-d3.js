@@ -573,11 +573,15 @@ Library of tooltip rendering utilities
 (function() {
   this.ForestD3.TooltipContent = {
     multiple: function(chart, xIndex) {
-      var slice, xValue;
+      var rows, slice, xValue;
       xValue = chart.data().xValueAt(xIndex);
       xValue = chart.xTickFormat()(xValue);
       slice = chart.data().sliced(xIndex);
-      return "<div class='header'>" + xValue + "</div>";
+      rows = slice.map(function(d) {
+        return "<tr>\n    <td class='series-label'>" + d.label + "</td>\n    <td class='series-value'>" + (chart.yTickFormat()(d.y)) + "</td>\n</tr>";
+      });
+      rows = rows.join('');
+      return "<div class='header'>" + xValue + "</div>\n<table>\n    " + rows + "\n</table>";
     }
   };
 
