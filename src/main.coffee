@@ -10,5 +10,3 @@ Author:  Robin Hu
     version: '1.0.0'
 
 @ForestD3.ChartItem = {}
-
-@ForestD3.getIdx = (d,i)-> i

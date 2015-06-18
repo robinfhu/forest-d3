@@ -42,7 +42,7 @@ getIdx = (d,i)-> i
         @seriesColor = (d)=> d.color or @color()(d._index)
         @getXInternal = =>
             if @ordinal()
-                ForestD3.getIdx
+                getIdx
             else
                 @getX()
 
@@ -338,7 +338,8 @@ getIdx = (d,i)-> i
                 .transition()
                 .style('opacity', 0.5)
 
-            @tooltip.render xPos, clientMouse
+            content = ForestD3.TooltipContent.multiple @, idx
+            @tooltip.render content, clientMouse
 
     addPlugin: (plugin)->
         @plugins[plugin.name] = plugin

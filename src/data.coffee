@@ -58,8 +58,11 @@
     visible: ->
         data.filter (d)-> not d.hidden
 
+    _getSliceable: ->
+        data.filter (d)-> d.values? and d.type isnt 'region'
+
     _xValues: (getX)->
-        dataObjs = data.filter (d)-> d.values? and d.type isnt 'region'
+        dataObjs = @._getSliceable()
         return [] unless dataObjs[0]?
 
         dataObjs[0].values.map getX
@@ -72,5 +75,30 @@
     # Get array of all X-axis data points, returning the raw x value
     xValuesRaw: ->
         @._xValues chart.getX()
+
+    # Get the x raw value at a certain position
+    xValueAt: (i)->
+        dataObjs = @._getSliceable()
+        return null unless dataObjs[0]?
+
+        point = dataObjs[0].values[i]
+        if point?
+            chart.getX()(point)
+        else
+            null
+
+    ###
+    For a set of data series, grabs a slice of the data at a certain index.
+    Useful for making the tooltip.
+    ###
+    sliced: (i)->
+        @._getSliceable().filter((d)-> not d.hidden).map (d)->
+            point = d.values[i]
+
+            x: chart.getX()(point)
+            y: chart.getY()(point)
+            key: d.key
+            label: d.label
+            color: chart.seriesColor d
 
     render: -> chart.render()

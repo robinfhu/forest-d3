@@ -174,3 +174,101 @@ describe 'Data API', ->
         chart.ordinal(true).data(data)
 
         chart.data().xValuesRaw().should.deep.equal [2,80,90]
+
+    it 'can get x value at certain index', ->
+        data = [
+            values: [
+                [2, 10]
+                [80, 100]
+                [90, 101]
+            ]
+        ]
+        chart = new ForestD3.Chart()
+        chart.ordinal(true).data(data)
+
+        chart.data().xValueAt(0).should.equal 2
+        chart.data().xValueAt(1).should.equal 80
+        chart.data().xValueAt(2).should.equal 90
+        should.not.exist chart.data().xValueAt(4)
+
+    describe 'Data Slice', ->
+        it 'can get a slice of data at an index', ->
+            data = [
+                key: 'series1'
+                label: 'Foo'
+                color: '#000'
+                values: [
+                    [70, 10]
+                    [80, 100]
+                    [90, 101]
+                ]
+            ,
+                key: 'series2'
+                label: 'Bar'
+                values: [
+                    [70, 10]
+                    [80, 800]
+                    [90, 709]
+                ]
+            ,
+                key: 'series3'
+                label: 'Maz'
+                color: '#0f0'
+                values: [
+                    [70, 12]
+                    [80, 300]
+                    [90, 749]
+                ]
+            ]
+
+            chart = new ForestD3.Chart()
+            chart.data(data)
+
+            slice = chart.data().sliced(0)
+
+            slice.length.should.equal 3, '3 items'
+
+            slice[0].should.deep.equal
+                x: 70
+                y: 10
+                key: 'series1'
+                label: 'Foo'
+                color: '#000'
+
+            slice[2].y.should.equal 12
+
+            slice = chart.data().sliced(2)
+
+            yData = slice.map (d)-> d.y
+
+            yData.should.deep.equal [101, 709, 749]
+
+        it 'keeps hidden data out of slice', ->
+            it 'can get a slice of data at an index', ->
+            data = [
+                values: [
+                    [70, 10]
+                    [80, 100]
+                    [90, 101]
+                ]
+            ,
+                hidden: true
+                values: [
+                    [70, 10]
+                    [80, 800]
+                    [90, 709]
+                ]
+            ,
+                hidden: true
+                values: [
+                    [70, 12]
+                    [80, 300]
+                    [90, 749]
+                ]
+            ]
+
+            chart = new ForestD3.Chart()
+            chart.data(data)
+
+            slice = chart.data().sliced(0)
+            slice.length.should.equal 1, 'only one item'

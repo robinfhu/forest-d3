@@ -15,10 +15,6 @@ Author:  Robin Hu
 
   this.ForestD3.ChartItem = {};
 
-  this.ForestD3.getIdx = function(d, i) {
-    return i;
-  };
-
 }).call(this);
 
 (function() {
@@ -440,11 +436,14 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
           return !d.hidden;
         });
       },
-      _xValues: function(getX) {
-        var dataObjs;
-        dataObjs = data.filter(function(d) {
+      _getSliceable: function() {
+        return data.filter(function(d) {
           return (d.values != null) && d.type !== 'region';
         });
+      },
+      _xValues: function(getX) {
+        var dataObjs;
+        dataObjs = this._getSliceable();
         if (dataObjs[0] == null) {
           return [];
         }
@@ -455,6 +454,39 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
       },
       xValuesRaw: function() {
         return this._xValues(chart.getX());
+      },
+      xValueAt: function(i) {
+        var dataObjs, point;
+        dataObjs = this._getSliceable();
+        if (dataObjs[0] == null) {
+          return null;
+        }
+        point = dataObjs[0].values[i];
+        if (point != null) {
+          return chart.getX()(point);
+        } else {
+          return null;
+        }
+      },
+
+      /*
+      For a set of data series, grabs a slice of the data at a certain index.
+      Useful for making the tooltip.
+       */
+      sliced: function(i) {
+        return this._getSliceable().filter(function(d) {
+          return !d.hidden;
+        }).map(function(d) {
+          var point;
+          point = d.values[i];
+          return {
+            x: chart.getX()(point),
+            y: chart.getY()(point),
+            key: d.key,
+            label: d.label,
+            color: chart.seriesColor(d)
+          };
+        });
       },
       render: function() {
         return chart.render();
@@ -540,7 +572,13 @@ Library of tooltip rendering utilities
 
 (function() {
   this.ForestD3.TooltipContent = {
-    multiple: function(chart, xIndex) {}
+    multiple: function(chart, xIndex) {
+      var slice, xValue;
+      xValue = chart.data().xValueAt(xIndex);
+      xValue = chart.xTickFormat()(xValue);
+      slice = chart.data().sliced(xIndex);
+      return "<div class='header'>" + xValue + "</div>";
+    }
   };
 
 }).call(this);
@@ -656,7 +694,7 @@ Library of tooltip rendering utilities
       this.getXInternal = (function(_this) {
         return function() {
           if (_this.ordinal()) {
-            return ForestD3.getIdx;
+            return getIdx;
           } else {
             return _this.getX();
           }
@@ -871,7 +909,7 @@ Library of tooltip rendering utilities
      */
 
     Chart.prototype.updateTooltip = function(mouse, clientMouse) {
-      var idx, line, xPos, xValues, yPos;
+      var content, idx, line, xPos, xValues, yPos;
       line = this.canvas.select('line.guideline');
       if (mouse == null) {
         line.transition().delay(250).style('opacity', 0);
@@ -884,7 +922,8 @@ Library of tooltip rendering utilities
         });
         xPos = this.xScale(xValues[idx]);
         line.attr('x1', xPos).attr('x2', xPos).transition().style('opacity', 0.5);
-        return this.tooltip.render(xPos, clientMouse);
+        content = ForestD3.TooltipContent.multiple(this, idx);
+        return this.tooltip.render(content, clientMouse);
       }
     };
 
