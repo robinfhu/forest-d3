@@ -5,6 +5,7 @@ chart
     .ordinal(true)
     .xLabel('Date')
     .yLabel('Price')
+    .yTickFormat(d3.format('$,.2f'))
     .xTickFormat((d)->
         if d?
             d3.time.format('%Y-%m-%d')(new Date d)
@@ -55,7 +56,5 @@ data = [
     axis: 'x'
     values: [50, 90]
 ]
-
-chart.yAxis.tickFormat(d3.format('$,.2f'))
 
 chart.data(data).render()

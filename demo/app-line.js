@@ -5,7 +5,7 @@
 
   legend = new ForestD3.Legend(d3.select('#legend'));
 
-  chart.ordinal(true).xLabel('Date').yLabel('Price').xTickFormat(function(d) {
+  chart.ordinal(true).xLabel('Date').yLabel('Price').yTickFormat(d3.format('$,.2f')).xTickFormat(function(d) {
     if (d != null) {
       return d3.time.format('%Y-%m-%d')(new Date(d));
     } else {
@@ -55,8 +55,6 @@
       values: [50, 90]
     }
   ];
-
-  chart.yAxis.tickFormat(d3.format('$,.2f'));
 
   chart.data(data).render();
 

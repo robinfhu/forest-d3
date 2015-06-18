@@ -623,7 +623,7 @@ It acts as a plugin to a main chart instance.
       'xTickFormat', function(d) {
         return d;
       }
-    ], ['showTooltip', true]
+    ], ['yTickFormat', d3.format(',.2f')], ['showTooltip', true]
   ];
 
   getIdx = function(d, i) {
@@ -827,7 +827,7 @@ It acts as a plugin to a main chart instance.
       xAxisGroup = this.svg.selectAll('g.x-axis').data([0]);
       xAxisGroup.enter().append('g').attr('class', 'x-axis axis');
       xAxisGroup.attr('transform', "translate(" + this.margin.left + ", " + (this.canvasHeight + this.margin.top) + ")");
-      this.yAxis.scale(this.yScale).orient('left').tickSize(-this.canvasWidth, 1).tickPadding(10);
+      this.yAxis.scale(this.yScale).orient('left').tickSize(-this.canvasWidth, 1).tickPadding(10).tickFormat(this.yTickFormat());
       yAxisGroup = this.svg.selectAll('g.y-axis').data([0]);
       yAxisGroup.enter().append('g').attr('class', 'y-axis axis');
       yAxisGroup.attr('transform', "translate(" + this.margin.left + ", " + this.margin.top + ")");

@@ -10,6 +10,7 @@ chartProperties = [
     ['xLabel', '']
     ['yLabel', '']
     ['xTickFormat', (d)-> d]
+    ['yTickFormat', d3.format(',.2f')]
     ['showTooltip', true]
 ]
 
@@ -210,6 +211,7 @@ getIdx = (d,i)-> i
             .orient('left')
             .tickSize(-@canvasWidth, 1)
             .tickPadding(10)
+            .tickFormat(@yTickFormat())
 
         yAxisGroup = @svg.selectAll('g.y-axis').data([0])
         yAxisGroup.enter()
