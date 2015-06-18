@@ -289,13 +289,14 @@ chartProperties = [
 
             xValues = @data().xValues()
 
-            x = ForestD3.Utils.smartBisect(
+            idx = ForestD3.Utils.smartBisect(
                 xValues,
                 @xScale.invert(xPos),
                 (d)-> d
             )
 
-            xPos = @xScale x
+            # Todo: this must be passed into getX()
+            xPos = @xScale idx
 
             line
                 .attr('x1', xPos)

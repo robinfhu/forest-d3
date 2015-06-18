@@ -163,6 +163,25 @@
 
         index
 
+    ###
+    Returns true if the getX function passed in is of type:
+    function(d,i){ return i;}
+
+    Accomplishes this using basic duck typing.
+    ###
+    isOrdinal: (getX)->
+        try
+            for i in [0..3]
+                result = getX null, i
+
+                if result isnt i
+                    throw true
+        catch e
+            return false
+
+        return true
+
+
     defaultColor: (i)-> colors20[i % colors20.length]
 
     debounce: (fn, delay)->

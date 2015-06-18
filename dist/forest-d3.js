@@ -335,6 +335,28 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         }
         return index;
       },
+
+      /*
+      Returns true if the getX function passed in is of type:
+      function(d,i){ return i;}
+      
+      Accomplishes this using basic duck typing.
+       */
+      isOrdinal: function(getX) {
+        var e, i, j, result;
+        try {
+          for (i = j = 0; j <= 3; i = ++j) {
+            result = getX(null, i);
+            if (result !== i) {
+              throw true;
+            }
+          }
+        } catch (_error) {
+          e = _error;
+          return false;
+        }
+        return true;
+      },
       defaultColor: function(i) {
         return colors20[i % colors20.length];
       },
@@ -801,7 +823,7 @@ It acts as a plugin to a main chart instance.
      */
 
     Chart.prototype.updateTooltip = function(mouse, clientMouse) {
-      var line, x, xPos, xValues, yPos;
+      var idx, line, xPos, xValues, yPos;
       line = this.canvas.select('line.guideline');
       if (mouse == null) {
         line.transition().delay(250).style('opacity', 0);
@@ -809,10 +831,10 @@ It acts as a plugin to a main chart instance.
       } else {
         xPos = mouse[0], yPos = mouse[1];
         xValues = this.data().xValues();
-        x = ForestD3.Utils.smartBisect(xValues, this.xScale.invert(xPos), function(d) {
+        idx = ForestD3.Utils.smartBisect(xValues, this.xScale.invert(xPos), function(d) {
           return d;
         });
-        xPos = this.xScale(x);
+        xPos = this.xScale(idx);
         line.attr('x1', xPos).attr('x2', xPos).transition().style('opacity', 0.5);
         return this.tooltip.render(this.data().get(), clientMouse);
       }
