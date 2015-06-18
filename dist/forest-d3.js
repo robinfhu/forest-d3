@@ -341,28 +341,6 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         }
         return index;
       },
-
-      /*
-      Returns true if the getX function passed in is of type:
-      function(d,i){ return i;}
-      
-      Accomplishes this using basic duck typing.
-       */
-      isOrdinal: function(getX) {
-        var e, i, j, result;
-        try {
-          for (i = j = 0; j <= 3; i = ++j) {
-            result = getX(null, i);
-            if (result !== i) {
-              throw true;
-            }
-          }
-        } catch (_error) {
-          e = _error;
-          return false;
-        }
-        return true;
-      },
       defaultColor: function(i) {
         return colors20[i % colors20.length];
       },

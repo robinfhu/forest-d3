@@ -188,16 +188,3 @@ describe 'Utilities', ->
 
                 result.should.equal expected, "Test case #{i}"
 
-    describe 'isOrdinal', ->
-        it 'has utility to check if function is an ordinal type', ->
-            getX = (d,i)-> i
-
-            result = ForestD3.Utils.isOrdinal getX
-            result.should.equal true, 'yes, it is ordinal'
-
-            getX = (d,i)-> d[0]
-
-            result = ForestD3.Utils.isOrdinal getX
-
-            result.should.equal false, 'no it is not ordinal'
-
