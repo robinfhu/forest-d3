@@ -180,12 +180,21 @@ getIdx = (d,i)-> i
         # TODO: Auto generate this xTicks number based on tickFormat.
         xTicks = Math.abs(@xScale.range()[0] - @xScale.range()[1]) / 100
 
+        xValues = @data().xValuesRaw()
+
         @xAxis
             .scale(@xScale)
             .tickSize(-@canvasHeight, 1)
             .ticks(xTicks)
             .tickPadding(10)
+            .tickFormat((d)=>
+                tick = if @ordinal()
+                    xValues[d]
+                else
+                    d
 
+                @xTickFormat()(tick, d)
+            )
         xAxisGroup = @svg.selectAll('g.x-axis').data([0])
         xAxisGroup.enter()
             .append('g')

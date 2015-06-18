@@ -462,7 +462,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
           return !d.hidden;
         });
       },
-      xValues: function() {
+      _xValues: function(getX) {
         var dataObjs;
         dataObjs = data.filter(function(d) {
           return (d.values != null) && d.type !== 'region';
@@ -470,7 +470,13 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         if (dataObjs[0] == null) {
           return [];
         }
-        return dataObjs[0].values.map(chart.getXInternal());
+        return dataObjs[0].values.map(getX);
+      },
+      xValues: function() {
+        return this._xValues(chart.getXInternal());
+      },
+      xValuesRaw: function() {
+        return this._xValues(chart.getX());
       },
       render: function() {
         return chart.render();
@@ -805,12 +811,19 @@ It acts as a plugin to a main chart instance.
      */
 
     Chart.prototype.updateChartFrame = function() {
-      var axesLabels, backdrop, canvasEnter, chart, xAxisGroup, xAxisLabel, xTicks, yAxisGroup, yAxisLabel;
+      var axesLabels, backdrop, canvasEnter, chart, xAxisGroup, xAxisLabel, xTicks, xValues, yAxisGroup, yAxisLabel;
       backdrop = this.svg.selectAll('rect.backdrop').data([0]);
       backdrop.enter().append('rect').classed('backdrop', true);
       backdrop.attr('width', this.width).attr('height', this.height);
       xTicks = Math.abs(this.xScale.range()[0] - this.xScale.range()[1]) / 100;
-      this.xAxis.scale(this.xScale).tickSize(-this.canvasHeight, 1).ticks(xTicks).tickPadding(10);
+      xValues = this.data().xValuesRaw();
+      this.xAxis.scale(this.xScale).tickSize(-this.canvasHeight, 1).ticks(xTicks).tickPadding(10).tickFormat((function(_this) {
+        return function(d) {
+          var tick;
+          tick = _this.ordinal() ? xValues[d] : d;
+          return _this.xTickFormat()(tick, d);
+        };
+      })(this));
       xAxisGroup = this.svg.selectAll('g.x-axis').data([0]);
       xAxisGroup.enter().append('g').attr('class', 'x-axis axis');
       xAxisGroup.attr('transform', "translate(" + this.margin.left + ", " + (this.canvasHeight + this.margin.top) + ")");

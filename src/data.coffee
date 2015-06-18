@@ -58,11 +58,19 @@
     visible: ->
         data.filter (d)-> not d.hidden
 
-    # Get array of all X-axis data points
-    xValues: ->
+    _xValues: (getX)->
         dataObjs = data.filter (d)-> d.values? and d.type isnt 'region'
         return [] unless dataObjs[0]?
 
-        dataObjs[0].values.map chart.getXInternal()
+        dataObjs[0].values.map getX
+
+    # Get array of all X-axis data points
+    # Returns natural ordered indices if chart.ordinal is true
+    xValues: ->
+        @._xValues chart.getXInternal()
+
+    # Get array of all X-axis data points, returning the raw x value
+    xValuesRaw: ->
+        @._xValues chart.getX()
 
     render: -> chart.render()

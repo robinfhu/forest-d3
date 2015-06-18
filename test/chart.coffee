@@ -82,6 +82,25 @@ describe 'Chart', ->
                 yTicks = $(container).find('.y-axis .tick')
                 yTicks.length.should.be.greaterThan 0
 
+            it 'formats x-axis tick labels', ->
+                chart = new ForestD3.Chart container
+                sampleData = [
+                    key: 'series1'
+                    values: [
+                        [ (new Date(2012, 0, 1)).getTime(), 0]
+                        [ (new Date(2012, 0, 2)).getTime(), 2]
+                    ]
+                ]
+
+                chart.xTickFormat (d)->
+                    d3.time.format('%Y-%m-%d')(new Date d)
+
+                chart.ordinal(true).data(sampleData).render()
+
+                tickFormat = chart.xAxis.tickFormat()
+                tickFormat(0).should.equal '2012-01-01'
+                tickFormat(1).should.equal '2012-01-02'
+
             it 'renders more than one series', ->
                 chart = new ForestD3.Chart container
 

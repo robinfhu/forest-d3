@@ -161,3 +161,16 @@ describe 'Data API', ->
         chart.data(data)
 
         chart.data().xValues().should.deep.equal [0,1,2]
+
+    it 'can get raw x values for an ordinal chart', ->
+        data = [
+            values: [
+                [2, 10]
+                [80, 100]
+                [90, 101]
+            ]
+        ]
+        chart = new ForestD3.Chart()
+        chart.ordinal(true).data(data)
+
+        chart.data().xValuesRaw().should.deep.equal [2,80,90]
