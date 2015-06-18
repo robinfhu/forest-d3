@@ -3,10 +3,10 @@
         @container = null
 
     ###
-    data: array of data objects to render
+    content: string or DOM object or d3 object representing tooltip content.
     clientMouse: Array of [mouse screen x, mouse screen y] positions
     ###
-    render: (data, clientMouse)->
+    render: (content, clientMouse)->
         unless @container?
             @container = document.createElement 'div'
             document.body.appendChild @container
@@ -30,6 +30,9 @@
             .style('top', "#{yPos}px")
             .transition()
             .style('opacity', 1)
+
+        if (typeof content is 'string') or (typeof content is 'number')
+            d3.select(@container).html(content)
 
     # Hide tooltip from view by making it transparent.
     hide: ->

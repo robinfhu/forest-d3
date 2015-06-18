@@ -170,7 +170,7 @@ describe 'Chart', ->
                     series = $(container).find('g.chart-item')
                     series.length.should.equal 2, 'back to two series only'
                     done()
-                , 300
+                , 400
 
         describe 'Marker Lines', ->
             it 'can render horizontal line (y-axis marker)', (done)->

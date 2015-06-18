@@ -338,7 +338,7 @@ getIdx = (d,i)-> i
                 .transition()
                 .style('opacity', 0.5)
 
-            @tooltip.render @data().get(), clientMouse
+            @tooltip.render xPos, clientMouse
 
     addPlugin: (plugin)->
         @plugins[plugin.name] = plugin

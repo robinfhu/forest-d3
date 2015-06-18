@@ -533,6 +533,18 @@ It acts as a plugin to a main chart instance.
 
 }).call(this);
 
+
+/*
+Library of tooltip rendering utilities
+ */
+
+(function() {
+  this.ForestD3.TooltipContent = {
+    multiple: function(chart, xIndex) {}
+  };
+
+}).call(this);
+
 (function() {
   var Tooltip;
 
@@ -543,11 +555,11 @@ It acts as a plugin to a main chart instance.
 
 
     /*
-    data: array of data objects to render
+    content: string or DOM object or d3 object representing tooltip content.
     clientMouse: Array of [mouse screen x, mouse screen y] positions
      */
 
-    Tooltip.prototype.render = function(data, clientMouse) {
+    Tooltip.prototype.render = function(content, clientMouse) {
       var xPos, yPos;
       if (this.container == null) {
         this.container = document.createElement('div');
@@ -566,7 +578,10 @@ It acts as a plugin to a main chart instance.
       xPos = clientMouse[0], yPos = clientMouse[1];
       xPos += window.pageXOffset;
       yPos += window.pageYOffset;
-      return d3.select(this.container).classed('forest-d3 tooltip-box', true).style('left', xPos + "px").style('top', yPos + "px").transition().style('opacity', 1);
+      d3.select(this.container).classed('forest-d3 tooltip-box', true).style('left', xPos + "px").style('top', yPos + "px").transition().style('opacity', 1);
+      if ((typeof content === 'string') || (typeof content === 'number')) {
+        return d3.select(this.container).html(content);
+      }
     };
 
     Tooltip.prototype.hide = function() {
@@ -869,7 +884,7 @@ It acts as a plugin to a main chart instance.
         });
         xPos = this.xScale(xValues[idx]);
         line.attr('x1', xPos).attr('x2', xPos).transition().style('opacity', 0.5);
-        return this.tooltip.render(this.data().get(), clientMouse);
+        return this.tooltip.render(xPos, clientMouse);
       }
     };
 
