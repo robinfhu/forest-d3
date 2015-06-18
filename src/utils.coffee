@@ -181,7 +181,6 @@
 
         return true
 
-
     defaultColor: (i)-> colors20[i % colors20.length]
 
     debounce: (fn, delay)->

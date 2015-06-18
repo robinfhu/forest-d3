@@ -5,9 +5,13 @@
 
   legend = new ForestD3.Legend(d3.select('#legend'));
 
-  chart.getX(function(d, i) {
-    return i;
-  }).xLabel('Date').yLabel('Price').addPlugin(legend);
+  chart.ordinal(true).xLabel('Date').yLabel('Price').xTickFormat(function(d) {
+    if (d != null) {
+      return d3.time.format('%Y-%m-%d')(new Date(d));
+    } else {
+      return '';
+    }
+  }).addPlugin(legend);
 
   getStocks = function(startPrice, volatility) {
     var changePct, i, j, result, startDate;
@@ -53,16 +57,6 @@
   ];
 
   chart.yAxis.tickFormat(d3.format('$,.2f'));
-
-  chart.xAxis.tickFormat(function(d) {
-    var date, ref;
-    date = (ref = data[0].values[d]) != null ? ref[0] : void 0;
-    if (date != null) {
-      return d3.time.format('%Y-%m-%d')(new Date(date));
-    } else {
-      return '';
-    }
-  });
 
   chart.data(data).render();
 

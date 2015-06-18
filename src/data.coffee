@@ -2,6 +2,8 @@
 
     chart = @
 
+    getIdx = (d,i)-> i
+
     get: -> data
 
     # Used for legends that need label and color information
@@ -61,6 +63,6 @@
         dataObjs = data.filter (d)-> d.values? and d.type isnt 'region'
         return [] unless dataObjs[0]?
 
-        dataObjs[0].values.map (d,i)-> chart.getX()(d,i)
+        dataObjs[0].values.map chart.getXInternal()
 
     render: -> chart.render()

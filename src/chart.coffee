@@ -1,6 +1,7 @@
 chartProperties = [
     ['getX', (d,i)-> d[0] ]
     ['getY', (d,i)-> d[1] ]
+    ['ordinal', false]
     ['autoResize', true]
     ['color', ForestD3.Utils.defaultColor]
     ['pointSize', 4]
@@ -8,8 +9,11 @@ chartProperties = [
     ['yPadding', 0.1]
     ['xLabel', '']
     ['yLabel', '']
+    ['xTickFormat', (d)-> d]
     ['showTooltip', true]
 ]
+
+getIdx = (d,i)-> i
 
 @ForestD3.Chart = class Chart
     constructor: (domContainer)->
@@ -32,9 +36,15 @@ chartProperties = [
         @container domContainer
 
         @tooltip = new ForestD3.Tooltip()
-        @xAxis = d3.svg.axis().tickPadding(10)
-        @yAxis = d3.svg.axis().tickPadding(10)
+        @xAxis = d3.svg.axis()
+        @yAxis = d3.svg.axis()
         @seriesColor = (d)=> d.color or @color()(d._index)
+        @getXInternal = =>
+            if @ordinal()
+                ForestD3.getIdx
+            else
+                @getX()
+
         @plugins = {}
 
         ###
@@ -169,7 +179,12 @@ chartProperties = [
         # Add axes
         # TODO: Auto generate this xTicks number based on tickFormat.
         xTicks = Math.abs(@xScale.range()[0] - @xScale.range()[1]) / 100
-        @xAxis.scale(@xScale).tickSize(-@canvasHeight, 1).ticks(xTicks)
+
+        @xAxis
+            .scale(@xScale)
+            .tickSize(-@canvasHeight, 1)
+            .ticks(xTicks)
+            .tickPadding(10)
 
         xAxisGroup = @svg.selectAll('g.x-axis').data([0])
         xAxisGroup.enter()
@@ -181,7 +196,12 @@ chartProperties = [
             "translate(#{@margin.left}, #{@canvasHeight + @margin.top})"
         )
 
-        @yAxis.scale(@yScale).orient('left').tickSize(-@canvasWidth, 1)
+        @yAxis
+            .scale(@yScale)
+            .orient('left')
+            .tickSize(-@canvasWidth, 1)
+            .tickPadding(10)
+
         yAxisGroup = @svg.selectAll('g.y-axis').data([0])
         yAxisGroup.enter()
             .append('g')
@@ -259,7 +279,11 @@ chartProperties = [
         yAxisLabel.text((d)-> d)
 
     updateChartScale: ->
-        extent = ForestD3.Utils.extent @data().visible(), @getX(), @getY()
+        extent = ForestD3.Utils.extent(
+            @data().visible(),
+            @getXInternal(),
+            @getY()
+        )
         extent = ForestD3.Utils.extentPadding extent, {
             x: @xPadding()
             y: @yPadding()
@@ -295,8 +319,7 @@ chartProperties = [
                 (d)-> d
             )
 
-            # Todo: this must be passed into getX()
-            xPos = @xScale idx
+            xPos = @xScale xValues[idx]
 
             line
                 .attr('x1', xPos)

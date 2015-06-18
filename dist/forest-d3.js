@@ -15,24 +15,30 @@ Author:  Robin Hu
 
   this.ForestD3.ChartItem = {};
 
+  this.ForestD3.getIdx = function(d, i) {
+    return i;
+  };
+
 }).call(this);
 
 (function() {
   this.ForestD3.ChartItem.line = function(selection, selectionData) {
-    var chart, interpolate, lineFn, path;
+    var chart, interpolate, lineFn, path, x, y;
     chart = this;
     selection.style('stroke', chart.seriesColor);
     path = selection.selectAll('path.line').data([selectionData.values]);
     interpolate = selectionData.interpolate || 'linear';
+    x = chart.getXInternal();
+    y = chart.getY();
     path.enter().append('path').classed('line', true).attr('d', d3.svg.line().interpolate(interpolate).x(function(d, i) {
-      return chart.xScale(chart.getX()(d, i));
+      return chart.xScale(x(d, i));
     }).y(function() {
       return chart.canvasHeight;
     }));
     lineFn = d3.svg.line().interpolate(interpolate).x(function(d, i) {
-      return chart.xScale(chart.getX()(d, i));
+      return chart.xScale(x(d, i));
     }).y(function(d, i) {
-      return chart.yScale(chart.getY()(d, i));
+      return chart.yScale(y(d, i));
     });
     return path.transition().duration(800).attr('d', lineFn);
   };
@@ -119,7 +125,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
     points = selection.selectAll('circle.point').data(function(d) {
       return d.values;
     });
-    x = chart.getX();
+    x = chart.getXInternal();
     y = chart.getY();
     points.enter().append('circle').classed('point', true).attr('cx', chart.canvasWidth / 2).attr('cy', chart.canvasHeight / 2).attr('r', 0);
     points.exit().remove();
@@ -384,8 +390,11 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
   var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   this.ForestD3.DataAPI = function(data) {
-    var chart;
+    var chart, getIdx;
     chart = this;
+    getIdx = function(d, i) {
+      return i;
+    };
     return {
       get: function() {
         return data;
@@ -461,9 +470,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         if (dataObjs[0] == null) {
           return [];
         }
-        return dataObjs[0].values.map(function(d, i) {
-          return chart.getX()(d, i);
-        });
+        return dataObjs[0].values.map(chart.getXInternal());
       },
       render: function() {
         return chart.render();
@@ -550,12 +557,28 @@ It acts as a plugin to a main chart instance.
       this.container = null;
     }
 
+
+    /*
+    data: array of data objects to render
+    clientMouse: Array of [mouse screen x, mouse screen y] positions
+     */
+
     Tooltip.prototype.render = function(data, clientMouse) {
       var xPos, yPos;
       if (this.container == null) {
         this.container = document.createElement('div');
         document.body.appendChild(this.container);
       }
+
+      /*
+      xPos and yPos are the relative coordinates of the mouse in the
+      browser window.
+      
+      Adding page offset to it takes into account any scrolling.
+      
+      Because the tooltip DIV is placed on document.body, this should give
+      us the absolute correct position.
+       */
       xPos = clientMouse[0], yPos = clientMouse[1];
       xPos += window.pageXOffset;
       yPos += window.pageYOffset;
@@ -567,7 +590,9 @@ It acts as a plugin to a main chart instance.
     };
 
     Tooltip.prototype.cleanUp = function() {
-      return document.body.removeChild(this.container);
+      if (this.container != null) {
+        return document.body.removeChild(this.container);
+      }
     };
 
     return Tooltip;
@@ -577,7 +602,7 @@ It acts as a plugin to a main chart instance.
 }).call(this);
 
 (function() {
-  var Chart, chartProperties;
+  var Chart, chartProperties, getIdx;
 
   chartProperties = [
     [
@@ -588,8 +613,16 @@ It acts as a plugin to a main chart instance.
       'getY', function(d, i) {
         return d[1];
       }
-    ], ['autoResize', true], ['color', ForestD3.Utils.defaultColor], ['pointSize', 4], ['xPadding', 0.1], ['yPadding', 0.1], ['xLabel', ''], ['yLabel', ''], ['showTooltip', true]
+    ], ['ordinal', false], ['autoResize', true], ['color', ForestD3.Utils.defaultColor], ['pointSize', 4], ['xPadding', 0.1], ['yPadding', 0.1], ['xLabel', ''], ['yLabel', ''], [
+      'xTickFormat', function(d) {
+        return d;
+      }
+    ], ['showTooltip', true]
   ];
+
+  getIdx = function(d, i) {
+    return i;
+  };
 
   this.ForestD3.Chart = Chart = (function() {
     function Chart(domContainer) {
@@ -614,11 +647,20 @@ It acts as a plugin to a main chart instance.
       }
       this.container(domContainer);
       this.tooltip = new ForestD3.Tooltip();
-      this.xAxis = d3.svg.axis().tickPadding(10);
-      this.yAxis = d3.svg.axis().tickPadding(10);
+      this.xAxis = d3.svg.axis();
+      this.yAxis = d3.svg.axis();
       this.seriesColor = (function(_this) {
         return function(d) {
           return d.color || _this.color()(d._index);
+        };
+      })(this);
+      this.getXInternal = (function(_this) {
+        return function() {
+          if (_this.ordinal()) {
+            return ForestD3.getIdx;
+          } else {
+            return _this.getX();
+          }
         };
       })(this);
       this.plugins = {};
@@ -768,11 +810,11 @@ It acts as a plugin to a main chart instance.
       backdrop.enter().append('rect').classed('backdrop', true);
       backdrop.attr('width', this.width).attr('height', this.height);
       xTicks = Math.abs(this.xScale.range()[0] - this.xScale.range()[1]) / 100;
-      this.xAxis.scale(this.xScale).tickSize(-this.canvasHeight, 1).ticks(xTicks);
+      this.xAxis.scale(this.xScale).tickSize(-this.canvasHeight, 1).ticks(xTicks).tickPadding(10);
       xAxisGroup = this.svg.selectAll('g.x-axis').data([0]);
       xAxisGroup.enter().append('g').attr('class', 'x-axis axis');
       xAxisGroup.attr('transform', "translate(" + this.margin.left + ", " + (this.canvasHeight + this.margin.top) + ")");
-      this.yAxis.scale(this.yScale).orient('left').tickSize(-this.canvasWidth, 1);
+      this.yAxis.scale(this.yScale).orient('left').tickSize(-this.canvasWidth, 1).tickPadding(10);
       yAxisGroup = this.svg.selectAll('g.y-axis').data([0]);
       yAxisGroup.enter().append('g').attr('class', 'y-axis axis');
       yAxisGroup.attr('transform', "translate(" + this.margin.left + ", " + this.margin.top + ")");
@@ -806,7 +848,7 @@ It acts as a plugin to a main chart instance.
 
     Chart.prototype.updateChartScale = function() {
       var extent;
-      extent = ForestD3.Utils.extent(this.data().visible(), this.getX(), this.getY());
+      extent = ForestD3.Utils.extent(this.data().visible(), this.getXInternal(), this.getY());
       extent = ForestD3.Utils.extentPadding(extent, {
         x: this.xPadding(),
         y: this.yPadding()
@@ -834,7 +876,7 @@ It acts as a plugin to a main chart instance.
         idx = ForestD3.Utils.smartBisect(xValues, this.xScale.invert(xPos), function(d) {
           return d;
         });
-        xPos = this.xScale(idx);
+        xPos = this.xScale(xValues[idx]);
         line.attr('x1', xPos).attr('x2', xPos).transition().style('opacity', 0.5);
         return this.tooltip.render(this.data().get(), clientMouse);
       }

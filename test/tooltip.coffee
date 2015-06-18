@@ -25,6 +25,7 @@ describe 'Tooltip and Guideline', ->
         chart.data(data).render()
 
     afterEach ->
+        chart.tooltip.cleanUp()
         document.body.removeChild container
 
     it 'rendered a guideline on the chart canvas', ->

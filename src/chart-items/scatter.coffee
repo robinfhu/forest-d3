@@ -14,7 +14,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         .selectAll('circle.point')
         .data((d)-> d.values)
 
-    x = chart.getX()
+    x = chart.getXInternal()
     y = chart.getY()
     points.enter()
         .append('circle')

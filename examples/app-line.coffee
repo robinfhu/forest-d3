@@ -2,9 +2,15 @@ chart = new ForestD3.Chart d3.select('#example')
 legend = new ForestD3.Legend d3.select('#legend')
 
 chart
-    .getX((d,i)-> i)
+    .ordinal(true)
     .xLabel('Date')
     .yLabel('Price')
+    .xTickFormat((d)->
+        if d?
+            d3.time.format('%Y-%m-%d')(new Date d)
+        else
+            ''
+    )
     .addPlugin(legend)
 
 getStocks = (startPrice, volatility)->
@@ -51,11 +57,5 @@ data = [
 ]
 
 chart.yAxis.tickFormat(d3.format('$,.2f'))
-chart.xAxis.tickFormat((d)->
-    date = data[0].values[d]?[0]
-    if date?
-        d3.time.format('%Y-%m-%d')(new Date date)
-    else
-        ''
-)
+
 chart.data(data).render()
