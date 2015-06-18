@@ -11,19 +11,22 @@
     .axis
         .tick
             line
-                stroke #848DED
-                stroke-opacity 0.07
+                stroke black
+                stroke-opacity 0.2
 
         > path
-            fill #CDD2F3
+            fill black
+            fill-opacity 0.2
 
     .axes-labels
         pointer-events none
 
     .canvas
         & > rect
-            fill-opacity 0.1
-            fill #BCBCF2
+            pointer-events all
+            fill none
+            stroke black
+            stroke-opacity 0.2
 
         circle
             &.point

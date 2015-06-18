@@ -185,9 +185,9 @@ getIdx = (d,i)-> i
 
         @xAxis
             .scale(@xScale)
-            .tickSize(-@canvasHeight, 1)
+            .tickSize(10, 1)
             .ticks(xTicks)
-            .tickPadding(10)
+            .tickPadding(5)
             .tickFormat((d)=>
                 tick = if @ordinal()
                     xValues[d]
@@ -209,8 +209,8 @@ getIdx = (d,i)-> i
         @yAxis
             .scale(@yScale)
             .orient('left')
-            .tickSize(-@canvasWidth, 1)
-            .tickPadding(10)
+            .tickSize(10, 1)
+            .tickPadding(5)
             .tickFormat(@yTickFormat())
 
         yAxisGroup = @svg.selectAll('g.y-axis').data([0])
