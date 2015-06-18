@@ -8,11 +8,17 @@
 }
 .forest-d3 .axis .tick line {
   stroke: #000;
+}
+.forest-d3 .axis.x-axis .tick line {
   stroke-opacity: 0.2;
 }
+.forest-d3 .axis.y-axis .tick line {
+  stroke-opacity: 0.05;
+}
 .forest-d3 .axis > path {
-  fill: #000;
-  fill-opacity: 0.2;
+  fill: none;
+  stroke: #000;
+  stroke-opacity: 0.2;
 }
 .forest-d3 .axes-labels {
   pointer-events: none;

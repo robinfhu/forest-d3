@@ -795,7 +795,7 @@ It acts as a plugin to a main chart instance.
       backdrop.attr('width', this.width).attr('height', this.height);
       xTicks = Math.abs(this.xScale.range()[0] - this.xScale.range()[1]) / 100;
       xValues = this.data().xValuesRaw();
-      this.xAxis.scale(this.xScale).tickSize(10, 1).ticks(xTicks).tickPadding(5).tickFormat((function(_this) {
+      this.xAxis.scale(this.xScale).tickSize(10, 10).ticks(xTicks).tickPadding(5).tickFormat((function(_this) {
         return function(d) {
           var tick;
           tick = _this.ordinal() ? xValues[d] : d;
@@ -805,7 +805,7 @@ It acts as a plugin to a main chart instance.
       xAxisGroup = this.svg.selectAll('g.x-axis').data([0]);
       xAxisGroup.enter().append('g').attr('class', 'x-axis axis');
       xAxisGroup.attr('transform', "translate(" + this.margin.left + ", " + (this.canvasHeight + this.margin.top) + ")");
-      this.yAxis.scale(this.yScale).orient('left').tickSize(10, 1).tickPadding(5).tickFormat(this.yTickFormat());
+      this.yAxis.scale(this.yScale).orient('left').tickSize(-this.canvasWidth, 10).tickPadding(10).tickFormat(this.yTickFormat());
       yAxisGroup = this.svg.selectAll('g.y-axis').data([0]);
       yAxisGroup.enter().append('g').attr('class', 'y-axis axis');
       yAxisGroup.attr('transform', "translate(" + this.margin.left + ", " + this.margin.top + ")");

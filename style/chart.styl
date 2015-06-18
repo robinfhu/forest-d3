@@ -12,11 +12,21 @@
         .tick
             line
                 stroke black
-                stroke-opacity 0.2
+
+        &.x-axis
+            .tick
+                line
+                    stroke-opacity 0.2
+
+        &.y-axis
+            .tick
+                line
+                    stroke-opacity 0.05
 
         > path
-            fill black
-            fill-opacity 0.2
+            fill none
+            stroke black
+            stroke-opacity 0.2
 
     .axes-labels
         pointer-events none
