@@ -12,6 +12,7 @@ chartProperties = [
     ['xTickFormat', (d)-> d]
     ['yTickFormat', d3.format(',.2f')]
     ['showTooltip', true]
+    ['showGuideline', true]
 ]
 
 getIdx = (d,i)-> i
@@ -37,6 +38,7 @@ getIdx = (d,i)-> i
         @container domContainer
 
         @tooltip = new ForestD3.Tooltip()
+        @guideline = new ForestD3.Guideline @
         @xAxis = d3.svg.axis()
         @yAxis = d3.svg.axis()
         @seriesColor = (d)=> d.color or @color()(d._index)
@@ -252,14 +254,7 @@ getIdx = (d,i)-> i
             .on('mouseout', -> chart.updateTooltip null)
 
         # Add a guideline
-        canvasEnter
-            .append('line')
-            .classed('guideline', true)
-            .style('opacity', 0)
-
-        @canvas.select('line.guideline')
-            .attr('y1', 0)
-            .attr('y2', @canvasHeight)
+        @guideline.create @canvas
 
         # Add axes labels
         axesLabels = @canvas.selectAll('g.axes-labels').data([0])
@@ -312,13 +307,8 @@ getIdx = (d,i)-> i
         line = @canvas.select('line.guideline')
         unless mouse?
             # Hide guideline from view if 'null' passed in
-            line
-                .transition()
-                .delay(250)
-                .style('opacity', 0)
-
+            @guideline.hide()
             @tooltip.hide()
-
         else
             [xPos, yPos] = mouse
 
@@ -332,11 +322,8 @@ getIdx = (d,i)-> i
 
             xPos = @xScale xValues[idx]
 
-            line
-                .attr('x1', xPos)
-                .attr('x2', xPos)
-                .transition()
-                .style('opacity', 0.5)
+            # Show the guideline and position it.
+            @guideline.render xPos, idx
 
             content = ForestD3.TooltipContent.multiple @, idx
             @tooltip.render content, clientMouse

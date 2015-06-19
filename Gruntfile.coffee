@@ -52,6 +52,7 @@ module.exports = (grunt)->
                         'src/data.coffee'
                         'src/plugins/*.coffee'
                         'src/tooltip*.coffee'
+                        'src/guideline.coffee'
                         'src/chart.coffee'
                     ]
             examples:

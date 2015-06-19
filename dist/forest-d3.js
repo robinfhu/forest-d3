@@ -657,6 +657,56 @@ Library of tooltip rendering utilities
 
 }).call(this);
 
+
+/*
+Handles the guideline that moves along the x-axis
+ */
+
+(function() {
+  var Guideline;
+
+  this.ForestD3.Guideline = Guideline = (function() {
+    function Guideline(chart) {
+      this.chart = chart;
+    }
+
+    Guideline.prototype.create = function(canvas) {
+      if (!this.chart.showGuideline()) {
+        return;
+      }
+      this.line = canvas.selectAll('line.guideline').data([this.chart.canvasHeight]);
+      this.line.enter().append('line').classed('guideline', true).style('opacity', 0);
+      return this.line.attr('y1', 0).attr('y2', function(d) {
+        return d;
+      });
+    };
+
+    Guideline.prototype.render = function(xPosition, idx) {
+      if (!this.chart.showGuideline()) {
+        return;
+      }
+      if (this.line == null) {
+        return;
+      }
+      return this.line.attr('x1', xPosition).attr('x2', xPosition).transition().style('opacity', 0.5);
+    };
+
+    Guideline.prototype.hide = function() {
+      if (!this.chart.showGuideline()) {
+        return;
+      }
+      if (this.line == null) {
+        return;
+      }
+      return this.line.transition().delay(250).style('opacity', 0);
+    };
+
+    return Guideline;
+
+  })();
+
+}).call(this);
+
 (function() {
   var Chart, chartProperties, getIdx;
 
@@ -673,7 +723,7 @@ Library of tooltip rendering utilities
       'xTickFormat', function(d) {
         return d;
       }
-    ], ['yTickFormat', d3.format(',.2f')], ['showTooltip', true]
+    ], ['yTickFormat', d3.format(',.2f')], ['showTooltip', true], ['showGuideline', true]
   ];
 
   getIdx = function(d, i) {
@@ -703,6 +753,7 @@ Library of tooltip rendering utilities
       }
       this.container(domContainer);
       this.tooltip = new ForestD3.Tooltip();
+      this.guideline = new ForestD3.Guideline(this);
       this.xAxis = d3.svg.axis();
       this.yAxis = d3.svg.axis();
       this.seriesColor = (function(_this) {
@@ -893,8 +944,7 @@ Library of tooltip rendering utilities
       }).on('mouseout', function() {
         return chart.updateTooltip(null);
       });
-      canvasEnter.append('line').classed('guideline', true).style('opacity', 0);
-      this.canvas.select('line.guideline').attr('y1', 0).attr('y2', this.canvasHeight);
+      this.guideline.create(this.canvas);
       axesLabels = this.canvas.selectAll('g.axes-labels').data([0]);
       axesLabels.enter().append('g').classed('axes-labels', true);
       xAxisLabel = axesLabels.selectAll('text.x-axis').data([this.xLabel()]);
@@ -931,7 +981,7 @@ Library of tooltip rendering utilities
       var content, idx, line, xPos, xValues, yPos;
       line = this.canvas.select('line.guideline');
       if (mouse == null) {
-        line.transition().delay(250).style('opacity', 0);
+        this.guideline.hide();
         return this.tooltip.hide();
       } else {
         xPos = mouse[0], yPos = mouse[1];
@@ -940,7 +990,7 @@ Library of tooltip rendering utilities
           return d;
         });
         xPos = this.xScale(xValues[idx]);
-        line.attr('x1', xPos).attr('x2', xPos).transition().style('opacity', 0.5);
+        this.guideline.render(xPos, idx);
         content = ForestD3.TooltipContent.multiple(this, idx);
         return this.tooltip.render(content, clientMouse);
       }
