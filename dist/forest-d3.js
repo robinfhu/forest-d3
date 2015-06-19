@@ -19,22 +19,30 @@ Author:  Robin Hu
 
 (function() {
   this.ForestD3.ChartItem.line = function(selection, selectionData) {
-    var chart, interpolate, lineFn, path, x, y;
+    var area, areaFn, chart, interpolate, lineFn, path, x, y;
     chart = this;
     selection.style('stroke', chart.seriesColor);
-    path = selection.selectAll('path.line').data([selectionData.values]);
     interpolate = selectionData.interpolate || 'linear';
     x = chart.getXInternal();
     y = chart.getY();
     lineFn = d3.svg.line().interpolate(interpolate).x(function(d, i) {
       return chart.xScale(x(d, i));
     });
-    path.enter().append('path').classed('line', true).attr('d', lineFn.y(function() {
-      return chart.canvasHeight;
-    }));
-    return path.transition().duration(800).attr('d', lineFn.y(function(d, i) {
+    path = selection.selectAll('path.line').data([selectionData.values]);
+    path.enter().append('path').classed('line', true).attr('d', lineFn.y(chart.canvasHeight));
+    path.transition().duration(800).attr('d', lineFn.y(function(d, i) {
       return chart.yScale(y(d, i));
     }));
+    if (selectionData.area) {
+      areaFn = d3.svg.area().interpolate(interpolate).x(function(d, i) {
+        return chart.xScale(x(d, i));
+      }).y0(chart.yScale(0));
+      area = selection.selectAll('path.area').data([selectionData.values]);
+      area.enter().append('path').classed('area', true).attr('d', areaFn.y1(chart.yScale(0)));
+      return area.transition().duration(800).style('fill', chart.seriesColor(selectionData)).attr('d', areaFn.y1(function(d, i) {
+        return chart.yScale(y(d, i));
+      }));
+    }
   };
 
 }).call(this);

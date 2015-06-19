@@ -87,6 +87,9 @@
   stroke-width: 2;
   pointer-events: none;
 }
+.forest-d3 path.area {
+  fill-opacity: 0.3;
+}
 
 .forest-d3 line.marker {
   stroke: #000;

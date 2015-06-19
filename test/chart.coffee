@@ -255,5 +255,26 @@ describe 'Chart', ->
                 chart = new ForestD3.Chart container
                 chart.data(data).render()
 
-                line = $(container).find('g.chart-item path')
-                line.length.should.equal 1, 'path exists'
+                line = $(container).find('g.chart-item path.line')
+                line.length.should.equal 1, 'line path exists'
+
+            it 'can render an SVG line and path if area=true', ->
+                data = [
+                    key: 'line1'
+                    type: 'line'
+                    area: true
+                    values: [
+                        [0,0]
+                        [1,1]
+                        [2,4]
+                    ]
+                ]
+
+                chart = new ForestD3.Chart container
+                chart.data(data).render()
+
+                line = $(container).find('g.chart-item path.line')
+                line.length.should.equal 1, 'line path exists'
+
+                area = $(container).find('g.chart-item path.area')
+                area.length.should.equal 1, 'area path exists'

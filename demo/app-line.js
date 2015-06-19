@@ -40,11 +40,13 @@
       key: 'series2',
       label: 'MSFT',
       type: 'line',
+      area: true,
       values: getStocks(0.26, 0.2)
     }, {
       key: 'series3',
       label: 'FACEBOOK',
       type: 'line',
+      area: true,
       interpolate: 'cardinal',
       values: getStocks(0.56, 0.13)
     }, {
