@@ -584,7 +584,9 @@ Library of tooltip rendering utilities
       xValue = chart.xTickFormat()(xValue);
       slice = chart.data().sliced(xIndex);
       rows = slice.map(function(d) {
-        return "<tr>\n    <td class='series-label'>" + d.label + "</td>\n    <td class='series-value'>" + (chart.yTickFormat()(d.y)) + "</td>\n</tr>";
+        var bgColor;
+        bgColor = "background-color: " + d.color;
+        return "<tr>\n    <td><div class='series-color' style='" + bgColor + "'></div></td>\n    <td class='series-label'>" + d.label + "</td>\n    <td class='series-value'>" + (chart.yTickFormat()(d.y)) + "</td>\n</tr>";
       });
       rows = rows.join('');
       return "<div class='header'>" + xValue + "</div>\n<table>\n    " + rows + "\n</table>";
@@ -608,10 +610,13 @@ Library of tooltip rendering utilities
      */
 
     Tooltip.prototype.render = function(content, clientMouse) {
-      var xPos, yPos;
+      var containerCenter, xPos, yPos;
       if (this.container == null) {
         this.container = document.createElement('div');
         document.body.appendChild(this.container);
+      }
+      if ((typeof content === 'string') || (typeof content === 'number')) {
+        d3.select(this.container).classed('forest-d3 tooltip-box', true).html(content);
       }
 
       /*
@@ -626,10 +631,14 @@ Library of tooltip rendering utilities
       xPos = clientMouse[0], yPos = clientMouse[1];
       xPos += window.pageXOffset;
       yPos += window.pageYOffset;
-      d3.select(this.container).classed('forest-d3 tooltip-box', true).style('left', xPos + "px").style('top', yPos + "px").transition().style('opacity', 1);
-      if ((typeof content === 'string') || (typeof content === 'number')) {
-        return d3.select(this.container).html(content);
-      }
+
+      /*
+      Adjust tooltip so that it is centered on the mouse.
+      Accomplish this by calculating container height and dividing it by 2.
+       */
+      containerCenter = this.container.getBoundingClientRect().height / 2;
+      yPos -= containerCenter;
+      return d3.select(this.container).style('left', xPos + "px").style('top', yPos + "px").transition().style('opacity', 0.9);
     };
 
     Tooltip.prototype.hide = function() {

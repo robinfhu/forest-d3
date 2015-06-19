@@ -11,6 +11,11 @@
             @container = document.createElement 'div'
             document.body.appendChild @container
 
+        if (typeof content is 'string') or (typeof content is 'number')
+            d3.select(@container)
+                .classed('forest-d3 tooltip-box', true)
+                .html(content)
+
         ###
         xPos and yPos are the relative coordinates of the mouse in the
         browser window.
@@ -24,15 +29,18 @@
         xPos += window.pageXOffset
         yPos += window.pageYOffset
 
+        ###
+        Adjust tooltip so that it is centered on the mouse.
+        Accomplish this by calculating container height and dividing it by 2.
+        ###
+        containerCenter = @container.getBoundingClientRect().height / 2
+        yPos -= containerCenter
+
         d3.select(@container)
-            .classed('forest-d3 tooltip-box', true)
             .style('left', "#{xPos}px")
             .style('top', "#{yPos}px")
             .transition()
-            .style('opacity', 1)
-
-        if (typeof content is 'string') or (typeof content is 'number')
-            d3.select(@container).html(content)
+            .style('opacity', 0.9)
 
     # Hide tooltip from view by making it transparent.
     hide: ->

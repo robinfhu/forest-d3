@@ -126,3 +126,9 @@
   text-align: right;
   font-weight: bold;
 }
+.forest-d3.tooltip-box table td .series-color {
+  width: 13px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 10px;
+}
