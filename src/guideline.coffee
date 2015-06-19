@@ -2,8 +2,7 @@
 Handles the guideline that moves along the x-axis
 ###
 @ForestD3.Guideline = class Guideline
-    constructor: (chart)->
-        @chart = chart
+    constructor: (@chart)->
 
     # Creates the guideline on the canvas selection
     create: (canvas)->

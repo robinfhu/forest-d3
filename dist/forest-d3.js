@@ -599,7 +599,8 @@ Library of tooltip rendering utilities
   var Tooltip;
 
   this.ForestD3.Tooltip = Tooltip = (function() {
-    function Tooltip() {
+    function Tooltip(chart) {
+      this.chart = chart;
       this.container = null;
     }
 
@@ -611,6 +612,9 @@ Library of tooltip rendering utilities
 
     Tooltip.prototype.render = function(content, clientMouse) {
       var containerCenter, xPos, yPos;
+      if (!this.chart.showTooltip()) {
+        return;
+      }
       if (this.container == null) {
         this.container = document.createElement('div');
         document.body.appendChild(this.container);
@@ -642,6 +646,9 @@ Library of tooltip rendering utilities
     };
 
     Tooltip.prototype.hide = function() {
+      if (!this.chart.showTooltip()) {
+        return;
+      }
       return d3.select(this.container).transition().delay(250).style('opacity', 0);
     };
 
@@ -752,7 +759,7 @@ Handles the guideline that moves along the x-axis
         })(this)(prop);
       }
       this.container(domContainer);
-      this.tooltip = new ForestD3.Tooltip();
+      this.tooltip = new ForestD3.Tooltip(this);
       this.guideline = new ForestD3.Guideline(this);
       this.xAxis = d3.svg.axis();
       this.yAxis = d3.svg.axis();

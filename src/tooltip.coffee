@@ -1,5 +1,5 @@
 @ForestD3.Tooltip = class Tooltip
-    constructor: ->
+    constructor: (@chart)->
         @container = null
 
     ###
@@ -7,6 +7,8 @@
     clientMouse: Array of [mouse screen x, mouse screen y] positions
     ###
     render: (content, clientMouse)->
+        return unless @chart.showTooltip()
+
         unless @container?
             @container = document.createElement 'div'
             document.body.appendChild @container
@@ -44,6 +46,8 @@
 
     # Hide tooltip from view by making it transparent.
     hide: ->
+        return unless @chart.showTooltip()
+
         d3.select(@container)
             .transition()
             .delay(250)

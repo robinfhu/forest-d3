@@ -37,7 +37,7 @@ getIdx = (d,i)-> i
 
         @container domContainer
 
-        @tooltip = new ForestD3.Tooltip()
+        @tooltip = new ForestD3.Tooltip @
         @guideline = new ForestD3.Guideline @
         @xAxis = d3.svg.axis()
         @yAxis = d3.svg.axis()
