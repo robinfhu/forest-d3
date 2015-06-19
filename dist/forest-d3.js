@@ -26,17 +26,15 @@ Author:  Robin Hu
     interpolate = selectionData.interpolate || 'linear';
     x = chart.getXInternal();
     y = chart.getY();
-    path.enter().append('path').classed('line', true).attr('d', d3.svg.line().interpolate(interpolate).x(function(d, i) {
-      return chart.xScale(x(d, i));
-    }).y(function() {
-      return chart.canvasHeight;
-    }));
     lineFn = d3.svg.line().interpolate(interpolate).x(function(d, i) {
       return chart.xScale(x(d, i));
-    }).y(function(d, i) {
-      return chart.yScale(y(d, i));
     });
-    return path.transition().duration(800).attr('d', lineFn);
+    path.enter().append('path').classed('line', true).attr('d', lineFn.y(function() {
+      return chart.canvasHeight;
+    }));
+    return path.transition().duration(800).attr('d', lineFn.y(function(d, i) {
+      return chart.yScale(y(d, i));
+    }));
   };
 
 }).call(this);

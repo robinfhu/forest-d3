@@ -5,7 +5,7 @@
 
   legend = new ForestD3.Legend(d3.select('#legend'));
 
-  chart.ordinal(true).xLabel('Date').yLabel('Price').yTickFormat(d3.format('$,.2f')).xTickFormat(function(d) {
+  chart.ordinal(true).xLabel('Date').yLabel('Price').yTickFormat(d3.format(',.3f')).xTickFormat(function(d) {
     if (d != null) {
       return d3.time.format('%Y-%m-%d')(new Date(d));
     } else {
@@ -18,7 +18,7 @@
     result = [];
     startDate = new Date(2012, 0, 1);
     for (i = j = 0; j < 200; i = ++j) {
-      result.push([startDate.getTime(), startPrice]);
+      result.push([startDate.getTime(), startPrice - 0.3]);
       changePct = 2 * volatility * Math.random();
       if (changePct > volatility) {
         changePct -= 2 * volatility;
@@ -35,18 +35,24 @@
       label: 'AAPL',
       type: 'line',
       interpolate: 'basis',
-      values: getStocks(301.43, 0.0015)
+      values: getStocks(0.75, 0.47)
     }, {
       key: 'series2',
       label: 'MSFT',
       type: 'line',
-      values: getStocks(303.12, 0.002)
+      values: getStocks(0.26, 0.2)
+    }, {
+      key: 'series3',
+      label: 'FACEBOOK',
+      type: 'line',
+      interpolate: 'cardinal',
+      values: getStocks(0.56, 0.13)
     }, {
       key: 'marker1',
       label: 'Profit',
       type: 'marker',
       axis: 'y',
-      value: 305.1
+      value: 0.2
     }, {
       key: 'region1',
       label: 'Election Season',

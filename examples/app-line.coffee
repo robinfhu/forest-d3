@@ -5,7 +5,7 @@ chart
     .ordinal(true)
     .xLabel('Date')
     .yLabel('Price')
-    .yTickFormat(d3.format('$,.2f'))
+    .yTickFormat(d3.format(',.3f'))
     .xTickFormat((d)->
         if d?
             d3.time.format('%Y-%m-%d')(new Date d)
@@ -21,7 +21,7 @@ getStocks = (startPrice, volatility)->
     for i in [0...200]
         result.push [
             startDate.getTime(),
-            startPrice
+            startPrice - 0.3
         ]
         changePct = 2 * volatility * Math.random()
         if changePct > volatility
@@ -37,18 +37,24 @@ data = [
     label: 'AAPL'
     type: 'line'
     interpolate: 'basis'
-    values: getStocks(301.43, 0.0015)
+    values: getStocks(0.75, 0.47)
 ,
     key: 'series2'
     label: 'MSFT'
     type: 'line'
-    values: getStocks(303.12, 0.002)
+    values: getStocks(0.26, 0.2)
+,
+    key: 'series3'
+    label: 'FACEBOOK'
+    type: 'line'
+    interpolate: 'cardinal'
+    values: getStocks(0.56, 0.13)
 ,
     key: 'marker1'
     label: 'Profit'
     type: 'marker'
     axis: 'y'
-    value: 305.1
+    value: 0.2
 ,
     key: 'region1'
     label: 'Election Season'
