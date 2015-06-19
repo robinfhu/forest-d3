@@ -304,7 +304,6 @@ getIdx = (d,i)-> i
     mouse should be an array of two things: [mouse x , mouse y]
     ###
     updateTooltip: (mouse, clientMouse)->
-        line = @canvas.select('line.guideline')
         unless mouse?
             # Hide guideline from view if 'null' passed in
             @guideline.hide()

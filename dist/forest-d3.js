@@ -683,19 +683,34 @@ Handles the guideline that moves along the x-axis
       }
       this.line = canvas.selectAll('line.guideline').data([this.chart.canvasHeight]);
       this.line.enter().append('line').classed('guideline', true).style('opacity', 0);
-      return this.line.attr('y1', 0).attr('y2', function(d) {
+      this.line.attr('y1', 0).attr('y2', function(d) {
         return d;
       });
+      this.markerContainer = canvas.selectAll('g.guideline-markers').data([0]);
+      return this.markerContainer.enter().append('g').classed('guideline-markers', true);
     };
 
-    Guideline.prototype.render = function(xPosition, idx) {
+    Guideline.prototype.render = function(xPosition, xIndex) {
+      var markers, slice;
       if (!this.chart.showGuideline()) {
         return;
       }
       if (this.line == null) {
         return;
       }
-      return this.line.attr('x1', xPosition).attr('x2', xPosition).transition().style('opacity', 0.5);
+      this.line.attr('x1', xPosition).attr('x2', xPosition).transition().style('opacity', 0.5);
+      slice = this.chart.data().sliced(xIndex);
+      this.markerContainer.transition().style('opacity', 1);
+      markers = this.markerContainer.selectAll('circle.marker').data(slice);
+      markers.enter().append('circle').classed('marker', true).attr('r', 3);
+      markers.exit().remove();
+      return markers.attr('cx', xPosition).attr('cy', (function(_this) {
+        return function(d) {
+          return _this.chart.yScale(d.y);
+        };
+      })(this)).style('fill', function(d) {
+        return d.color;
+      });
     };
 
     Guideline.prototype.hide = function() {
@@ -705,7 +720,8 @@ Handles the guideline that moves along the x-axis
       if (this.line == null) {
         return;
       }
-      return this.line.transition().delay(250).style('opacity', 0);
+      this.line.transition().delay(250).style('opacity', 0);
+      return this.markerContainer.transition().delay(250).style('opacity', 0);
     };
 
     return Guideline;
@@ -985,8 +1001,7 @@ Handles the guideline that moves along the x-axis
      */
 
     Chart.prototype.updateTooltip = function(mouse, clientMouse) {
-      var content, idx, line, xPos, xValues, yPos;
-      line = this.canvas.select('line.guideline');
+      var content, idx, xPos, xValues, yPos;
       if (mouse == null) {
         this.guideline.hide();
         return this.tooltip.hide();
