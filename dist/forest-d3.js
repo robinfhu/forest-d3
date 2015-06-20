@@ -1036,6 +1036,13 @@ Handles the guideline that moves along the x-axis
         }
         return renderFn.call(chart, chartItem, d);
       });
+
+      /*
+      This line keeps chart-items in order on the canvas. Items that appear
+      lower in the list thus overlap items that are near the beginning of the
+      list.
+       */
+      chartItems.order();
       this.renderPlugins();
       return this;
     };

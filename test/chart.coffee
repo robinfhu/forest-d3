@@ -172,6 +172,37 @@ describe 'Chart', ->
                     done()
                 , 400
 
+            it 'keeps chart items in order', (done)->
+                chart = new ForestD3.Chart container
+
+                sampleData = [
+                    key: 'foo'
+                    values: [
+                        [0,0]
+                    ]
+                ,
+                    key: 'bar'
+                    values: [
+                        [1,1]
+                    ]
+                ,
+                    key: 'maz'
+                    values: [
+                        [2,2]
+                    ]
+                ]
+
+                chart.data(sampleData)
+                chart.data().hide(['bar']).render()
+
+                chart.data().show('bar').render()
+
+                items = $(container).find('g.chart-item')
+                items.get(0).getAttribute('class').should.contain 'item-foo'
+                items.get(1).getAttribute('class').should.contain 'item-bar'
+                items.get(2).getAttribute('class').should.contain 'item-maz'
+                done()
+
         describe 'Marker Lines', ->
             it 'can render horizontal line (y-axis marker)', (done)->
                 data = [
