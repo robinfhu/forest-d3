@@ -17,9 +17,15 @@ Author:  Robin Hu
 
 }).call(this);
 
+
+/*
+Draws a simple line graph.
+If you set area=true, turns it into an area graph
+ */
+
 (function() {
   this.ForestD3.ChartItem.line = function(selection, selectionData) {
-    var area, areaFn, chart, interpolate, lineFn, path, x, y;
+    var area, areaBase, areaFn, chart, interpolate, lineFn, path, x, y;
     chart = this;
     selection.style('stroke', chart.seriesColor);
     interpolate = selectionData.interpolate || 'linear';
@@ -34,11 +40,17 @@ Author:  Robin Hu
       return chart.yScale(y(d, i));
     }));
     if (selectionData.area) {
+      areaBase = chart.yScale(0);
+      if (areaBase > chart.canvasHeight) {
+        areaBase = chart.canvasHeight;
+      } else if (areaBase < 0) {
+        areaBase = 0;
+      }
       areaFn = d3.svg.area().interpolate(interpolate).x(function(d, i) {
         return chart.xScale(x(d, i));
-      }).y0(chart.yScale(0));
+      }).y0(areaBase);
       area = selection.selectAll('path.area').data([selectionData.values]);
-      area.enter().append('path').classed('area', true).attr('d', areaFn.y1(chart.yScale(0)));
+      area.enter().append('path').classed('area', true).attr('d', areaFn.y1(areaBase));
       return area.transition().duration(800).style('fill', chart.seriesColor(selectionData)).attr('d', areaFn.y1(function(d, i) {
         return chart.yScale(y(d, i));
       }));
@@ -198,6 +210,9 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         xExt = d3.extent(d3.merge(xAllPoints));
         yExt = d3.extent(d3.merge(yAllPoints));
         roundOff = function(d, i) {
+          if (Math.abs(d) < 1) {
+            return d;
+          }
           if (i === 0) {
             return Math.floor(d);
           }

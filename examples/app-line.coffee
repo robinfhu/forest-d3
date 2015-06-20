@@ -18,7 +18,7 @@ getStocks = (startPrice, volatility)->
     result = []
     startDate = new Date 2012, 0, 1
 
-    for i in [0...200]
+    for i in [0...20]
         result.push [
             startDate.getTime(),
             startPrice - 0.3
@@ -62,7 +62,7 @@ data = [
     label: 'Election Season'
     type: 'region'
     axis: 'x'
-    values: [50, 90]
+    values: [5, 9]
 ]
 
 chart.data(data).render()

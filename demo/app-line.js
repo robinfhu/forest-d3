@@ -17,7 +17,7 @@
     var changePct, i, j, result, startDate;
     result = [];
     startDate = new Date(2012, 0, 1);
-    for (i = j = 0; j < 200; i = ++j) {
+    for (i = j = 0; j < 20; i = ++j) {
       result.push([startDate.getTime(), startPrice - 0.3]);
       changePct = 2 * volatility * Math.random();
       if (changePct > volatility) {
@@ -60,7 +60,7 @@
       label: 'Election Season',
       type: 'region',
       axis: 'x',
-      values: [50, 90]
+      values: [5, 9]
     }
   ];
 

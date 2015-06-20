@@ -1,3 +1,7 @@
+###
+Draws a simple line graph.
+If you set area=true, turns it into an area graph
+###
 @ForestD3.ChartItem.line = (selection, selectionData)->
     chart = @
 
@@ -24,11 +28,19 @@
         .duration(800)
         .attr('d', lineFn.y((d,i)-> chart.yScale(y(d,i))))
 
+    # Draw an area graph if area option is turned on
     if selectionData.area
+        # Ensure the base of the area doesn't extend outside the cavnas bounds.
+        areaBase = chart.yScale 0
+        if areaBase > chart.canvasHeight
+            areaBase = chart.canvasHeight
+        else if areaBase < 0
+            areaBase = 0
+
         areaFn = d3.svg.area()
             .interpolate(interpolate)
             .x((d,i)-> chart.xScale(x(d,i)))
-            .y0(chart.yScale(0))
+            .y0(areaBase)
 
         area = selection.selectAll('path.area').data([selectionData.values])
 
@@ -36,7 +48,7 @@
             .enter()
             .append('path')
             .classed('area', true)
-            .attr('d', areaFn.y1(chart.yScale(0)))
+            .attr('d', areaFn.y1(areaBase))
 
         area
             .transition()

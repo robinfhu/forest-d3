@@ -41,6 +41,7 @@
         yExt = d3.extent d3.merge yAllPoints
 
         roundOff = (d,i)->
+            return d if Math.abs(d) < 1
             return Math.floor(d) if i is 0
             return Math.ceil(d)
 

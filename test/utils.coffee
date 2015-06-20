@@ -34,17 +34,17 @@ describe 'Utilities', ->
         it 'handles multiple series', ->
             data = [
                 values: [
-                    [1,1]
+                    [1,5]
                     [2,3]
                 ]
             ,
                 values: [
-                    [1,1]
+                    [1,7]
                     [0,5]
                 ]
             ,
                 values: [
-                    [1,0.5]
+                    [1,1]
                     [1.6,2.9]
                 ]
             ]
@@ -53,20 +53,33 @@ describe 'Utilities', ->
 
             result.should.deep.equal
                 x: [0, 2]
-                y: [0, 5]
+                y: [1, 7]
 
         it 'rounds extent to nearest integer', ->
             data = [
                 values: [
-                    [0.1, 0.1]
-                    [0.9, 0.9]
+                    [5.1, 5.1]
+                    [80.9, 8.9]
+                ]
+            ]
+
+            result = extent data
+            result.should.deep.equal
+                x: [5, 81]
+                y: [5, 9]
+
+        it 'skips the integer rounding if extent range is small', ->
+            data = [
+                values: [
+                    [0, -0.02]
+                    [1, 0.8]
                 ]
             ]
 
             result = extent data
             result.should.deep.equal
                 x: [0, 1]
-                y: [0, 1]
+                y: [-0.02, 0.8]
 
         it 'factors in chart markers as part of the computation', ->
             data = [
