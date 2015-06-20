@@ -16,18 +16,32 @@
         barBase = 0
 
     # Figure out an optimal width for each bar.
-    # TODO: Make this more dynamic. Don't hard code the spacing.
-    width = chart.canvasWidth / selectionData.values.length
-    width -= 5
 
-    # Adjustment to center each bar on the x-axis tick.
-    xAdjust = width/2
+    # Calculates how much available space there is between each x-axis tick mark
+    fullSpace = chart.canvasWidth / selectionData.values.length
+
+    maxPadding = 15
+    #add some padding between groups of bars
+    # Padding is maxed out after a certain threshold
+    fullSpace -= d3.min [(fullSpace / 2), maxPadding]
+
+    # Gets total number of visible bars
+    barCount = chart.data().barCount()
+
+    # Ensure we don't get negative bar widths
+    fullSpace = d3.max [barCount, fullSpace]
+
+    ###
+    This is used to ensure that the bar group is centered around the x-axis
+    tick mark.
+    ###
+    xCentered = fullSpace / 2
 
     bars
         .enter()
         .append('rect')
         .classed('bar', true)
-        .attr('x', (d,i)-> chart.xScale(x(d,i)) - xAdjust)
+        .attr('x', (d,i)-> chart.xScale(x(d,i)) - xCentered)
         .attr('y', barBase)
         .attr('height', 0)
 
@@ -35,10 +49,18 @@
         .exit()
         .remove()
 
+    barIndex = chart.data().barIndex selectionData.key
+    barWidth = fullSpace / barCount
     bars
         .transition()
         .delay((d,i)-> i * 20)
-        .attr('x', (d,i)-> chart.xScale(x(d,i)) - xAdjust)
+        .attr('x', (d,i)->
+            ###
+            Calculates the x position of each bar. Shifts the bar along x-axis
+            depending on which series index the bar belongs to.
+            ###
+            chart.xScale(x(d,i)) - xCentered + barWidth*barIndex
+        )
         .attr('y', (d,i)->
             yVal = y(d,i)
             if yVal < 0
@@ -49,5 +71,5 @@
         .attr('height', (d,i)->
             Math.abs(chart.yScale(y(d,i)) - barBase)
         )
-        .attr('width', width)
+        .attr('width', barWidth)
         .style('fill', chart.seriesColor(selectionData))

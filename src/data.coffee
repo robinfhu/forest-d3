@@ -101,4 +101,23 @@
             label: d.label
             color: chart.seriesColor d
 
+    _barItems: -> @.visible().filter((d)-> d.type is 'bar')
+    ###
+    Count how many visible bar series items there are.
+    Used for doing bar chart math.
+    ###
+    barCount: ->
+        @._barItems().length
+
+    ###
+    Returns the index of the bar item given a key.
+    Only takes into account visible bar items.
+    Returns null if the key specified is not a bar item
+    ###
+    barIndex: (key)->
+        for item, i in @._barItems()
+            if item.key is key
+                return i
+
+        return null
     render: -> chart.render()

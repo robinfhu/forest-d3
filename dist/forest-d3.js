@@ -19,7 +19,7 @@ Author:  Robin Hu
 
 (function() {
   this.ForestD3.ChartItem.bar = function(selection, selectionData) {
-    var barBase, bars, chart, width, x, xAdjust, y;
+    var barBase, barCount, barIndex, barWidth, bars, chart, fullSpace, maxPadding, x, xCentered, y;
     chart = this;
     bars = selection.selectAll('rect.bar').data(selectionData.values);
     x = chart.getXInternal();
@@ -35,17 +35,32 @@ Author:  Robin Hu
     } else if (barBase < 0) {
       barBase = 0;
     }
-    width = chart.canvasWidth / selectionData.values.length;
-    width -= 5;
-    xAdjust = width / 2;
+    fullSpace = chart.canvasWidth / selectionData.values.length;
+    maxPadding = 15;
+    fullSpace -= d3.min([fullSpace / 2, maxPadding]);
+    barCount = chart.data().barCount();
+    fullSpace = d3.max([barCount, fullSpace]);
+
+    /*
+    This is used to ensure that the bar group is centered around the x-axis
+    tick mark.
+     */
+    xCentered = fullSpace / 2;
     bars.enter().append('rect').classed('bar', true).attr('x', function(d, i) {
-      return chart.xScale(x(d, i)) - xAdjust;
+      return chart.xScale(x(d, i)) - xCentered;
     }).attr('y', barBase).attr('height', 0);
     bars.exit().remove();
+    barIndex = chart.data().barIndex(selectionData.key);
+    barWidth = fullSpace / barCount;
     return bars.transition().delay(function(d, i) {
       return i * 20;
     }).attr('x', function(d, i) {
-      return chart.xScale(x(d, i)) - xAdjust;
+
+      /*
+      Calculates the x position of each bar. Shifts the bar along x-axis
+      depending on which series index the bar belongs to.
+       */
+      return chart.xScale(x(d, i)) - xCentered + barWidth * barIndex;
     }).attr('y', function(d, i) {
       var yVal;
       yVal = y(d, i);
@@ -56,7 +71,7 @@ Author:  Robin Hu
       }
     }).attr('height', function(d, i) {
       return Math.abs(chart.yScale(y(d, i)) - barBase);
-    }).attr('width', width).style('fill', chart.seriesColor(selectionData));
+    }).attr('width', barWidth).style('fill', chart.seriesColor(selectionData));
   };
 
 }).call(this);
@@ -562,6 +577,36 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
             color: chart.seriesColor(d)
           };
         });
+      },
+      _barItems: function() {
+        return this.visible().filter(function(d) {
+          return d.type === 'bar';
+        });
+      },
+
+      /*
+      Count how many visible bar series items there are.
+      Used for doing bar chart math.
+       */
+      barCount: function() {
+        return this._barItems().length;
+      },
+
+      /*
+      Returns the index of the bar item given a key.
+      Only takes into account visible bar items.
+      Returns null if the key specified is not a bar item
+       */
+      barIndex: function(key) {
+        var i, item, j, len, ref;
+        ref = this._barItems();
+        for (i = j = 0, len = ref.length; j < len; i = ++j) {
+          item = ref[i];
+          if (item.key === key) {
+            return i;
+          }
+        }
+        return null;
       },
       render: function() {
         return chart.render();

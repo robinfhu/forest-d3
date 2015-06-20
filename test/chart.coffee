@@ -278,3 +278,33 @@ describe 'Chart', ->
 
                 area = $(container).find('g.chart-item path.area')
                 area.length.should.equal 1, 'area path exists'
+
+        describe 'Bar Chart', ->
+            it 'can render bar chart', ->
+                data = [
+                    key: 's1'
+                    type: 'bar'
+                    values: [
+                        [0, 10]
+                        [1, 20]
+                        [2, 25]
+                    ]
+                ,
+
+                    key: 's2'
+                    type: 'bar'
+                    values: [
+                        [0, 11]
+                        [1, 22]
+                        [2, 27]
+                    ]
+                ]
+
+                chart = new ForestD3.Chart container
+                chart.data(data).render()
+
+                bars1 = $(container).find('g.item-s1 rect')
+                bars1.length.should.equal 3, 'three bars s1'
+
+                bars2 = $(container).find('g.item-s2 rect')
+                bars2.length.should.equal 3, 'three bars s2'

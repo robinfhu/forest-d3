@@ -272,3 +272,49 @@ describe 'Data API', ->
 
             slice = chart.data().sliced(0)
             slice.length.should.equal 1, 'only one item'
+
+        describe 'bar item api', ->
+            data = [
+                key: 's1'
+                type: 'line'
+                values: []
+            ,
+                key: 's2'
+                type: 'bar'
+                values: []
+            ,
+                key: 's3'
+                type: 'line'
+                values: []
+            ,
+                key: 's4'
+                type: 'bar'
+                values: []
+            ,
+                key: 's5'
+                type: 'bar'
+                values: []
+            ]
+
+            it 'can count number of bar items', ->
+                api = ForestD3.DataAPI data
+
+                api.hide 's5'
+                api.barCount().should.equal 2, 'two visible bars'
+
+                api.show 's5'
+                api.barCount().should.equal 3, 'three bars visible'
+
+            it 'can get the relative bar index', ->
+                api = ForestD3.DataAPI data
+
+                api.barIndex('s5').should.equal 2
+                api.barIndex('s4').should.equal 1
+                api.barIndex('s2').should.equal 0
+                should.not.exist api.barIndex('s1')
+
+                api.hide 's2'
+
+                api.barIndex('s4').should.equal 0
+                api.barIndex('s5').should.equal 1
+

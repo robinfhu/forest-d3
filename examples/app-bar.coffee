@@ -37,6 +37,22 @@ data = [
     label: 'AAPL'
     type: 'bar'
     values: getStocks(0.75, 0.47)
+,
+    key: 'series2'
+    label: 'GOLDMAN'
+    type: 'bar'
+    values: getStocks(0.6, 0.32)
+,
+    key: 'series3'
+    label: 'CITI'
+    type: 'bar'
+    values: getStocks(0.45, 0.76)
+,
+    key: 'marker1'
+    label: 'High Volume'
+    type: 'marker'
+    axis: 'y'
+    value: 0.21
 ]
 
 chart.data(data).render()
