@@ -17,6 +17,50 @@ Author:  Robin Hu
 
 }).call(this);
 
+(function() {
+  this.ForestD3.ChartItem.bar = function(selection, selectionData) {
+    var barBase, bars, chart, width, x, xAdjust, y;
+    chart = this;
+    bars = selection.selectAll('rect.bar').data(selectionData.values);
+    x = chart.getXInternal();
+    y = chart.getY();
+
+    /*
+    Ensure the bars are based at the zero line, but does not extend past
+    canvas boundaries.
+     */
+    barBase = chart.yScale(0);
+    if (barBase > chart.canvasHeight) {
+      barBase = chart.canvasHeight;
+    } else if (barBase < 0) {
+      barBase = 0;
+    }
+    width = chart.canvasWidth / selectionData.values.length;
+    width -= 5;
+    xAdjust = width / 2;
+    bars.enter().append('rect').classed('bar', true).attr('x', function(d, i) {
+      return chart.xScale(x(d, i)) - xAdjust;
+    }).attr('y', barBase).attr('height', 0);
+    bars.exit().remove();
+    return bars.transition().delay(function(d, i) {
+      return i * 20;
+    }).attr('x', function(d, i) {
+      return chart.xScale(x(d, i)) - xAdjust;
+    }).attr('y', function(d, i) {
+      var yVal;
+      yVal = y(d, i);
+      if (yVal < 0) {
+        return barBase;
+      } else {
+        return chart.yScale(y(d, i));
+      }
+    }).attr('height', function(d, i) {
+      return Math.abs(chart.yScale(y(d, i)) - barBase);
+    }).attr('width', width).style('fill', chart.seriesColor(selectionData));
+  };
+
+}).call(this);
+
 
 /*
 Draws a simple line graph.
@@ -919,6 +963,8 @@ Handles the guideline that moves along the x-axis
           renderFn = ForestD3.ChartItem.scatter;
         } else if (d.type === 'line') {
           renderFn = ForestD3.ChartItem.line;
+        } else if (d.type === 'bar') {
+          renderFn = ForestD3.ChartItem.bar;
         } else if ((d.type === 'marker') || ((d.type == null) && (d.value != null))) {
           renderFn = ForestD3.ChartItem.markerLine;
         } else if (d.type === 'region') {

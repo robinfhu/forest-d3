@@ -17,6 +17,14 @@ module.exports = (grunt)->
                         title: 'Line Chart'
                 files:
                     'demo/line.html': ['examples/index.jade']
+            barchart:
+                options:
+                    pretty: true
+                    data:
+                        exampleCode: 'app-bar.js'
+                        title: 'Bar Chart'
+                files:
+                    'demo/bar.html': ['examples/index.jade']
 
         copy:
             demo:

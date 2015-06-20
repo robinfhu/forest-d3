@@ -134,6 +134,8 @@ getIdx = (d,i)-> i
                 renderFn = ForestD3.ChartItem.scatter
             else if d.type is 'line'
                 renderFn = ForestD3.ChartItem.line
+            else if d.type is 'bar'
+                renderFn = ForestD3.ChartItem.bar
             else if (d.type is 'marker') or (not d.type? and d.value?)
                 renderFn = ForestD3.ChartItem.markerLine
             else if d.type is 'region'
