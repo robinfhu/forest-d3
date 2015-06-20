@@ -91,12 +91,12 @@
     For a set of data series, grabs a slice of the data at a certain index.
     Useful for making the tooltip.
     ###
-    sliced: (i)->
+    sliced: (idx)->
         @._getSliceable().filter((d)-> not d.hidden).map (d)->
-            point = d.values[i]
+            point = d.values[idx]
 
-            x: chart.getX()(point)
-            y: chart.getY()(point)
+            x: chart.getX()(point, idx)
+            y: chart.getY()(point, idx)
             key: d.key
             label: d.label
             color: chart.seriesColor d

@@ -153,6 +153,74 @@ Draws a horizontal or vertical line at the specified x or y location.
 
 }).call(this);
 
+(function() {
+  this.ForestD3.ChartItem.ohlc = function(selection, selectionData) {
+    var chart, close, closeMarks, hi, lo, open, openMarks, rangeLines, x;
+    chart = this;
+    selection.classed('ohlc', true);
+    rangeLines = selection.selectAll('line.ohlc-range').data(selectionData.values);
+    x = chart.getXInternal();
+    open = function(d, i) {
+      return d[1];
+    };
+    hi = function(d, i) {
+      return d[2];
+    };
+    lo = function(d, i) {
+      return d[3];
+    };
+    close = function(d, i) {
+      return d[4];
+    };
+    rangeLines.enter().append('line').classed('ohlc-range', true).attr('x1', function(d, i) {
+      return chart.xScale(x(d, i));
+    }).attr('x2', function(d, i) {
+      return chart.xScale(x(d, i));
+    }).attr('y1', 0).attr('y2', 0);
+    rangeLines.exit().remove();
+    rangeLines.transition().delay(function(d, i) {
+      return i * 20;
+    }).attr('x1', function(d, i) {
+      return chart.xScale(x(d, i));
+    }).attr('x2', function(d, i) {
+      return chart.xScale(x(d, i));
+    }).attr('y1', function(d, i) {
+      return chart.yScale(hi(d, i));
+    }).attr('y2', function(d, i) {
+      return chart.yScale(lo(d, i));
+    });
+    openMarks = selection.selectAll('line.ohlc-open').data(selectionData.values);
+    openMarks.enter().append('line').classed('ohlc-open', true).attr('y1', 0).attr('y2', 0);
+    openMarks.exit().remove();
+    openMarks.transition().delay(function(d, i) {
+      return i * 20;
+    }).attr('y1', function(d, i) {
+      return chart.yScale(open(d, i));
+    }).attr('y2', function(d, i) {
+      return chart.yScale(open(d, i));
+    }).attr('x1', function(d, i) {
+      return chart.xScale(x(d, i));
+    }).attr('x2', function(d, i) {
+      return chart.xScale(x(d, i)) - 5;
+    });
+    closeMarks = selection.selectAll('line.ohlc-close').data(selectionData.values);
+    closeMarks.enter().append('line').classed('ohlc-close', true).attr('y1', 0).attr('y2', 0);
+    closeMarks.exit().remove();
+    return closeMarks.transition().delay(function(d, i) {
+      return i * 20;
+    }).attr('y1', function(d, i) {
+      return chart.yScale(close(d, i));
+    }).attr('y2', function(d, i) {
+      return chart.yScale(close(d, i));
+    }).attr('x1', function(d, i) {
+      return chart.xScale(x(d, i));
+    }).attr('x2', function(d, i) {
+      return chart.xScale(x(d, i)) + 5;
+    });
+  };
+
+}).call(this);
+
 
 /*
 Draws a transparent rectangle across the canvas signifying an important
@@ -563,15 +631,15 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
       For a set of data series, grabs a slice of the data at a certain index.
       Useful for making the tooltip.
        */
-      sliced: function(i) {
+      sliced: function(idx) {
         return this._getSliceable().filter(function(d) {
           return !d.hidden;
         }).map(function(d) {
           var point;
-          point = d.values[i];
+          point = d.values[idx];
           return {
-            x: chart.getX()(point),
-            y: chart.getY()(point),
+            x: chart.getX()(point, idx),
+            y: chart.getY()(point, idx),
             key: d.key,
             label: d.label,
             color: chart.seriesColor(d)
@@ -1029,6 +1097,8 @@ Handles the guideline that moves along the x-axis
           renderFn = ForestD3.ChartItem.line;
         } else if (d.type === 'bar') {
           renderFn = ForestD3.ChartItem.bar;
+        } else if (d.type === 'ohlc') {
+          renderFn = ForestD3.ChartItem.ohlc;
         } else if ((d.type === 'marker') || ((d.type == null) && (d.value != null))) {
           renderFn = ForestD3.ChartItem.markerLine;
         } else if (d.type === 'region') {

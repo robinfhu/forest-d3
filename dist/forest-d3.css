@@ -108,6 +108,17 @@
   font-size: 11px;
 }
 
+.forest-d3 .ohlc line {
+  stroke: #000;
+}
+.forest-d3 .ohlc line.ohlc-range {
+  stroke-width: 2px;
+}
+.forest-d3 .ohlc line.ohlc-open,
+.forest-d3 .ohlc line.ohlc-close {
+  stroke-width: 3px;
+}
+
 .forest-d3 rect.region {
   fill-opacity: 0.15;
 }

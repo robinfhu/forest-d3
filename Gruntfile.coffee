@@ -25,6 +25,14 @@ module.exports = (grunt)->
                         title: 'Bar Chart'
                 files:
                     'demo/bar.html': ['examples/index.jade']
+            ohlcchart:
+                options:
+                    pretty: true
+                    data:
+                        exampleCode: 'app-ohlc.js'
+                        title: 'OHLC Chart'
+                files:
+                    'demo/ohlc.html': ['examples/index.jade']
 
         copy:
             demo:
