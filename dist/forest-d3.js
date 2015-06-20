@@ -23,7 +23,7 @@ Author:  Robin Hu
     chart = this;
     bars = selection.selectAll('rect.bar').data(selectionData.values);
     x = chart.getXInternal();
-    y = chart.getY();
+    y = selectionData.getY || chart.getY();
 
     /*
     Ensure the bars are based at the zero line, but does not extend past
@@ -89,7 +89,7 @@ If you set area=true, turns it into an area graph
     selection.style('stroke', chart.seriesColor);
     interpolate = selectionData.interpolate || 'linear';
     x = chart.getXInternal();
-    y = chart.getY();
+    y = selectionData.getY || chart.getY();
     lineFn = d3.svg.line().interpolate(interpolate).x(function(d, i) {
       return chart.xScale(x(d, i));
     });
@@ -160,16 +160,16 @@ Draws a horizontal or vertical line at the specified x or y location.
     selection.classed('ohlc', true);
     rangeLines = selection.selectAll('line.ohlc-range').data(selectionData.values);
     x = chart.getXInternal();
-    open = function(d, i) {
+    open = selectionData.getOpen || function(d, i) {
       return d[1];
     };
-    hi = function(d, i) {
+    hi = selectionData.getHi || function(d, i) {
       return d[2];
     };
-    lo = function(d, i) {
+    lo = selectionData.getLo || function(d, i) {
       return d[3];
     };
-    close = function(d, i) {
+    close = selectionData.getClose || function(d, i) {
       return d[4];
     };
     rangeLines.enter().append('line').classed('ohlc-range', true).attr('x1', function(d, i) {
@@ -267,7 +267,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
       return d.values;
     });
     x = chart.getXInternal();
-    y = chart.getY();
+    y = selectionData.getY || chart.getY();
     points.enter().append('circle').classed('point', true).attr('cx', chart.canvasWidth / 2).attr('cy', chart.canvasHeight / 2).attr('r', 0);
     points.exit().remove();
     return points.transition().delay(function(d, i) {

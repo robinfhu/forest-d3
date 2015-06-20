@@ -3,7 +3,7 @@
     bars = selection.selectAll('rect.bar').data(selectionData.values)
 
     x = chart.getXInternal()
-    y = chart.getY()
+    y = selectionData.getY or chart.getY()
 
     ###
     Ensure the bars are based at the zero line, but does not extend past

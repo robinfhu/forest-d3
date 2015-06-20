@@ -8,10 +8,10 @@
         .data(selectionData.values)
 
     x = chart.getXInternal()
-    open = (d,i)-> d[1]
-    hi = (d,i)-> d[2]
-    lo = (d,i)-> d[3]
-    close = (d,i)-> d[4]
+    open = selectionData.getOpen or (d,i)-> d[1]
+    hi = selectionData.getHi or (d,i)-> d[2]
+    lo = selectionData.getLo or (d,i)-> d[3]
+    close = selectionData.getClose or (d,i)-> d[4]
 
     rangeLines
         .enter()

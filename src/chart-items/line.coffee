@@ -9,7 +9,7 @@ If you set area=true, turns it into an area graph
 
     interpolate = selectionData.interpolate or 'linear'
     x = chart.getXInternal()
-    y = chart.getY()
+    y = selectionData.getY or chart.getY()
 
     lineFn = d3.svg.line()
         .interpolate(interpolate)

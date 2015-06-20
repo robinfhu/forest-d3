@@ -3,6 +3,8 @@ legend = new ForestD3.Legend '#legend'
 
 chart
     .ordinal(true)
+    .getX((d)-> d.date)
+    .getY((d)-> d.open)
     .xLabel('Date')
     .yLabel('Quote')
     .yTickFormat(d3.format(',.3f'))
@@ -24,13 +26,14 @@ getStocks = (startPrice, volatility)->
 
         close = Math.random() * (lo - hi) + hi
 
-        result.push [
-            startDate.getTime(),
-            startPrice,    # open price
-            hi,
-            lo,
-            close
-        ]
+        result.push {
+                date: startDate.getTime()
+                open: startPrice
+                hi
+                lo
+                close
+            }
+
         changePct = 2 * volatility * Math.random()
         if changePct > volatility
             changePct -= 2*volatility
@@ -47,11 +50,24 @@ data = [
     label: 'AAPL'
     type: 'ohlc'
     values: stocks
+    getOpen: (d)-> d.open
+    getClose: (d)-> d.close
+    getHi: (d)-> d.hi
+    getLo: (d)-> d.lo
 ,
     key: 'series2'
-    label: 'AAPL Open'
+    label: 'AAPL Low'
     type: 'line'
     color: 'orange'
+    getY: (d)-> d.lo
+    interpolate: 'cardinal'
+    values: stocks
+,
+    key: 'series3'
+    label: 'AAPL Hi'
+    type: 'line'
+    color: 'blue'
+    getY: (d)-> d.hi
     interpolate: 'cardinal'
     values: stocks
 ]
