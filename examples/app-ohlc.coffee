@@ -4,7 +4,7 @@ legend = new ForestD3.Legend '#legend'
 chart
     .ordinal(true)
     .getX((d)-> d.date)
-    .getY((d)-> d.open)
+    .getY((d)-> d.value)
     .xLabel('Date')
     .yLabel('Quote')
     .yTickFormat(d3.format(',.3f'))
@@ -61,15 +61,10 @@ data = [
     color: 'orange'
     getY: (d)-> d.lo
     interpolate: 'cardinal'
-    values: stocks
-,
-    key: 'series3'
-    label: 'AAPL Hi'
-    type: 'line'
-    color: 'blue'
-    getY: (d)-> d.hi
-    interpolate: 'cardinal'
-    values: stocks
+    values: do->
+        stocks.map (d)->
+            date: d.date
+            value: d.lo
 ]
 
 chart.data(data).render()

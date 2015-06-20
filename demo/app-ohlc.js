@@ -8,7 +8,7 @@
   chart.ordinal(true).getX(function(d) {
     return d.date;
   }).getY(function(d) {
-    return d.open;
+    return d.value;
   }).xLabel('Date').yLabel('Quote').yTickFormat(d3.format(',.3f')).xTickFormat(function(d) {
     if (d != null) {
       return d3.time.format('%Y-%m-%d')(new Date(d));
@@ -71,17 +71,14 @@
         return d.lo;
       },
       interpolate: 'cardinal',
-      values: stocks
-    }, {
-      key: 'series3',
-      label: 'AAPL Hi',
-      type: 'line',
-      color: 'blue',
-      getY: function(d) {
-        return d.hi;
-      },
-      interpolate: 'cardinal',
-      values: stocks
+      values: (function() {
+        return stocks.map(function(d) {
+          return {
+            date: d.date,
+            value: d.lo
+          };
+        });
+      })()
     }
   ];
 

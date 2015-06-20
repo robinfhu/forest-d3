@@ -23,7 +23,7 @@ Author:  Robin Hu
     chart = this;
     bars = selection.selectAll('rect.bar').data(selectionData.values);
     x = chart.getXInternal();
-    y = selectionData.getY || chart.getY();
+    y = chart.getY();
 
     /*
     Ensure the bars are based at the zero line, but does not extend past
@@ -89,7 +89,7 @@ If you set area=true, turns it into an area graph
     selection.style('stroke', chart.seriesColor);
     interpolate = selectionData.interpolate || 'linear';
     x = chart.getXInternal();
-    y = selectionData.getY || chart.getY();
+    y = chart.getY();
     lineFn = d3.svg.line().interpolate(interpolate).x(function(d, i) {
       return chart.xScale(x(d, i));
     });
@@ -267,7 +267,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
       return d.values;
     });
     x = chart.getXInternal();
-    y = selectionData.getY || chart.getY();
+    y = chart.getY();
     points.enter().append('circle').classed('point', true).attr('cx', chart.canvasWidth / 2).attr('cy', chart.canvasHeight / 2).attr('r', 0);
     points.exit().remove();
     return points.transition().delay(function(d, i) {
