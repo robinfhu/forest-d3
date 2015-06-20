@@ -54,6 +54,6 @@
             .style('opacity', 0)
 
     # Call this to remove the tooltip DIV from the page.
-    cleanUp: ->
+    destroy: ->
         if @container?
             document.body.removeChild @container

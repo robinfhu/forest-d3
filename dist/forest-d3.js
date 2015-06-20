@@ -766,7 +766,7 @@ Library of tooltip rendering utilities
       return d3.select(this.container).transition().delay(250).style('opacity', 0);
     };
 
-    Tooltip.prototype.cleanUp = function() {
+    Tooltip.prototype.destroy = function() {
       if (this.container != null) {
         return document.body.removeChild(this.container);
       }
@@ -912,14 +912,31 @@ Handles the guideline that moves along the x-axis
       /*
       Auto resize the chart if user resizes the browser window.
        */
-      window.onresize = (function(_this) {
+      this.resize = (function(_this) {
         return function() {
           if (_this.autoResize()) {
             return _this.render();
           }
         };
       })(this);
+      window.addEventListener('resize', this.resize);
     }
+
+
+    /*
+    Call this method to remove chart from the document and any artifacts
+    it has (like tooltips) and event handlers.
+     */
+
+    Chart.prototype.destroy = function() {
+      var domContainer;
+      domContainer = this.container();
+      if ((domContainer != null ? domContainer.parentNode : void 0) != null) {
+        domContainer.parentNode.removeChild(domContainer);
+      }
+      this.tooltip.destroy();
+      return window.removeEventListener('resize', this.resize);
+    };
 
 
     /*

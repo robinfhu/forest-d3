@@ -15,7 +15,7 @@ describe 'Chart', ->
             document.body.appendChild container
 
         afterEach ->
-            document.body.removeChild container
+            chart.destroy()
 
         it 'can accept container DOM', ->
             chart = new ForestD3.Chart()

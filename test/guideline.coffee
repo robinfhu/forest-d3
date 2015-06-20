@@ -35,8 +35,7 @@ describe 'Chart', ->
                 .render()
 
         afterEach ->
-            chart.tooltip.cleanUp()
-            document.body.removeChild container
+            chart.destroy()
 
         it 'can render a guideline', ->
             chart.updateTooltip [250, 200], [0,0]

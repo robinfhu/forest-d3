@@ -18,7 +18,7 @@ getStocks = (startPrice, volatility)->
     result = []
     startDate = new Date 2012, 0, 1
 
-    for i in [0...20]
+    for i in [0...15]
         result.push [
             startDate.getTime(),
             startPrice - 0.3

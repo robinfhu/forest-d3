@@ -25,8 +25,7 @@ describe 'Tooltip and Guideline', ->
         chart.data(data).render()
 
     afterEach ->
-        chart.tooltip.cleanUp()
-        document.body.removeChild container
+        chart.destroy()
 
     it 'rendered a guideline on the chart canvas', ->
         line = $(container).find('.canvas line.guideline')

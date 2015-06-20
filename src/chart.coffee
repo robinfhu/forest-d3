@@ -53,9 +53,23 @@ getIdx = (d,i)-> i
         ###
         Auto resize the chart if user resizes the browser window.
         ###
-        window.onresize = =>
+        @resize = =>
             if @autoResize()
                 @render()
+
+        window.addEventListener 'resize', @resize
+
+    ###
+    Call this method to remove chart from the document and any artifacts
+    it has (like tooltips) and event handlers.
+    ###
+    destroy: ->
+        domContainer = @container()
+        if domContainer?.parentNode?
+            domContainer.parentNode.removeChild domContainer
+
+        @tooltip.destroy()
+        window.removeEventListener 'resize', @resize
 
     ###
     Set chart data.
