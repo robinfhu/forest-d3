@@ -145,6 +145,18 @@ describe 'Utilities', ->
                 x: [0,1]
                 y: [1,4]
 
+        it 'defaults to [-1,1] extent if no valid values', ->
+            data = [
+                type: 'marker'
+                axis: 'y'
+                value: 0.5
+            ]
+
+            result = extent data
+            result.should.deep.equal
+                x: [-1, 1]
+                y: [0.5,0.5]
+
     describe 'Indexify', ->
         it 'adds _index to each series', ->
             data = [
@@ -175,6 +187,19 @@ describe 'Utilities', ->
             newExtent.should.deep.equal
                 x: [-11, 11]
                 y: [1.925, 5.075]
+
+        it 'handles cases where the extent values are the same', ->
+            xyExtent =
+                x: [0.2, 0.2]
+                y: [0.2, 0.2]
+
+            padding =
+                x: 0.1
+                y: 0.1
+
+            newExtent = ForestD3.Utils.extentPadding xyExtent, padding
+            newExtent.x[0].toFixed(2).should.equal '0.19'
+            newExtent.x[1].toFixed(2).should.equal '0.21'
 
     describe 'smartBisect', ->
         smartBisect = null

@@ -209,15 +209,6 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         });
         xExt = d3.extent(d3.merge(xAllPoints));
         yExt = d3.extent(d3.merge(yAllPoints));
-        roundOff = function(d, i) {
-          if (Math.abs(d) < 1) {
-            return d;
-          }
-          if (i === 0) {
-            return Math.floor(d);
-          }
-          return Math.ceil(d);
-        };
         data.filter(function(d) {
           return d.type === 'marker';
         }).forEach(function(marker) {
@@ -238,6 +229,24 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         });
         xExt = d3.extent(xExt);
         yExt = d3.extent(yExt);
+        roundOff = function(d, i) {
+          if (Math.abs(d) < 1) {
+            return d;
+          }
+          if (i === 0) {
+            if (isNaN(d)) {
+              return -1;
+            } else {
+              return Math.floor(d);
+            }
+          } else {
+            if (isNaN(d)) {
+              return 1;
+            } else {
+              return Math.ceil(d);
+            }
+          }
+        };
         xExt = xExt.map(roundOff);
         yExt = yExt.map(roundOff);
         return {
@@ -263,13 +272,14 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
           }
        */
       extentPadding: function(extent, padding) {
-        var amount, domain, key, padPercent, result;
+        var amount, domain, key, padPercent, range, result;
         result = {};
         for (key in extent) {
           domain = extent[key];
           padPercent = padding[key];
           if (padPercent != null) {
-            amount = Math.abs(domain[0] - domain[1]) * padPercent;
+            range = Math.abs(domain[0] - domain[1]) || domain[0];
+            amount = range * padPercent;
             amount /= 2;
             result[key] = [domain[0] - amount, domain[1] + amount];
           }

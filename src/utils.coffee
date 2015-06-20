@@ -40,11 +40,6 @@
         xExt = d3.extent d3.merge xAllPoints
         yExt = d3.extent d3.merge yAllPoints
 
-        roundOff = (d,i)->
-            return d if Math.abs(d) < 1
-            return Math.floor(d) if i is 0
-            return Math.ceil(d)
-
         # Factor in any markers
         data.filter((d)-> d.type is 'marker').forEach (marker)->
             if marker.axis is 'x'
@@ -61,6 +56,20 @@
 
         xExt = d3.extent xExt
         yExt = d3.extent yExt
+
+        roundOff = (d,i)->
+            return d if Math.abs(d) < 1
+
+            if i is 0
+                if isNaN d
+                    return -1
+                else
+                    return Math.floor(d)
+            else
+                if isNaN d
+                    return 1
+                else
+                    return Math.ceil(d)
 
         xExt = xExt.map roundOff
         yExt = yExt.map roundOff
@@ -90,7 +99,8 @@
         for key, domain of extent
             padPercent = padding[key]
             if padPercent?
-                amount = Math.abs(domain[0] - domain[1]) * padPercent
+                range = Math.abs(domain[0] - domain[1]) or domain[0]
+                amount = range * padPercent
                 amount /= 2
 
                 result[key] = [domain[0] - amount, domain[1] + amount]
