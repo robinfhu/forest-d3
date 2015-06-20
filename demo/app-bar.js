@@ -1,9 +1,9 @@
 (function() {
   var chart, data, getStocks, legend;
 
-  chart = new ForestD3.Chart(d3.select('#example'));
+  chart = new ForestD3.Chart('#example');
 
-  legend = new ForestD3.Legend(d3.select('#legend'));
+  legend = new ForestD3.Legend('#legend');
 
   chart.ordinal(true).xLabel('Date').yLabel('Volume').yTickFormat(d3.format(',.3f')).xTickFormat(function(d) {
     if (d != null) {

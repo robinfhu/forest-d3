@@ -957,8 +957,10 @@ Handles the guideline that moves along the x-axis
       if (d == null) {
         return this.properties['container'];
       } else {
-        if (d.select != null) {
+        if ((d.select != null) && (d.node != null)) {
           d = d.node();
+        } else if (typeof d === 'string') {
+          d = document.querySelector(d);
         }
         this.properties['container'] = d;
         this.svg = this.createSvg();

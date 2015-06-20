@@ -1,5 +1,5 @@
-chart = new ForestD3.Chart d3.select('#example')
-legend = new ForestD3.Legend d3.select('#legend')
+chart = new ForestD3.Chart '#example'
+legend = new ForestD3.Legend '#legend'
 
 chart
     .ordinal(true)

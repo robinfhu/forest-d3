@@ -34,7 +34,6 @@ getIdx = (d,i)-> i
                         @properties[prop] = d
                         return @
 
-
         @container domContainer
 
         @tooltip = new ForestD3.Tooltip @
@@ -86,9 +85,11 @@ getIdx = (d,i)-> i
         unless d?
             return @properties['container']
         else
-            if d.select?
+            if d.select? and d.node?
                 # This is a d3 selection
                 d = d.node()
+            else if typeof(d) is 'string'
+                d = document.querySelector d
 
             @properties['container'] = d
             @svg = @createSvg()
