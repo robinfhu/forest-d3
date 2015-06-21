@@ -40,7 +40,7 @@ Author:  Robin Hu
     maxFullSpace = chart.xScale(1) / 2;
     fullSpace = d3.min([maxFullSpace, fullSpace]);
     maxPadding = 15;
-    fullSpace -= d3.min([fullSpace / 2, maxPadding]);
+    fullSpace -= d3.min([fullSpace * 0.1, maxPadding]);
     fullSpace = d3.max([barCount, fullSpace]);
 
     /*
