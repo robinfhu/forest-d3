@@ -19,7 +19,7 @@ Author:  Robin Hu
 
 (function() {
   this.ForestD3.ChartItem.bar = function(selection, selectionData) {
-    var barBase, barCount, barIndex, barWidth, bars, chart, fullSpace, maxPadding, x, xCentered, y;
+    var barBase, barCount, barIndex, barWidth, bars, chart, fullSpace, maxFullSpace, maxPadding, x, xCentered, y;
     chart = this;
     bars = selection.selectAll('rect.bar').data(selectionData.values);
     x = chart.getXInternal();
@@ -40,6 +40,8 @@ Author:  Robin Hu
     fullSpace -= d3.min([fullSpace / 2, maxPadding]);
     barCount = chart.data().barCount();
     fullSpace = d3.max([barCount, fullSpace]);
+    maxFullSpace = chart.canvasWidth / 2;
+    fullSpace = d3.min([maxFullSpace, fullSpace]);
 
     /*
     This is used to ensure that the bar group is centered around the x-axis

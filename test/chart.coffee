@@ -339,3 +339,22 @@ describe 'Chart', ->
 
                 bars2 = $(container).find('g.item-s2 rect')
                 bars2.length.should.equal 3, 'three bars s2'
+
+            it 'should set max width for each bar', (done)->
+                data = [
+                    key: 's1'
+                    type: 'bar'
+                    values: [
+                        ['Population', 234]
+                    ]
+                ]
+
+                chart = new ForestD3.Chart container
+                chart.ordinal(true).data(data).render()
+
+                setTimeout ->
+                    bar = $(container).find('g.item-s1 rect').get(0)
+                    width = parseFloat(bar.getAttribute('width'))
+                    width.should.be.lessThan 300
+                    done()
+                , 300

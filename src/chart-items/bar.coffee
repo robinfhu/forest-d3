@@ -31,6 +31,10 @@
     # Ensure we don't get negative bar widths
     fullSpace = d3.max [barCount, fullSpace]
 
+    # Ensure the bars don't get too wide either.
+    maxFullSpace = chart.canvasWidth / 2
+    fullSpace = d3.min [maxFullSpace, fullSpace]
+
     ###
     This is used to ensure that the bar group is centered around the x-axis
     tick mark.
