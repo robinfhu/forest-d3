@@ -11,41 +11,41 @@
   pointer-events: all;
 }
 .forest-d3 .axis .tick line {
-  stroke: #000;
+  stroke: #fff;
 }
 .forest-d3 .axis .tick text {
-  fill: #333;
+  fill: #dcdcdc;
 }
 .forest-d3 .axis.x-axis .tick line {
   stroke-opacity: 0.2;
 }
 .forest-d3 .axis.y-axis .tick line {
-  stroke-opacity: 0.07;
+  stroke-opacity: 0.1;
 }
 .forest-d3 .axis > path {
   fill: none;
-  stroke: #000;
+  stroke: #fff;
   stroke-opacity: 0.2;
 }
 .forest-d3 .axes-labels {
-  fill: #333;
+  fill: #dcdcdc;
   pointer-events: none;
 }
 .forest-d3 .canvas > rect {
   pointer-events: all;
   fill: none;
-  stroke: #000;
+  stroke: #fff;
   stroke-opacity: 0.2;
 }
 .forest-d3 .canvas circle.point {
   fill-opacity: 0.8;
 }
 .forest-d3 .canvas line.guideline {
-  stroke: #000;
+  stroke: #fff;
   pointer-events: none;
 }
 .forest-d3 .canvas .guideline-markers circle.marker {
-  stroke: #000;
+  stroke: #fff;
   stroke-opacity: 0.7;
 }
 .forest-d3 .canvas .chart-item {
@@ -102,12 +102,12 @@
 }
 
 .forest-d3 line.marker {
-  stroke: #000;
+  stroke: #fff;
   stroke-opacity: 0.5;
   stroke-dasharray: 5;
 }
 .forest-d3 .marker-label {
-  fill: #333;
+  fill: #dcdcdc;
   font-size: 11px;
 }
 
@@ -133,8 +133,8 @@
   min-height: 20px;
   margin: 0 10px 0 10px;
   padding: 7px;
-  background: #fff;
-  color: #333;
+  background: #201f1d;
+  color: #dcdcdc;
   border: solid 1px #ccc;
   border-radius: 3px;
 }

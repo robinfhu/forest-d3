@@ -1,4 +1,3 @@
 node_modules
-demo/forest-d3.js
-demo/forest-d3.css
+demo/forest-d3*
 karma.xml

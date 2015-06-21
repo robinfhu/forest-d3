@@ -11,7 +11,10 @@
     .axis
         .tick
             line
-                stroke black
+                stroke $axisLineColor
+
+            text
+                fill $axisTextColor
 
         &.x-axis
             .tick
@@ -21,21 +24,22 @@
         &.y-axis
             .tick
                 line
-                    stroke-opacity 0.05
+                    stroke-opacity $yAxisOpacity
 
         > path
             fill none
-            stroke black
+            stroke $axisLineColor
             stroke-opacity 0.2
 
     .axes-labels
+        fill $axisTextColor
         pointer-events none
 
     .canvas
         & > rect
             pointer-events all
             fill none
-            stroke black
+            stroke $axisLineColor
             stroke-opacity 0.2
 
         circle
@@ -44,13 +48,13 @@
 
         line
             &.guideline
-                stroke #000
+                stroke $axisLineColor
                 pointer-events none
 
         .guideline-markers
             circle
                 &.marker
-                    stroke #000
+                    stroke $axisLineColor
                     stroke-opacity 0.7
 
         .chart-item

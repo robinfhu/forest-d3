@@ -21,11 +21,20 @@ module.exports = (grunt)->
                 flatten: true
 
         stylus:
-            client:
+            light:
                 files:
                     'dist/forest-d3.css': ['style/*.styl']
                 options:
                     compress: false
+                    import: ['variables/light']
+
+            dark:
+                files:
+                    'dist/forest-d3-dark.css': ['style/*.styl']
+                options:
+                    compress: false
+                    import: ['variables/dark']
+
 
         coffeelint:
             client:
