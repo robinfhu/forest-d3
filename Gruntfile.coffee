@@ -1,39 +1,17 @@
 module.exports = (grunt)->
     grunt.initConfig
         jade:
-            homepage:
+            examples:
                 options:
                     pretty: true
-                    data:
-                        exampleCode: 'app.js'
-                        title: 'Basic Chart'
-                files:
-                    'demo/index.html': ['examples/index.jade']
-            linechart:
-                options:
-                    pretty: true
-                    data:
-                        exampleCode: 'app-line.js'
-                        title: 'Line Chart'
-                files:
-                    'demo/line.html': ['examples/index.jade']
-            barchart:
-                options:
-                    pretty: true
-                    data:
-                        exampleCode: 'app-bar.js'
-                        title: 'Bar Chart'
-                files:
-                    'demo/bar.html': ['examples/index.jade']
-            ohlcchart:
-                options:
-                    pretty: true
-                    data:
-                        exampleCode: 'app-ohlc.js'
-                        title: 'OHLC Chart'
-                files:
-                    'demo/ohlc.html': ['examples/index.jade']
-
+                files: [
+                    cwd: 'examples/'
+                    src: ['*.jade', '!template.jade']
+                    dest: 'demo/'
+                    ext: '.html'
+                    expand: true
+                    flatten: true
+                ]
         copy:
             demo:
                 cwd: 'dist/'
