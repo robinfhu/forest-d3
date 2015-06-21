@@ -123,6 +123,7 @@
 }
 
 .forest-d3 rect.region {
+  fill: #333;
   fill-opacity: 0.15;
 }
 
@@ -141,6 +142,9 @@
 .forest-d3.tooltip-box .header {
   font-weight: bold;
   margin-bottom: 8px;
+}
+.forest-d3.tooltip-box table td {
+  white-space: nowrap;
 }
 .forest-d3.tooltip-box table td.series-label {
   padding-right: 20px;

@@ -820,7 +820,7 @@ Library of tooltip rendering utilities
      */
 
     Tooltip.prototype.render = function(content, clientMouse) {
-      var containerCenter, xPos, yPos;
+      var containerCenter, dimensions, edgeThreshold, xPos, yPos;
       if (!this.chart.showTooltip()) {
         return;
       }
@@ -849,8 +849,18 @@ Library of tooltip rendering utilities
       Adjust tooltip so that it is centered on the mouse.
       Accomplish this by calculating container height and dividing it by 2.
        */
-      containerCenter = this.container.getBoundingClientRect().height / 2;
+      dimensions = this.container.getBoundingClientRect();
+      containerCenter = dimensions.height / 2;
       yPos -= containerCenter;
+
+      /*
+      Check to see if the tooltip will render past the right side of the
+      browser window. If so, then move it to the left of the mouse.
+       */
+      edgeThreshold = 40;
+      if ((xPos + dimensions.width + edgeThreshold) > window.innerWidth) {
+        xPos -= dimensions.width + edgeThreshold;
+      }
       return d3.select(this.container).style('left', xPos + "px").style('top', yPos + "px").transition().style('opacity', 0.9);
     };
 
