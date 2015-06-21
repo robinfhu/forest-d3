@@ -36,12 +36,12 @@ Author:  Robin Hu
       barBase = 0;
     }
     fullSpace = chart.canvasWidth / selectionData.values.length;
+    barCount = chart.data().barCount();
+    maxFullSpace = chart.xScale(1) / 2;
+    fullSpace = d3.min([maxFullSpace, fullSpace]);
     maxPadding = 15;
     fullSpace -= d3.min([fullSpace / 2, maxPadding]);
-    barCount = chart.data().barCount();
     fullSpace = d3.max([barCount, fullSpace]);
-    maxFullSpace = chart.canvasWidth / 2;
-    fullSpace = d3.min([maxFullSpace, fullSpace]);
 
     /*
     This is used to ensure that the bar group is centered around the x-axis

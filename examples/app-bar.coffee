@@ -70,3 +70,47 @@ dataSingle = [
 ]
 
 chartSingle.data(dataSingle).render()
+
+# ******************* ONE GROUP BAR EXAMPLE **************** #
+chartOneGroup = new ForestD3.Chart '#example-onegroup'
+chartOneGroup.ordinal(true).yPadding(0.3)
+dataOneGroup = [
+    key: 'k1'
+    type: 'bar'
+    label: 'Series 1'
+    values: [
+        ['Population', 234]
+    ]
+,
+    key: 'k2'
+    type: 'bar'
+    label: 'Series 2'
+    values: [
+        ['Population', 341]
+    ]
+]
+
+chartOneGroup.data(dataOneGroup).render()
+
+# ******************* TWO GROUPS BAR EXAMPLE **************** #
+chartTwoGroups = new ForestD3.Chart '#example-twogroups'
+chartTwoGroups.ordinal(true).yPadding(0.3).xPadding(1.5)
+dataTwoGroups = [
+    key: 'k1'
+    type: 'bar'
+    label: 'Series 1'
+    values: [
+        ['Exp. 1', 234]
+        ['Exp. 2', 245]
+    ]
+,
+    key: 'k2'
+    type: 'bar'
+    label: 'Series 2'
+    values: [
+        ['Exp. 1', 341]
+        ['Exp. 2', 321]
+    ]
+]
+
+chartTwoGroups.data(dataTwoGroups).render()

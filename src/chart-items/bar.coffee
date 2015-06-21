@@ -20,20 +20,21 @@
     # Calculates how much available space there is between each x-axis tick mark
     fullSpace = chart.canvasWidth / selectionData.values.length
 
+    # Gets total number of visible bars
+    barCount = chart.data().barCount()
+
+    # Ensure the bars don't get too wide either.
+    maxFullSpace = chart.xScale(1) / 2
+
+    fullSpace = d3.min [maxFullSpace, fullSpace]
+
     maxPadding = 15
     #add some padding between groups of bars
     # Padding is maxed out after a certain threshold
     fullSpace -= d3.min [(fullSpace / 2), maxPadding]
 
-    # Gets total number of visible bars
-    barCount = chart.data().barCount()
-
     # Ensure we don't get negative bar widths
     fullSpace = d3.max [barCount, fullSpace]
-
-    # Ensure the bars don't get too wide either.
-    maxFullSpace = chart.canvasWidth / 2
-    fullSpace = d3.min [maxFullSpace, fullSpace]
 
     ###
     This is used to ensure that the bar group is centered around the x-axis
