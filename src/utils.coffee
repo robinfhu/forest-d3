@@ -99,11 +99,14 @@
         for key, domain of extent
             padPercent = padding[key]
             if padPercent?
-                range = Math.abs(domain[0] - domain[1]) or domain[0]
-                amount = range * padPercent
-                amount /= 2
+                if domain[0] is 0 and domain[1] is 0
+                    result[key] = [-1, 1]
+                else
+                    range = Math.abs(domain[0] - domain[1]) or domain[0]
+                    amount = range * padPercent
+                    amount /= 2
 
-                result[key] = [domain[0] - amount, domain[1] + amount]
+                    result[key] = [domain[0] - amount, domain[1] + amount]
 
 
         result

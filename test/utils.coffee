@@ -173,6 +173,10 @@ describe 'Utilities', ->
                 d._index.should.equal i
 
     describe 'extentPadding', ->
+        extPadding = null
+        beforeEach ->
+            extPadding = ForestD3.Utils.extentPadding
+
         it 'increases the extent by a certain percentage', ->
             xyExtent =
                 x: [-10, 10]
@@ -182,7 +186,7 @@ describe 'Utilities', ->
                 x: 0.1   # 10 percent
                 y: 0.05  # 5 percent
 
-            newExtent = ForestD3.Utils.extentPadding xyExtent, padding
+            newExtent = extPadding xyExtent, padding
 
             newExtent.should.deep.equal
                 x: [-11, 11]
@@ -197,9 +201,23 @@ describe 'Utilities', ->
                 x: 0.1
                 y: 0.1
 
-            newExtent = ForestD3.Utils.extentPadding xyExtent, padding
+            newExtent = extPadding xyExtent, padding
             newExtent.x[0].toFixed(2).should.equal '0.19'
             newExtent.x[1].toFixed(2).should.equal '0.21'
+
+        it 'handles case where extent is [0,0]', ->
+            xyExtent =
+                x: [0,0]
+                y: [0,1]
+
+            padding =
+                x: 0.1
+                y: 0
+
+            newExtent = extPadding xyExtent, padding
+            newExtent.should.deep.equal
+                x: [-1, 1]
+                y: [0, 1]
 
     describe 'smartBisect', ->
         smartBisect = null

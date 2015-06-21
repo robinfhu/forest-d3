@@ -56,3 +56,17 @@ data = [
 ]
 
 chart.data(data).render()
+
+# ******************* SINGLE BAR EXAMPLE **************** #
+chartSingle = new ForestD3.Chart '#example-single'
+chartSingle.ordinal(true)
+dataSingle = [
+    key: 'k1'
+    type: 'bar'
+    label: 'Series 1'
+    values: [
+        ['Population', 234]
+    ]
+]
+
+chartSingle.data(dataSingle).render()

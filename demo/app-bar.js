@@ -1,5 +1,5 @@
 (function() {
-  var chart, data, getStocks, legend;
+  var chart, chartSingle, data, dataSingle, getStocks, legend;
 
   chart = new ForestD3.Chart('#example');
 
@@ -55,5 +55,20 @@
   ];
 
   chart.data(data).render();
+
+  chartSingle = new ForestD3.Chart('#example-single');
+
+  chartSingle.ordinal(true);
+
+  dataSingle = [
+    {
+      key: 'k1',
+      type: 'bar',
+      label: 'Series 1',
+      values: [['Population', 234]]
+    }
+  ];
+
+  chartSingle.data(dataSingle).render();
 
 }).call(this);

@@ -405,10 +405,14 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
           domain = extent[key];
           padPercent = padding[key];
           if (padPercent != null) {
-            range = Math.abs(domain[0] - domain[1]) || domain[0];
-            amount = range * padPercent;
-            amount /= 2;
-            result[key] = [domain[0] - amount, domain[1] + amount];
+            if (domain[0] === 0 && domain[1] === 0) {
+              result[key] = [-1, 1];
+            } else {
+              range = Math.abs(domain[0] - domain[1]) || domain[0];
+              amount = range * padPercent;
+              amount /= 2;
+              result[key] = [domain[0] - amount, domain[1] + amount];
+            }
           }
         }
         return result;
