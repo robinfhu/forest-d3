@@ -1,5 +1,5 @@
 (function() {
-  var chart, data, getStocks, legend;
+  var chart, chartUpdate, data, dataUpdate, getStocks, legend;
 
   chart = new ForestD3.Chart(d3.select('#example'));
 
@@ -13,11 +13,14 @@
     }
   }).addPlugin(legend);
 
-  getStocks = function(startPrice, volatility) {
-    var changePct, i, j, result, startDate;
+  getStocks = function(startPrice, volatility, points) {
+    var changePct, i, j, ref, result, startDate;
+    if (points == null) {
+      points = 20;
+    }
     result = [];
     startDate = new Date(2012, 0, 1);
-    for (i = j = 0; j < 20; i = ++j) {
+    for (i = j = 0, ref = points; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
       result.push([startDate.getTime(), startPrice - 0.3]);
       changePct = 2 * volatility * Math.random();
       if (changePct > volatility) {
@@ -65,5 +68,30 @@
   ];
 
   chart.data(data).render();
+
+  chartUpdate = new ForestD3.Chart('#example-update');
+
+  chartUpdate.ordinal(true).chartLabel('Citi Bank (NYSE)').xTickFormat(function(d) {
+    if (d != null) {
+      return d3.time.format('%Y-%m-%d')(new Date(d));
+    } else {
+      return '';
+    }
+  });
+
+  dataUpdate = [
+    {
+      key: 'series1',
+      type: 'line',
+      label: 'CITI',
+      values: getStocks(206, 0.07, 200)
+    }
+  ];
+
+  chartUpdate.data(dataUpdate).render();
+
+  document.getElementById('update-data').addEventListener('click', function() {
+    return chartUpdate.data().updateValues('series1', getStocks(206, 0.07, 200)).render();
+  });
 
 }).call(this);

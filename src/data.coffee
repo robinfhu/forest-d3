@@ -1,9 +1,13 @@
-@ForestD3.DataAPI = (data)->
+###
+Returns an API object that performs calculations and operations on a chart
+data object.
 
+Some operations can mutate the original chart data.
+###
+@ForestD3.DataAPI = (data)->
     chart = @
 
-    getIdx = (d,i)-> i
-
+    # Returns the entire raw data object.
     get: -> data
 
     # Used for legends that need label and color information
@@ -14,7 +18,15 @@
             hidden: d.hidden is true
             color: chart.seriesColor d
 
-    # Mark a given data series as hidden
+    # Updates a data series with new values. Mutates data.
+    updateValues: (key, values)->
+        for d in data
+            if d.key is key
+                d.values = values
+                break
+        @
+
+    # Mark a given data series as hidden. Mutates the data.
     hide: (keys, flag = true)->
         if not (keys instanceof Array)
             keys = [keys]
@@ -23,13 +35,13 @@
             if d.key in keys
                 d.hidden = flag
 
-        return @
+        @
 
-    # Un-hide data series
+    # Un-hide data series.  Mutates the data.
     show: (keys)->
         @hide keys, false
 
-    # Flip data series on/off
+    # Flip data series on/off.  Mutates the data.
     toggle: (keys)->
         if not (keys instanceof Array)
             keys = [keys]
@@ -38,16 +50,16 @@
             if d.key in keys
                 d.hidden = not d.hidden
 
-        return @
+        @
 
-    # Turn everything off except for the given data series
+    # Turn everything off except for the given data series.  Mutates the data.
     showOnly: (key)->
         for d in data
             d.hidden = not (d.key is key)
 
         @
 
-    # Turn everything on
+    # Turn everything on.  Mutates the data.
     showAll: ->
         for d in data
             d.hidden = false
@@ -120,4 +132,9 @@
                 return i
 
         return null
+
+    ###
+    Alias to chart.render(). Allows you to do things like:
+    chart.data().show('mySeries').render()
+    ###
     render: -> chart.render()

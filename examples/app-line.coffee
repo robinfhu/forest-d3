@@ -14,11 +14,11 @@ chart
     )
     .addPlugin(legend)
 
-getStocks = (startPrice, volatility)->
+getStocks = (startPrice, volatility, points=20)->
     result = []
     startDate = new Date 2012, 0, 1
 
-    for i in [0...20]
+    for i in [0...points]
         result.push [
             startDate.getTime(),
             startPrice - 0.3
@@ -66,3 +66,31 @@ data = [
 ]
 
 chart.data(data).render()
+
+# ******************** Update Data Example *********************
+chartUpdate = new ForestD3.Chart '#example-update'
+
+chartUpdate
+    .ordinal(true)
+    .chartLabel('Citi Bank (NYSE)')
+    .xTickFormat((d)->
+        if d?
+            d3.time.format('%Y-%m-%d')(new Date d)
+        else
+            ''
+    )
+
+dataUpdate = [
+    key: 'series1'
+    type: 'line'
+    label: 'CITI'
+    values: getStocks(206, 0.07, 200)
+]
+
+chartUpdate.data(dataUpdate).render()
+
+document.getElementById('update-data').addEventListener 'click', ->
+    chartUpdate
+        .data()
+        .updateValues('series1', getStocks(206, 0.07, 200))
+        .render()

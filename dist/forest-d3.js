@@ -524,15 +524,20 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
 
 }).call(this);
 
+
+/*
+Returns an API object that performs calculations and operations on a chart
+data object.
+
+Some operations can mutate the original chart data.
+ */
+
 (function() {
   var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   this.ForestD3.DataAPI = function(data) {
-    var chart, getIdx;
+    var chart;
     chart = this;
-    getIdx = function(d, i) {
-      return i;
-    };
     return {
       get: function() {
         return data;
@@ -546,6 +551,17 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
             color: chart.seriesColor(d)
           };
         });
+      },
+      updateValues: function(key, values) {
+        var d, j, len;
+        for (j = 0, len = data.length; j < len; j++) {
+          d = data[j];
+          if (d.key === key) {
+            d.values = values;
+            break;
+          }
+        }
+        return this;
       },
       hide: function(keys, flag) {
         var d, j, len, ref;
@@ -682,6 +698,11 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         }
         return null;
       },
+
+      /*
+      Alias to chart.render(). Allows you to do things like:
+      chart.data().show('mySeries').render()
+       */
       render: function() {
         return chart.render();
       }
@@ -930,7 +951,7 @@ Handles the guideline that moves along the x-axis
       'getY', function(d, i) {
         return d[1];
       }
-    ], ['ordinal', false], ['autoResize', true], ['color', ForestD3.Utils.defaultColor], ['pointSize', 4], ['xPadding', 0.1], ['yPadding', 0.1], ['xLabel', ''], ['yLabel', ''], [
+    ], ['ordinal', false], ['autoResize', true], ['color', ForestD3.Utils.defaultColor], ['pointSize', 4], ['xPadding', 0.1], ['yPadding', 0.1], ['xLabel', ''], ['yLabel', ''], ['chartLabel', ''], [
       'xTickFormat', function(d) {
         return d;
       }
@@ -1153,7 +1174,7 @@ Handles the guideline that moves along the x-axis
      */
 
     Chart.prototype.updateChartFrame = function() {
-      var axesLabels, backdrop, canvasEnter, chart, xAxisGroup, xAxisLabel, xTicks, xValues, yAxisGroup, yAxisLabel;
+      var axesLabels, backdrop, canvasEnter, chart, chartLabel, xAxisGroup, xAxisLabel, xTicks, xValues, yAxisGroup, yAxisLabel;
       backdrop = this.svg.selectAll('rect.backdrop').data([0]);
       backdrop.enter().append('rect').classed('backdrop', true);
       backdrop.attr('width', this.width).attr('height', this.height);
@@ -1195,9 +1216,14 @@ Handles the guideline that moves along the x-axis
       }).transition().attr('x', this.canvasWidth);
       yAxisLabel = axesLabels.selectAll('text.y-axis').data([this.yLabel()]);
       yAxisLabel.enter().append('text').classed('y-axis', true).attr('text-anchor', 'end').attr('transform', 'translate(10,0) rotate(-90 0 0)');
-      return yAxisLabel.text(function(d) {
+      yAxisLabel.text(function(d) {
         return d;
       });
+      chartLabel = axesLabels.selectAll('text.chart-label').data([this.chartLabel()]);
+      chartLabel.enter().append('text').classed('chart-label', true).attr('text-anchor', 'end');
+      return chartLabel.text(function(d) {
+        return d;
+      }).attr('y', 0).attr('x', this.canvasWidth);
     };
 
     Chart.prototype.updateChartScale = function() {

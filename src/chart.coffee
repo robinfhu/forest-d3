@@ -9,6 +9,7 @@ chartProperties = [
     ['yPadding', 0.1]
     ['xLabel', '']
     ['yLabel', '']
+    ['chartLabel', '']
     ['xTickFormat', (d)-> d]
     ['yTickFormat', d3.format(',.2f')]
     ['showTooltip', true]
@@ -309,6 +310,21 @@ getIdx = (d,i)-> i
             .attr('transform', 'translate(10,0) rotate(-90 0 0)')
 
         yAxisLabel.text((d)-> d)
+
+        chartLabel = axesLabels
+            .selectAll('text.chart-label')
+            .data([@chartLabel()])
+
+        chartLabel
+            .enter()
+            .append('text')
+            .classed('chart-label', true)
+            .attr('text-anchor', 'end')
+
+        chartLabel
+            .text((d)-> d)
+            .attr('y', 0)
+            .attr('x', @canvasWidth)
 
     updateChartScale: ->
         extent = ForestD3.Utils.extent(
