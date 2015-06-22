@@ -14,7 +14,7 @@ chartProperties = [
     ['yTickFormat', d3.format(',.2f')]
     ['showTooltip', true]
     ['showGuideline', true]
-    ['tooltipType', 'bisect']
+    ['tooltipType', 'bisect']  # Can be 'bisect' or 'spatial'
 ]
 
 getIdx = (d,i)-> i
@@ -367,7 +367,16 @@ getIdx = (d,i)-> i
             [xPos, yPos] = mouse
 
             if @tooltipType() is 'bisect'
+                ###
+                Bisect tooltip algorithm works as follows:
 
+                - Given the current X position, look up the index of the
+                    closest point, which is basically a binary search.
+                - Calculate the x pixel location of the found point.
+                - Render the guideline at that point.
+                - Do a 'slice' of the data at the found index and render
+                    tooltip with all values at the current index.
+                ###
                 xValues = @data().xValues()
 
                 idx = ForestD3.Utils.smartBisect(
@@ -378,12 +387,26 @@ getIdx = (d,i)-> i
 
                 xPos = @xScale xValues[idx]
 
-                # Show the guideline and position it.
                 @guideline.render xPos, idx
 
                 content = ForestD3.TooltipContent.multiple @, idx
                 @tooltip.render content, clientMouse
+
             else if @tooltipType() is 'spatial'
+                ###
+                Spatial tooltip algorithm works as follows:
+
+                - Convert current mouse position into the domain coordinates
+                - Using those coordinates, look up the closest point in the
+                    quadtree data structure.
+                - Calculate distance between found point and mouse location.
+                - If the distance is under a certain threshold, render the
+                    tooltip and crosshairs. Otherwise hide them.
+
+                - the threshold is calculated by dividing the canvas into
+                    many small squares and using the diagnol length of each
+                    square. It was found through trial and error.
+                ###
                 x = @xScale.invert xPos
                 y = @yScale.invert yPos
                 point = @quadtree.find [x,y]

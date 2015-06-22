@@ -1359,6 +1359,17 @@ Handles the guideline that moves along the x-axis
       } else {
         xPos = mouse[0], yPos = mouse[1];
         if (this.tooltipType() === 'bisect') {
+
+          /*
+          Bisect tooltip algorithm works as follows:
+          
+          - Given the current X position, look up the index of the
+              closest point, which is basically a binary search.
+          - Calculate the x pixel location of the found point.
+          - Render the guideline at that point.
+          - Do a 'slice' of the data at the found index and render
+              tooltip with all values at the current index.
+           */
           xValues = this.data().xValues();
           idx = ForestD3.Utils.smartBisect(xValues, this.xScale.invert(xPos), function(d) {
             return d;
@@ -1368,6 +1379,21 @@ Handles the guideline that moves along the x-axis
           content = ForestD3.TooltipContent.multiple(this, idx);
           return this.tooltip.render(content, clientMouse);
         } else if (this.tooltipType() === 'spatial') {
+
+          /*
+          Spatial tooltip algorithm works as follows:
+          
+          - Convert current mouse position into the domain coordinates
+          - Using those coordinates, look up the closest point in the
+              quadtree data structure.
+          - Calculate distance between found point and mouse location.
+          - If the distance is under a certain threshold, render the
+              tooltip and crosshairs. Otherwise hide them.
+          
+          - the threshold is calculated by dividing the canvas into
+              many small squares and using the diagnol length of each
+              square. It was found through trial and error.
+           */
           x = this.xScale.invert(xPos);
           y = this.yScale.invert(yPos);
           point = this.quadtree.find([x, y]);
