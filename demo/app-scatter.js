@@ -1,9 +1,11 @@
 (function() {
-  var chart, chart2, data, data2, getValues;
+  var chart, data, getValues, legend;
 
   chart = new ForestD3.Chart('#example');
 
-  chart.tooltipType('spatial').xTickFormat(d3.format('.2f'));
+  legend = new ForestD3.Legend('#legend');
+
+  chart.tooltipType('spatial').xTickFormat(d3.format('.2f')).addPlugin(legend);
 
   getValues = function(factor) {
     var values;
@@ -25,30 +27,14 @@
       type: 'scatter',
       label: 'Sample A',
       values: getValues()
-    }
-  ];
-
-  chart.data(data).render();
-
-  chart2 = new ForestD3.Chart('#example2');
-
-  chart2.tooltipType('spatial').xTickFormat(d3.format('.2f'));
-
-  data2 = [
-    {
-      key: 'series1',
-      type: 'scatter',
-      label: 'Sample A',
-      values: getValues()
     }, {
       key: 'series2',
       type: 'scatter',
-      interpolate: 'cardinal',
       label: 'Sample B',
       values: getValues(20)
     }
   ];
 
-  chart2.data(data2).render();
+  chart.data(data).render();
 
 }).call(this);

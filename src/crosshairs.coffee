@@ -39,12 +39,14 @@ Handles the guideline that moves along the x-axis
         # Show the crosshairs and position it.
         @xLine
             .transition()
+            .duration(50)
             .attr('x1', x)
             .attr('x2', x)
             .style('opacity', 0.5)
 
         @yLine
             .transition()
+            .duration(50)
             .attr('y1', y)
             .attr('y2', y)
             .style('opacity', 0.5)

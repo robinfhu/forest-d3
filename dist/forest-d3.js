@@ -1015,8 +1015,8 @@ Handles the guideline that moves along the x-axis
       if (this.xLine == null) {
         return;
       }
-      this.xLine.transition().attr('x1', x).attr('x2', x).style('opacity', 0.5);
-      return this.yLine.transition().attr('y1', y).attr('y2', y).style('opacity', 0.5);
+      this.xLine.transition().duration(50).attr('x1', x).attr('x2', x).style('opacity', 0.5);
+      return this.yLine.transition().duration(50).attr('y1', y).attr('y2', y).style('opacity', 0.5);
     };
 
     Crosshairs.prototype.hide = function() {
@@ -1403,7 +1403,12 @@ Handles the guideline that moves along the x-axis
           yDiff = yActual - yPos;
           dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
           threshold = Math.sqrt((2 * this.canvasWidth * this.canvasHeight) / 1965);
-          if (dist < threshold) {
+
+          /*
+          There is an additional check to make sure tooltips are not
+          rendered for hidden chart series'.
+           */
+          if (dist < threshold && !point.series.hidden) {
             content = ForestD3.TooltipContent.single(this, point);
             this.crosshairs.render(xActual, yActual);
             return this.tooltip.render(content, clientMouse);

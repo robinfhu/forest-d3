@@ -419,7 +419,12 @@ getIdx = (d,i)-> i
                 dist = Math.sqrt(xDiff*xDiff + yDiff*yDiff)
 
                 threshold = Math.sqrt((2*@canvasWidth*@canvasHeight) / 1965)
-                if dist < threshold
+
+                ###
+                There is an additional check to make sure tooltips are not
+                rendered for hidden chart series'.
+                ###
+                if dist < threshold and not point.series.hidden
                     content = ForestD3.TooltipContent.single @, point
 
                     @crosshairs.render xActual, yActual
