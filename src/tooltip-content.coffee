@@ -9,7 +9,7 @@ Library of tooltip rendering utilities
         slice = chart.data().sliced xIndex
 
         rows = slice.map (d)->
-            bgColor = "background-color: #{d.color}"
+            bgColor = "background-color: #{d.color};"
             """
                 <tr>
                     <td><div class='series-color' style='#{bgColor}'></div></td>
@@ -24,5 +24,21 @@ Library of tooltip rendering utilities
         <div class='header'>#{xValue}</div>
         <table>
             #{rows}
+        </table>
+        """
+    single: (chart, point)->
+        xValue = chart.xTickFormat()(point.xValue)
+        color = chart.seriesColor point.series
+        bgColor = "background-color: #{color};"
+        """
+        <div class='header'>#{xValue}</div>
+        <table>
+            <tr>
+                <td><div class='series-color' style='#{bgColor}'></div></td>
+                <td class='series-label'>#{point.series.label}</td>
+                <td class='series-value'>
+                    #{chart.yTickFormat()(point.y)}
+                </td>
+            </tr>
         </table>
         """

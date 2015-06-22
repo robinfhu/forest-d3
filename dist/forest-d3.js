@@ -698,6 +698,23 @@ Some operations can mutate the original chart data.
         }
         return null;
       },
+      quadtree: function() {
+        var allPoints, qfn;
+        allPoints = data[0].values.map(function(d, i) {
+          return {
+            x: chart.getXInternal()(d, i),
+            y: chart.getY()(d, i),
+            xValue: chart.getX()(d, i),
+            series: data[0]
+          };
+        });
+        qfn = d3.geom.quadtree().x(function(d) {
+          return d.x;
+        }).y(function(d) {
+          return d.y;
+        });
+        return qfn(allPoints);
+      },
 
       /*
       Alias to chart.render(). Allows you to do things like:
@@ -794,11 +811,18 @@ Library of tooltip rendering utilities
       slice = chart.data().sliced(xIndex);
       rows = slice.map(function(d) {
         var bgColor;
-        bgColor = "background-color: " + d.color;
+        bgColor = "background-color: " + d.color + ";";
         return "<tr>\n    <td><div class='series-color' style='" + bgColor + "'></div></td>\n    <td class='series-label'>" + d.label + "</td>\n    <td class='series-value'>" + (chart.yTickFormat()(d.y)) + "</td>\n</tr>";
       });
       rows = rows.join('');
       return "<div class='header'>" + xValue + "</div>\n<table>\n    " + rows + "\n</table>";
+    },
+    single: function(chart, point) {
+      var bgColor, color, xValue;
+      xValue = chart.xTickFormat()(point.xValue);
+      color = chart.seriesColor(point.series);
+      bgColor = "background-color: " + color + ";";
+      return "<div class='header'>" + xValue + "</div>\n<table>\n    <tr>\n        <td><div class='series-color' style='" + bgColor + "'></div></td>\n        <td class='series-label'>" + point.series.label + "</td>\n        <td class='series-value'>\n            " + (chart.yTickFormat()(point.y)) + "\n        </td>\n    </tr>\n</table>";
     }
   };
 
@@ -949,6 +973,63 @@ Handles the guideline that moves along the x-axis
 
 }).call(this);
 
+
+/*
+Handles the guideline that moves along the x-axis
+ */
+
+(function() {
+  var Crosshairs;
+
+  this.ForestD3.Crosshairs = Crosshairs = (function() {
+    function Crosshairs(chart) {
+      this.chart = chart;
+    }
+
+    Crosshairs.prototype.create = function(canvas) {
+      if (!this.chart.showGuideline()) {
+        return;
+      }
+      this.xLine = canvas.selectAll('line.crosshair-x').data([this.chart.canvasHeight]);
+      this.yLine = canvas.selectAll('line.crosshair-y').data([this.chart.canvasWidth]);
+      this.xLine.enter().append('line').classed('crosshair-x', true).style('opacity', 0);
+      this.xLine.attr('y1', 0).attr('y2', function(d) {
+        return d;
+      });
+      this.yLine.enter().append('line').classed('crosshair-y', true).style('opacity', 0);
+      return this.yLine.attr('x1', 0).attr('x2', function(d) {
+        return d;
+      });
+    };
+
+    Crosshairs.prototype.render = function(x, y) {
+      if (!this.chart.showGuideline()) {
+        return;
+      }
+      if (this.xLine == null) {
+        return;
+      }
+      this.xLine.transition().attr('x1', x).attr('x2', x).style('opacity', 0.5);
+      return this.yLine.transition().attr('y1', y).attr('y2', y).style('opacity', 0.5);
+    };
+
+    Crosshairs.prototype.hide = function() {
+      if (!this.chart.showGuideline()) {
+        return;
+      }
+      if (this.xLine == null) {
+        return;
+      }
+      this.xLine.transition().delay(250).style('opacity', 0);
+      return this.yLine.transition().delay(250).style('opacity', 0);
+    };
+
+    return Crosshairs;
+
+  })();
+
+}).call(this);
+
 (function() {
   var Chart, chartProperties, getIdx;
 
@@ -965,7 +1046,7 @@ Handles the guideline that moves along the x-axis
       'xTickFormat', function(d) {
         return d;
       }
-    ], ['yTickFormat', d3.format(',.2f')], ['showTooltip', true], ['showGuideline', true]
+    ], ['yTickFormat', d3.format(',.2f')], ['showTooltip', true], ['showGuideline', true], ['tooltipType', 'bisect']
   ];
 
   getIdx = function(d, i) {
@@ -996,6 +1077,7 @@ Handles the guideline that moves along the x-axis
       this.container(domContainer);
       this.tooltip = new ForestD3.Tooltip(this);
       this.guideline = new ForestD3.Guideline(this);
+      this.crosshairs = new ForestD3.Crosshairs(this);
       this.xAxis = d3.svg.axis();
       this.yAxis = d3.svg.axis();
       this.seriesColor = (function(_this) {
@@ -1054,6 +1136,9 @@ Handles the guideline that moves along the x-axis
       } else {
         d = ForestD3.Utils.indexify(d);
         this.chartData = d;
+        if (this.tooltipType() === 'spatial') {
+          this.quadtree = this.data().quadtree();
+        }
         return this;
       }
     };
@@ -1217,6 +1302,7 @@ Handles the guideline that moves along the x-axis
         return chart.updateTooltip(null);
       });
       this.guideline.create(this.canvas);
+      this.crosshairs.create(this.canvas);
       axesLabels = this.canvas.selectAll('g.axes-labels').data([0]);
       axesLabels.enter().append('g').classed('axes-labels', true);
       xAxisLabel = axesLabels.selectAll('text.x-axis').data([this.xLabel()]);
@@ -1251,24 +1337,49 @@ Handles the guideline that moves along the x-axis
     /*
     Updates where the guideline and tooltip is.
     
-    mouse should be an array of two things: [mouse x , mouse y]
+    mouse: [mouse x , mouse y] - location of mouse in canvas
+    clientMouse should be an array: [x,y] - location of mouse in browser
      */
 
     Chart.prototype.updateTooltip = function(mouse, clientMouse) {
-      var content, idx, xPos, xValues, yPos;
+      var content, dist, idx, point, threshold, x, xActual, xDiff, xPos, xValues, y, yActual, yDiff, yPos;
+      if (!this.showTooltip()) {
+        return;
+      }
       if (mouse == null) {
         this.guideline.hide();
+        this.crosshairs.hide();
         return this.tooltip.hide();
       } else {
         xPos = mouse[0], yPos = mouse[1];
-        xValues = this.data().xValues();
-        idx = ForestD3.Utils.smartBisect(xValues, this.xScale.invert(xPos), function(d) {
-          return d;
-        });
-        xPos = this.xScale(xValues[idx]);
-        this.guideline.render(xPos, idx);
-        content = ForestD3.TooltipContent.multiple(this, idx);
-        return this.tooltip.render(content, clientMouse);
+        if (this.tooltipType() === 'bisect') {
+          xValues = this.data().xValues();
+          idx = ForestD3.Utils.smartBisect(xValues, this.xScale.invert(xPos), function(d) {
+            return d;
+          });
+          xPos = this.xScale(xValues[idx]);
+          this.guideline.render(xPos, idx);
+          content = ForestD3.TooltipContent.multiple(this, idx);
+          return this.tooltip.render(content, clientMouse);
+        } else if (this.tooltipType() === 'spatial') {
+          x = this.xScale.invert(xPos);
+          y = this.yScale.invert(yPos);
+          point = this.quadtree.find([x, y]);
+          xActual = this.xScale(point.x);
+          yActual = this.yScale(point.y);
+          xDiff = xActual - xPos;
+          yDiff = yActual - yPos;
+          dist = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+          threshold = Math.sqrt((2 * this.canvasWidth * this.canvasHeight) / 1965);
+          if (dist < threshold) {
+            content = ForestD3.TooltipContent.single(this, point);
+            this.crosshairs.render(xActual, yActual);
+            return this.tooltip.render(content, clientMouse);
+          } else {
+            this.crosshairs.hide();
+            return this.tooltip.hide();
+          }
+        }
       }
     };
 

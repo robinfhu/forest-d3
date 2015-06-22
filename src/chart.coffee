@@ -14,6 +14,7 @@ chartProperties = [
     ['yTickFormat', d3.format(',.2f')]
     ['showTooltip', true]
     ['showGuideline', true]
+    ['tooltipType', 'bisect']
 ]
 
 getIdx = (d,i)-> i
@@ -39,6 +40,7 @@ getIdx = (d,i)-> i
 
         @tooltip = new ForestD3.Tooltip @
         @guideline = new ForestD3.Guideline @
+        @crosshairs = new ForestD3.Crosshairs @
         @xAxis = d3.svg.axis()
         @yAxis = d3.svg.axis()
         @seriesColor = (d)=> d.color or @color()(d._index)
@@ -80,6 +82,10 @@ getIdx = (d,i)-> i
         else
             d = ForestD3.Utils.indexify d
             @chartData = d
+
+            if @tooltipType() is 'spatial'
+                @quadtree = @data().quadtree()
+
             return @
 
     container: (d)->
@@ -282,6 +288,7 @@ getIdx = (d,i)-> i
 
         # Add a guideline
         @guideline.create @canvas
+        @crosshairs.create @canvas
 
         # Add axes labels
         axesLabels = @canvas.selectAll('g.axes-labels').data([0])
@@ -343,31 +350,60 @@ getIdx = (d,i)-> i
     ###
     Updates where the guideline and tooltip is.
 
-    mouse should be an array of two things: [mouse x , mouse y]
+    mouse: [mouse x , mouse y] - location of mouse in canvas
+    clientMouse should be an array: [x,y] - location of mouse in browser
     ###
     updateTooltip: (mouse, clientMouse)->
+        return unless @showTooltip()
+
         unless mouse?
             # Hide guideline from view if 'null' passed in
             @guideline.hide()
+            @crosshairs.hide()
             @tooltip.hide()
         else
+            # Contains the current pixel coordinates of the mouse, within the
+            # canvas context (so [0,0] would be top left corner of canvas)
             [xPos, yPos] = mouse
 
-            xValues = @data().xValues()
+            if @tooltipType() is 'bisect'
 
-            idx = ForestD3.Utils.smartBisect(
-                xValues,
-                @xScale.invert(xPos),
-                (d)-> d
-            )
+                xValues = @data().xValues()
 
-            xPos = @xScale xValues[idx]
+                idx = ForestD3.Utils.smartBisect(
+                    xValues,
+                    @xScale.invert(xPos),
+                    (d)-> d
+                )
 
-            # Show the guideline and position it.
-            @guideline.render xPos, idx
+                xPos = @xScale xValues[idx]
 
-            content = ForestD3.TooltipContent.multiple @, idx
-            @tooltip.render content, clientMouse
+                # Show the guideline and position it.
+                @guideline.render xPos, idx
+
+                content = ForestD3.TooltipContent.multiple @, idx
+                @tooltip.render content, clientMouse
+            else if @tooltipType() is 'spatial'
+                x = @xScale.invert xPos
+                y = @yScale.invert yPos
+                point = @quadtree.find [x,y]
+
+                xActual = @xScale point.x
+                yActual = @yScale point.y
+
+                xDiff = xActual - xPos
+                yDiff = yActual - yPos
+                dist = Math.sqrt(xDiff*xDiff + yDiff*yDiff)
+
+                threshold = Math.sqrt((2*@canvasWidth*@canvasHeight) / 1965)
+                if dist < threshold
+                    content = ForestD3.TooltipContent.single @, point
+
+                    @crosshairs.render xActual, yActual
+                    @tooltip.render content, clientMouse
+                else
+                    @crosshairs.hide()
+                    @tooltip.hide()
 
     addPlugin: (plugin)->
         @plugins[plugin.name] = plugin

@@ -133,6 +133,20 @@ Some operations can mutate the original chart data.
 
         return null
 
+    quadtree: ->
+        allPoints = data[0].values.map (d, i)->
+            x: chart.getXInternal()(d,i)
+            y: chart.getY()(d,i)
+            xValue: chart.getX()(d,i)
+            series: data[0]
+
+        qfn = d3.geom.quadtree()
+            .x((d)-> d.x)
+            .y((d)-> d.y)
+
+        qfn allPoints
+
+
     ###
     Alias to chart.render(). Allows you to do things like:
     chart.data().show('mySeries').render()

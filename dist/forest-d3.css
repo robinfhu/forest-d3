@@ -40,7 +40,9 @@
 .forest-d3 .canvas circle.point {
   fill-opacity: 0.8;
 }
-.forest-d3 .canvas line.guideline {
+.forest-d3 .canvas line.guideline,
+.forest-d3 .canvas line.crosshair-x,
+.forest-d3 .canvas line.crosshair-y {
   stroke: #000;
   pointer-events: none;
 }
