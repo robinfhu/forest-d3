@@ -63,6 +63,12 @@
             .transition()
             .delay(250)
             .style('opacity', 0)
+            .each('end', ->
+                # Moves tooltip to top left corner after transition is done.
+                # This is so that the container doesn't disrupt the browser
+                # if the window is resized.
+                d3.select(@).style('left','0px').style('top', '0px')
+            )
 
     # Call this to remove the tooltip DIV from the page.
     destroy: ->

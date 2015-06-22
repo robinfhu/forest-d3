@@ -134,18 +134,18 @@ Some operations can mutate the original chart data.
         return null
 
     quadtree: ->
-        allPoints = data[0].values.map (d, i)->
-            x: chart.getXInternal()(d,i)
-            y: chart.getY()(d,i)
-            xValue: chart.getX()(d,i)
-            series: data[0]
+        allPoints = @._getSliceable().filter((d)-> not d.hidden).map (s, i)->
+            s.values.map (d,i)->
+                x: chart.getXInternal()(d,i)
+                y: chart.getY()(d,i)
+                xValue: chart.getX()(d,i)
+                series: s
 
-        qfn = d3.geom.quadtree()
+        allPoints = d3.merge allPoints
+
+        d3.geom.quadtree()
             .x((d)-> d.x)
-            .y((d)-> d.y)
-
-        qfn allPoints
-
+            .y((d)-> d.y)(allPoints)
 
     ###
     Alias to chart.render(). Allows you to do things like:

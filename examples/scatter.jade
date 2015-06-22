@@ -1,12 +1,16 @@
 extends ./template.jade
 
 block content
-    .col-xs-5
-        h3.text-center
-            | Scatter Chart
-            | &nbsp;&nbsp; with spatial tooltip
+    .col-md-12
+        h3.text-center Scatter Chart
+        .text-center
+            | Using spatial tooltips
 
+    .col-sm-6
         #example(style='height: 400px;')
+
+    .col-sm-6
+        #example2(style='height: 400px;')
 
     script(src='app-scatter.js')
 

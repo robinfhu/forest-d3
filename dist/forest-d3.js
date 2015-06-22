@@ -699,21 +699,25 @@ Some operations can mutate the original chart data.
         return null;
       },
       quadtree: function() {
-        var allPoints, qfn;
-        allPoints = data[0].values.map(function(d, i) {
-          return {
-            x: chart.getXInternal()(d, i),
-            y: chart.getY()(d, i),
-            xValue: chart.getX()(d, i),
-            series: data[0]
-          };
+        var allPoints;
+        allPoints = this._getSliceable().filter(function(d) {
+          return !d.hidden;
+        }).map(function(s, i) {
+          return s.values.map(function(d, i) {
+            return {
+              x: chart.getXInternal()(d, i),
+              y: chart.getY()(d, i),
+              xValue: chart.getX()(d, i),
+              series: s
+            };
+          });
         });
-        qfn = d3.geom.quadtree().x(function(d) {
+        allPoints = d3.merge(allPoints);
+        return d3.geom.quadtree().x(function(d) {
           return d.x;
         }).y(function(d) {
           return d.y;
-        });
-        return qfn(allPoints);
+        })(allPoints);
       },
 
       /*
@@ -892,7 +896,9 @@ Library of tooltip rendering utilities
       if (!this.chart.showTooltip()) {
         return;
       }
-      return d3.select(this.container).transition().delay(250).style('opacity', 0);
+      return d3.select(this.container).transition().delay(250).style('opacity', 0).each('end', function() {
+        return d3.select(this).style('left', '0px').style('top', '0px');
+      });
     };
 
     Tooltip.prototype.destroy = function() {
