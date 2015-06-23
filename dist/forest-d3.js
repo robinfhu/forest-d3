@@ -1053,7 +1053,7 @@ Handles the guideline that moves along the x-axis
       'xTickFormat', function(d) {
         return d;
       }
-    ], ['yTickFormat', d3.format(',.2f')], ['showTooltip', true], ['showGuideline', true], ['tooltipType', 'bisect']
+    ], ['yTickFormat', d3.format(',.2f')], ['showXAxis', true], ['showYAxis', true], ['showTooltip', true], ['showGuideline', true], ['tooltipType', 'bisect']
   ];
 
   getIdx = function(d, i) {
@@ -1280,24 +1280,28 @@ Handles the guideline that moves along the x-axis
       backdrop = this.svg.selectAll('rect.backdrop').data([0]);
       backdrop.enter().append('rect').classed('backdrop', true);
       backdrop.attr('width', this.width).attr('height', this.height);
-      xTicks = Math.abs(this.xScale.range()[0] - this.xScale.range()[1]) / 100;
-      xValues = this.data().xValuesRaw();
-      this.xAxis.scale(this.xScale).tickSize(10, 10).ticks(xTicks).tickPadding(5).tickFormat((function(_this) {
-        return function(d) {
-          var tick;
-          tick = _this.ordinal() ? xValues[d] : d;
-          return _this.xTickFormat()(tick, d);
-        };
-      })(this));
-      xAxisGroup = this.svg.selectAll('g.x-axis').data([0]);
-      xAxisGroup.enter().append('g').attr('class', 'x-axis axis');
-      xAxisGroup.attr('transform', "translate(" + this.margin.left + ", " + (this.canvasHeight + this.margin.top) + ")");
-      this.yAxis.scale(this.yScale).orient('left').tickSize(-this.canvasWidth, 10).tickPadding(10).tickFormat(this.yTickFormat());
-      yAxisGroup = this.svg.selectAll('g.y-axis').data([0]);
-      yAxisGroup.enter().append('g').attr('class', 'y-axis axis');
-      yAxisGroup.attr('transform', "translate(" + this.margin.left + ", " + this.margin.top + ")");
-      xAxisGroup.transition().call(this.xAxis);
-      yAxisGroup.transition().call(this.yAxis);
+      if (this.showXAxis()) {
+        xTicks = Math.abs(this.xScale.range()[0] - this.xScale.range()[1]) / 100;
+        xValues = this.data().xValuesRaw();
+        this.xAxis.scale(this.xScale).tickSize(10, 10).ticks(xTicks).tickPadding(5).tickFormat((function(_this) {
+          return function(d) {
+            var tick;
+            tick = _this.ordinal() ? xValues[d] : d;
+            return _this.xTickFormat()(tick, d);
+          };
+        })(this));
+        xAxisGroup = this.svg.selectAll('g.x-axis').data([0]);
+        xAxisGroup.enter().append('g').attr('class', 'x-axis axis');
+        xAxisGroup.attr('transform', "translate(" + this.margin.left + ", " + (this.canvasHeight + this.margin.top) + ")");
+        xAxisGroup.transition().call(this.xAxis);
+      }
+      if (this.showYAxis()) {
+        this.yAxis.scale(this.yScale).orient('left').tickSize(-this.canvasWidth, 10).tickPadding(10).tickFormat(this.yTickFormat());
+        yAxisGroup = this.svg.selectAll('g.y-axis').data([0]);
+        yAxisGroup.enter().append('g').attr('class', 'y-axis axis');
+        yAxisGroup.attr('transform', "translate(" + this.margin.left + ", " + this.margin.top + ")");
+        yAxisGroup.transition().call(this.yAxis);
+      }
       this.canvas = this.svg.selectAll('g.canvas').data([0]);
       canvasEnter = this.canvas.enter().append('g').classed('canvas', true);
       this.canvas.attr('transform', "translate(" + this.margin.left + ", " + this.margin.top + ")");

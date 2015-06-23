@@ -12,6 +12,8 @@ chartProperties = [
     ['chartLabel', '']
     ['xTickFormat', (d)-> d]
     ['yTickFormat', d3.format(',.2f')]
+    ['showXAxis', true]
+    ['showYAxis', true]
     ['showTooltip', true]
     ['showGuideline', true]
     ['tooltipType', 'bisect']  # Can be 'bisect' or 'spatial'
@@ -213,53 +215,55 @@ getIdx = (d,i)-> i
             .attr('height', @height)
 
         # Add axes
-        # TODO: Auto generate this xTicks number based on tickFormat.
-        xTicks = Math.abs(@xScale.range()[0] - @xScale.range()[1]) / 100
+        if @showXAxis()
+            # TODO: Auto generate this xTicks number based on tickFormat.
+            xTicks = Math.abs(@xScale.range()[0] - @xScale.range()[1]) / 100
+            xValues = @data().xValuesRaw()
 
-        xValues = @data().xValuesRaw()
+            @xAxis
+                .scale(@xScale)
+                .tickSize(10, 10)
+                .ticks(xTicks)
+                .tickPadding(5)
+                .tickFormat((d)=>
+                    tick = if @ordinal()
+                        xValues[d]
+                    else
+                        d
 
-        @xAxis
-            .scale(@xScale)
-            .tickSize(10, 10)
-            .ticks(xTicks)
-            .tickPadding(5)
-            .tickFormat((d)=>
-                tick = if @ordinal()
-                    xValues[d]
-                else
-                    d
+                    @xTickFormat()(tick, d)
+                )
+            xAxisGroup = @svg.selectAll('g.x-axis').data([0])
+            xAxisGroup.enter()
+                .append('g')
+                .attr('class','x-axis axis')
 
-                @xTickFormat()(tick, d)
+            xAxisGroup.attr(
+                'transform',
+                "translate(#{@margin.left}, #{@canvasHeight + @margin.top})"
             )
-        xAxisGroup = @svg.selectAll('g.x-axis').data([0])
-        xAxisGroup.enter()
-            .append('g')
-            .attr('class','x-axis axis')
 
-        xAxisGroup.attr(
-            'transform',
-            "translate(#{@margin.left}, #{@canvasHeight + @margin.top})"
-        )
+            xAxisGroup.transition().call @xAxis
 
-        @yAxis
-            .scale(@yScale)
-            .orient('left')
-            .tickSize(-@canvasWidth, 10)
-            .tickPadding(10)
-            .tickFormat(@yTickFormat())
+        if @showYAxis()
+            @yAxis
+                .scale(@yScale)
+                .orient('left')
+                .tickSize(-@canvasWidth, 10)
+                .tickPadding(10)
+                .tickFormat(@yTickFormat())
 
-        yAxisGroup = @svg.selectAll('g.y-axis').data([0])
-        yAxisGroup.enter()
-            .append('g')
-            .attr('class','y-axis axis')
+            yAxisGroup = @svg.selectAll('g.y-axis').data([0])
+            yAxisGroup.enter()
+                .append('g')
+                .attr('class','y-axis axis')
 
-        yAxisGroup.attr(
-            'transform',
-            "translate(#{@margin.left}, #{@margin.top})"
-        )
+            yAxisGroup.attr(
+                'transform',
+                "translate(#{@margin.left}, #{@margin.top})"
+            )
 
-        xAxisGroup.transition().call @xAxis
-        yAxisGroup.transition().call @yAxis
+            yAxisGroup.transition().call @yAxis
 
         # Create a canvas, where all data points will be plotted.
         @canvas = @svg.selectAll('g.canvas').data([0])

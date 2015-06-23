@@ -1,68 +1,86 @@
-chart = new ForestD3.Chart d3.select('#example')
-legend = new ForestD3.Legend d3.select('#legend')
+lineChart = new ForestD3.Chart '#line-plot'
+barChart = new ForestD3.Chart '#bar-plot'
+legend = new ForestD3.Legend '#legend'
 
-chart
-    .xLabel('Independent Variable')
-    .yLabel('Manufacture Error')
-    .addPlugin(legend)
+getStocks = (startPrice, volatility, points=20)->
+    result = []
+    startDate = new Date 2012, 0, 1
 
-data = [
+    for i in [0...points]
+        result.push [
+            startDate.getTime(),
+            startPrice - 0.3
+        ]
+        changePct = 2 * volatility * Math.random()
+        if changePct > volatility
+            changePct -= 2*volatility
+
+        startPrice += startPrice * changePct
+        startDate.setDate(startDate.getDate()+1)
+
+    result
+
+lineData = [
     key: 'series1'
-    label: 'Consumer Discretionary'
-    type: 'scatter'
-    values: do ->
-        result = []
-        for i in [-5...5]
-            for j in [0...10]
-                result.push [i - Math.random(), Math.random()*6 + 1]
-
-        result
-
+    label: 'AAPL'
+    type: 'line'
+    color: 'rgb(143,228,94)'
+    values: getStocks(320, 0.23, 100)
 ,
     key: 'series2'
-    label: 'Industrials'
-    values: do ->
-        result = []
-        for i in [-5...5]
-            for j in [0...10]
-                result.push [i, Math.random()*-4]
-
-        result
+    label: 'AAPL Volatility'
+    type: 'line'
+    area: true
+    values: getStocks(304, 0.34, 100)
 ,
     key: 'series3'
-    label: 'Telecommunications'
-    color: '#f09822'
-    values: do ->
-        result = []
-        for i in [-5...5]
-            for j in [0...10]
-                result.push [i, Math.random()*-3 + 1]
-
-        result
+    label: 'Benchmark S&P'
+    type: 'scatter'
+    shape: 'triangle-down'
+    size: 64
+    color: 'rgb(108, 109, 186)'
+    values: getStocks(306, 0.289, 100)
 ,
     key: 'marker1'
-    label: 'Performance Threshold'
+    label: 'DOW Average'
     type: 'marker'
     axis: 'y'
-    value: 5.75
-,
-    key: 'marker2'
-    label: 'Performance Threshold'
-    type: 'marker'
-    axis: 'x'
-    value: 1.07
-,
-    key: 'region1'
-    label: 'Tolerance'
-    type: 'region'
-    axis: 'x'
-    values: [-2.6, -0.9]
-,
-    key: 'region2'
-    label: 'Tolerance'
-    type: 'region'
-    axis: 'y'
-    values: [3.8, 5.67]
+    value: 404
 ]
 
-chart.data(data).render()
+lineChart
+    .ordinal(true)
+    .xTickFormat((d)->
+        if d?
+            d3.time.format('%Y-%m-%d')(new Date d)
+        else
+            ''
+    )
+    .showXAxis(false)
+    .addPlugin(legend)
+    .data(lineData)
+    .render()
+
+barData = [
+    key: 'bar1'
+    label: 'Volume'
+    type: 'bar'
+    values: getStocks(100, 0.35, 100)
+,
+    key: 'marker1'
+    label: 'VOL Average'
+    type: 'marker'
+    axis: 'y'
+    value: 230
+]
+
+barChart
+    .ordinal(true)
+    .xTickFormat((d)->
+        if d?
+            d3.time.format('%Y-%m-%d')(new Date d)
+        else
+            ''
+    )
+    .data(barData)
+    .render()
