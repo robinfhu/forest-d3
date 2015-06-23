@@ -51,8 +51,8 @@ describe 'Chart', ->
 
                 chart.data(sampleData).render()
 
-                circle = $(container).find('svg circle')
-                circle.length.should.equal 1, 'one <circle>'
+                circle = $(container).find('svg g.chart-item path.point')
+                circle.length.should.equal 1, 'one <path> point'
 
             it 'renders the chart frame once', ->
                 chart = new ForestD3.Chart container

@@ -37,8 +37,10 @@
   stroke: #000;
   stroke-opacity: 0.2;
 }
-.forest-d3 .canvas circle.point {
+.forest-d3 .canvas path.point {
   fill-opacity: 0.8;
+  stroke: #000;
+  stroke-opacity: 0.3;
 }
 .forest-d3 .canvas line.guideline,
 .forest-d3 .canvas line.crosshair-x,

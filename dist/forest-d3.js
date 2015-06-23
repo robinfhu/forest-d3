@@ -262,23 +262,24 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
 
 (function() {
   this.ForestD3.ChartItem.scatter = function(selection, selectionData) {
-    var chart, points, x, y;
+    var all, chart, points, shape, symbol, x, y;
     chart = this;
     selection.style('fill', chart.seriesColor);
-    points = selection.selectAll('circle.point').data(function(d) {
+    points = selection.selectAll('path.point').data(function(d) {
       return d.values;
     });
     x = chart.getXInternal();
     y = chart.getY();
-    points.enter().append('circle').classed('point', true).attr('cx', chart.canvasWidth / 2).attr('cy', chart.canvasHeight / 2).attr('r', 0);
+    all = d3.svg.symbolTypes;
+    shape = selectionData.shape || all[selectionData._index % all.length];
+    symbol = d3.svg.symbol().type(shape);
+    points.enter().append('path').classed('point', true).attr('transform', "translate(" + (chart.canvasWidth / 2) + "," + (chart.canvasHeight / 2) + ")").attr('d', symbol.size(0));
     points.exit().remove();
     return points.transition().delay(function(d, i) {
       return i * 10;
-    }).ease('quad').attr('cx', function(d, i) {
-      return chart.xScale(x(d, i));
-    }).attr('cy', function(d, i) {
-      return chart.yScale(y(d, i));
-    }).attr('r', chart.pointSize());
+    }).ease('quad').attr('transform', function(d, i) {
+      return "translate(" + (chart.xScale(x(d, i))) + "," + (chart.yScale(y(d, i))) + ")";
+    }).attr('d', symbol.size(selectionData.size || 96));
   };
 
 }).call(this);

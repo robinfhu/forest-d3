@@ -11,17 +11,25 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
     selection.style 'fill', chart.seriesColor
 
     points = selection
-        .selectAll('circle.point')
+        .selectAll('path.point')
         .data((d)-> d.values)
 
     x = chart.getXInternal()
     y = chart.getY()
+
+    all = d3.svg.symbolTypes
+    shape =
+        selectionData.shape or all[selectionData._index % all.length]
+
+    symbol = d3.svg.symbol().type shape
+
     points.enter()
-        .append('circle')
+        .append('path')
         .classed('point', true)
-        .attr('cx', chart.canvasWidth / 2)
-        .attr('cy', chart.canvasHeight / 2)
-        .attr('r',0)
+        .attr('transform',
+            "translate(#{chart.canvasWidth/2},#{chart.canvasHeight/2})"
+        )
+        .attr('d', symbol.size(0))
 
     points.exit().remove()
 
@@ -29,6 +37,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         .transition()
         .delay((d,i)-> i * 10)
         .ease('quad')
-        .attr('cx',(d,i)-> chart.xScale x(d,i))
-        .attr('cy',(d,i)-> chart.yScale y(d,i))
-        .attr('r', chart.pointSize())
+        .attr('transform', (d,i)->
+            "translate(#{chart.xScale(x(d,i))},#{chart.yScale(y(d,i))})"
+        )
+        .attr('d', symbol.size(selectionData.size or 96))
