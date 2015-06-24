@@ -71,11 +71,12 @@ module.exports = (grunt)->
                 options:
                     browsers: ['Firefox']
                     frameworks: ['mocha', 'sinon-chai']
-                    reporters: ['spec']
+                    reporters: ['spec', 'coverage']
                     junitReporter:
                         outputFile: 'karma.xml'
                     singleRun: true
                     preprocessors:
+                        'dist/*.js': ['coverage']
                         'test/*.coffee': 'coffee'
                     files: [
                         'node_modules/d3/d3.js'

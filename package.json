@@ -32,6 +32,7 @@
     "jquery": "^2.1.4",
     "karma": "^0.12.36",
     "karma-coffee-preprocessor": "^0.2.1",
+    "karma-coverage": "^0.4.2",
     "karma-firefox-launcher": "^0.1.6",
     "karma-junit-reporter": "^0.2.2",
     "karma-mocha": "^0.1.10",
