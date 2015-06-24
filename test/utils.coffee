@@ -172,6 +172,28 @@ describe 'Utilities', ->
             for d, i in data
                 d._index.should.equal i
 
+        it 'skips markers and regions', ->
+            data = [
+                type: 'marker'
+                value: 1
+            ,
+                type: 'line'
+                values: []
+            ,
+                type: 'scatter'
+                values: []
+            ,
+                type: 'region'
+                values: []
+            ]
+
+            result = ForestD3.Utils.indexify data
+            result[1]._index.should.equal 0
+            result[2]._index.should.equal 1
+
+            should.not.exist result[3]._index
+            should.not.exist result[0]._index
+
     describe 'extentPadding', ->
         extPadding = null
         beforeEach ->

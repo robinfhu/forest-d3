@@ -115,9 +115,12 @@
     identify it.
     ###
     indexify: (data)->
-        data.map (d, i)->
+        data
+        .filter((d)-> (not d.type?) or (d.type not in ['region', 'marker']))
+        .forEach (d, i)->
             d._index = i
-            d
+
+        data
 
     ###
     TODO: Add data normalization routine

@@ -76,6 +76,7 @@ barData = [
 
 barChart
     .ordinal(true)
+    .yTicks(3)
     .xTickFormat((d)->
         if d?
             d3.time.format('%Y-%m-%d')(new Date d)

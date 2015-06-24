@@ -12,6 +12,7 @@ chartProperties = [
     ['chartLabel', '']
     ['xTickFormat', (d)-> d]
     ['yTickFormat', d3.format(',.2f')]
+    ['yTicks', null]
     ['showXAxis', true]
     ['showYAxis', true]
     ['showTooltip', true]
@@ -249,6 +250,7 @@ getIdx = (d,i)-> i
             @yAxis
                 .scale(@yScale)
                 .orient('left')
+                .ticks(@yTicks())
                 .tickSize(-@canvasWidth, 10)
                 .tickPadding(10)
                 .tickFormat(@yTickFormat())

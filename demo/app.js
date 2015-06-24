@@ -79,7 +79,7 @@
     }
   ];
 
-  barChart.ordinal(true).xTickFormat(function(d) {
+  barChart.ordinal(true).yTicks(3).xTickFormat(function(d) {
     if (d != null) {
       return d3.time.format('%Y-%m-%d')(new Date(d));
     } else {

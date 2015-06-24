@@ -426,10 +426,13 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
       identify it.
        */
       indexify: function(data) {
-        return data.map(function(d, i) {
-          d._index = i;
-          return d;
+        data.filter(function(d) {
+          var ref;
+          return (d.type == null) || ((ref = d.type) !== 'region' && ref !== 'marker');
+        }).forEach(function(d, i) {
+          return d._index = i;
         });
+        return data;
       },
 
       /*
@@ -1053,7 +1056,7 @@ Handles the guideline that moves along the x-axis
       'xTickFormat', function(d) {
         return d;
       }
-    ], ['yTickFormat', d3.format(',.2f')], ['showXAxis', true], ['showYAxis', true], ['showTooltip', true], ['showGuideline', true], ['tooltipType', 'bisect']
+    ], ['yTickFormat', d3.format(',.2f')], ['yTicks', null], ['showXAxis', true], ['showYAxis', true], ['showTooltip', true], ['showGuideline', true], ['tooltipType', 'bisect']
   ];
 
   getIdx = function(d, i) {
@@ -1296,7 +1299,7 @@ Handles the guideline that moves along the x-axis
         xAxisGroup.transition().call(this.xAxis);
       }
       if (this.showYAxis()) {
-        this.yAxis.scale(this.yScale).orient('left').tickSize(-this.canvasWidth, 10).tickPadding(10).tickFormat(this.yTickFormat());
+        this.yAxis.scale(this.yScale).orient('left').ticks(this.yTicks()).tickSize(-this.canvasWidth, 10).tickPadding(10).tickFormat(this.yTickFormat());
         yAxisGroup = this.svg.selectAll('g.y-axis').data([0]);
         yAxisGroup.enter().append('g').attr('class', 'y-axis axis');
         yAxisGroup.attr('transform', "translate(" + this.margin.left + ", " + this.margin.top + ")");
