@@ -244,3 +244,13 @@ describe 'Utilities', ->
 
                 result.should.equal expected, "Test case #{i}"
 
+        it 'edge cases', ->
+            result = smartBisect 'blah'
+            should.not.exist result, 'result is null'
+
+            result = smartBisect []
+            should.not.exist result, 'result null if input empty array'
+
+            result = smartBisect [1]
+            result.should.equal 0, 'result is 0'
+

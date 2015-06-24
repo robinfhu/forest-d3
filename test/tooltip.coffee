@@ -1,6 +1,7 @@
 describe 'Tooltip and Guideline', ->
     chart = null
     container = null
+    data = null
     beforeEach ->
         container = document.createElement 'div'
         container.style.width = '500px'
@@ -22,17 +23,33 @@ describe 'Tooltip and Guideline', ->
             ]
         ]
 
-        chart.data(data).render()
-
     afterEach ->
         chart.destroy()
 
     it 'rendered a guideline on the chart canvas', ->
+        chart.data(data).render()
         line = $(container).find('.canvas line.guideline')
         line.length.should.equal 1
 
     it 'renders tooltip onto document.body', ->
+        chart.data(data).render()
         chart.updateTooltip [0,0], [10,10]
 
         tooltip = $('.forest-d3.tooltip-box')
         tooltip.length.should.equal 1, 'tooltip exists'
+
+    it 'can render spatial tooltips', (done)->
+        chart.tooltipType('spatial').data(data).render()
+
+        chart.updateTooltip [40, 400], [10, 10]
+
+        x = chart.xScale 1
+        y = chart.yScale 1
+
+        chart.updateTooltip [x,y], [10,10]
+
+        setTimeout ->
+            crosshair = $(container).find('line.crosshair-x')
+            crosshair.css('opacity').should.equal '0.5'
+            done()
+        , 200

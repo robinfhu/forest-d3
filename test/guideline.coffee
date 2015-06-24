@@ -57,3 +57,13 @@ describe 'Chart', ->
             markers = markerContainer.find('circle.marker')
             markers.length.should.equal 2, 'two markers'
 
+        it 'can hide guideline', (done)->
+            chart.updateTooltip [250, 200], [0,0]
+
+            chart.updateTooltip null
+
+            setTimeout ->
+                line = $(container).find('line.guideline')
+                line.css('opacity').should.equal '0'
+                done()
+            , 600

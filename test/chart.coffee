@@ -256,12 +256,17 @@ describe 'Chart', ->
                 , 300
 
         describe 'Regions', ->
-            it 'can render an x-axis region', ->
+            it 'can render regions', ->
                 data = [
                     key: 'region1'
                     type: 'region'
                     label: 'Tolerance'
                     axis: 'x'
+                    values: [-1, 1]
+                ,
+                    key: 'region2'
+                    type: 'region'
+                    axis: 'y'
                     values: [-1, 1]
                 ]
 
@@ -269,7 +274,7 @@ describe 'Chart', ->
                 chart.data(data).render()
 
                 rect = $(container).find('g.chart-item rect')
-                rect.length.should.equal 1, 'one rectangle'
+                rect.length.should.equal 2, 'two rectangles'
 
         describe 'Line Chart', ->
             it 'can render an SVG line', ->
