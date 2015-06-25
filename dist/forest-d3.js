@@ -603,7 +603,7 @@ Some operations can mutate the original chart data.
           return {
             key: d.key,
             label: d.label,
-            hidden: d.hidden === true,
+            hidden: chart.metadata(d).hidden === true,
             color: chart.seriesColor(d)
           };
         });
@@ -620,17 +620,18 @@ Some operations can mutate the original chart data.
         return this;
       },
       hide: function(keys, flag) {
-        var d, j, len, ref;
+        var d, j, len, metadata, ref;
         if (flag == null) {
           flag = true;
         }
+        metadata = chart.metadata();
         if (!(keys instanceof Array)) {
           keys = [keys];
         }
         for (j = 0, len = data.length; j < len; j++) {
           d = data[j];
           if (ref = d.key, indexOf.call(keys, ref) >= 0) {
-            d.hidden = flag;
+            metadata[d.key].hidden = flag;
           }
         }
         return this;
@@ -639,37 +640,40 @@ Some operations can mutate the original chart data.
         return this.hide(keys, false);
       },
       toggle: function(keys) {
-        var d, j, len, ref;
+        var d, j, len, metadata, ref;
+        metadata = chart.metadata();
         if (!(keys instanceof Array)) {
           keys = [keys];
         }
         for (j = 0, len = data.length; j < len; j++) {
           d = data[j];
           if (ref = d.key, indexOf.call(keys, ref) >= 0) {
-            d.hidden = !d.hidden;
+            metadata[d.key].hidden = !metadata[d.key].hidden;
           }
         }
         return this;
       },
       showOnly: function(key) {
-        var d, j, len;
+        var d, j, len, metadata;
+        metadata = chart.metadata();
         for (j = 0, len = data.length; j < len; j++) {
           d = data[j];
-          d.hidden = !(d.key === key);
+          metadata[d.key].hidden = !(d.key === key);
         }
         return this;
       },
       showAll: function() {
-        var d, j, len;
+        var d, j, len, metadata;
+        metadata = chart.metadata();
         for (j = 0, len = data.length; j < len; j++) {
           d = data[j];
-          d.hidden = false;
+          metadata[d.key].hidden = false;
         }
         return this;
       },
       visible: function() {
         return data.filter(function(d) {
-          return !d.hidden;
+          return !chart.metadata(d).hidden;
         });
       },
       _getSliceable: function() {
@@ -711,7 +715,7 @@ Some operations can mutate the original chart data.
        */
       sliced: function(idx) {
         return this._getSliceable().filter(function(d) {
-          return !d.hidden;
+          return !chart.metadata(d).hidden;
         }).map(function(d) {
           var point;
           point = d.values[idx];
@@ -757,7 +761,7 @@ Some operations can mutate the original chart data.
       quadtree: function() {
         var allPoints;
         allPoints = this._getSliceable().filter(function(d) {
-          return !d.hidden;
+          return !chart.metadata(d).hidden;
         }).map(function(s, i) {
           return s.values.map(function(d, i) {
             return {
