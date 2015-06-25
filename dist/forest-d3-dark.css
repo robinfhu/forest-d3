@@ -142,6 +142,7 @@
   color: #dcdcdc;
   border: solid 1px #ccc;
   border-radius: 3px;
+  z-index: 100;
 }
 .forest-d3.tooltip-box .header {
   font-weight: bold;
