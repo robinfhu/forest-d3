@@ -111,14 +111,18 @@
 
         result
     ###
-    Adds a numeric _index to each series, which is used to uniquely
-    identify it.
+    Assigns a numeric 'index' to each series, which is used to uniquely
+    identify it. Stores this index in chart.metadata
     ###
-    indexify: (data)->
+    indexify: (data, metadata)->
+        data.forEach((d)->
+            metadata[d.key] = {} unless metadata[d.key]?
+        )
+
         data
         .filter((d)-> (not d.type?) or (d.type not in ['region', 'marker']))
         .forEach (d, i)->
-            d._index = i
+            metadata[d.key].index = i
 
         data
 

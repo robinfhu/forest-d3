@@ -262,7 +262,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
 
 (function() {
   this.ForestD3.ChartItem.scatter = function(selection, selectionData) {
-    var all, chart, points, shape, symbol, x, y;
+    var all, chart, points, seriesIndex, shape, symbol, x, y;
     chart = this;
     selection.style('fill', chart.seriesColor);
     points = selection.selectAll('path.point').data(function(d) {
@@ -271,7 +271,8 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
     x = chart.getXInternal();
     y = chart.getY();
     all = d3.svg.symbolTypes;
-    shape = selectionData.shape || all[selectionData._index % all.length];
+    seriesIndex = chart.metadata(selectionData).index;
+    shape = selectionData.shape || all[seriesIndex % all.length];
     symbol = d3.svg.symbol().type(shape);
     points.enter().append('path').classed('point', true).attr('transform', "translate(" + (chart.canvasWidth / 2) + "," + (chart.canvasHeight / 2) + ")").attr('d', symbol.size(0));
     points.exit().remove();
@@ -422,15 +423,20 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
       },
 
       /*
-      Adds a numeric _index to each series, which is used to uniquely
-      identify it.
+      Assigns a numeric 'index' to each series, which is used to uniquely
+      identify it. Stores this index in chart.metadata
        */
-      indexify: function(data) {
+      indexify: function(data, metadata) {
+        data.forEach(function(d) {
+          if (metadata[d.key] == null) {
+            return metadata[d.key] = {};
+          }
+        });
         data.filter(function(d) {
           var ref;
           return (d.type == null) || ((ref = d.type) !== 'region' && ref !== 'marker');
         }).forEach(function(d, i) {
-          return d._index = i;
+          return metadata[d.key].index = i;
         });
         return data;
       },
@@ -1131,6 +1137,7 @@ Handles the guideline that moves along the x-axis
         })(this)(prop);
       }
       this.container(domContainer);
+      this._metadata = {};
       this.tooltip = new ForestD3.Tooltip(this);
       this.guideline = new ForestD3.Guideline(this);
       this.crosshairs = new ForestD3.Crosshairs(this);
@@ -1138,7 +1145,7 @@ Handles the guideline that moves along the x-axis
       this.yAxis = d3.svg.axis();
       this.seriesColor = (function(_this) {
         return function(d) {
-          return d.color || _this.color()(d._index);
+          return d.color || _this.color()(_this.metadata(d).index);
         };
       })(this);
       this.getXInternal = (function(_this) {
@@ -1190,12 +1197,22 @@ Handles the guideline that moves along the x-axis
       if (d == null) {
         return ForestD3.DataAPI.call(this, this.chartData);
       } else {
-        d = ForestD3.Utils.indexify(d);
+        d = ForestD3.Utils.indexify(d, this._metadata);
         this.chartData = d;
         if (this.tooltipType() === 'spatial') {
           this.quadtree = this.data().quadtree();
         }
         return this;
+      }
+    };
+
+    Chart.prototype.metadata = function(d) {
+      if (typeof d === 'string') {
+        return this._metadata[d];
+      } else if (typeof d === 'object' && (d.key != null)) {
+        return this._metadata[d.key];
+      } else {
+        return this._metadata;
       }
     };
 
