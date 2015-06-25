@@ -192,3 +192,45 @@
                 promise = null
                 fn.apply @, args
             , delay
+
+    # Approximate the max width in pixels that a label can use up in x-axis.
+    # Used to calculate how many ticks to show in x-axis.
+    textWidthApprox: (xValues, format)->
+        return 100 unless xValues?
+        sample = '' + format(xValues[0] or '')
+        sample.length * 10 + 40
+
+    ###
+    Returns an array that is a good approximation for what ticks should
+    be shown on x-axis.
+
+    xValues - array of all available x-axis values
+    numTicks - max number of ticks that can fit on the axis
+    widthThreshold - minimum distance between ticks allowed.
+    ###
+    tickValues: (xValues, numTicks, widthThreshold = 1)->
+        if numTicks is 0
+            return []
+
+        L = xValues.length
+        if L <= 2
+            return xValues
+
+        result = [xValues[0]]
+
+        counter = 0
+        increment = Math.ceil(L / numTicks)
+
+        while counter < L - 1
+            counter += increment
+            break if counter >= L - 1
+            result.push xValues[counter]
+
+        dist = xValues[L-1] - result[result.length-1]
+        if dist < widthThreshold
+            result.pop()
+
+        result.push xValues[L-1]
+
+        result
+

@@ -12,6 +12,7 @@ chartProperties = [
     ['chartLabel', '']
     ['xTickFormat', (d)-> d]
     ['yTickFormat', d3.format(',.2f')]
+    ['xTicks', null]
     ['yTicks', null]
     ['showXAxis', true]
     ['showYAxis', true]
@@ -217,18 +218,42 @@ getIdx = (d,i)-> i
 
         # Add axes
         if @showXAxis()
-            # TODO: Auto generate this xTicks number based on tickFormat.
-            xTicks = Math.abs(@xScale.range()[0] - @xScale.range()[1]) / 100
-            xValues = @data().xValuesRaw()
+            tickValues = null
+            xValuesRaw = @data().xValuesRaw()
+
+            if @ordinal()
+                ###
+                For ordinal scales, attempts to fit as many x-ticks as possible.
+                Will always show the first and last ticks, and fill in the
+                space in between.
+                ###
+
+                # Gets the width of each x-tick label
+                xTickWidth = ForestD3.Utils.textWidthApprox(
+                    xValuesRaw,
+                    @xTickFormat()
+                )
+
+                xValues = @data().xValues()
+                # Figures out how many ticks can be shown on x-axis
+                xTicks = @canvasWidth / xTickWidth
+
+                # Figures out optimal tick layout.
+                widthThreshold = Math.ceil @xScale.invert xTickWidth
+                tickValues = ForestD3.Utils.tickValues(
+                    xValues,
+                    xTicks,
+                    widthThreshold
+                )
 
             @xAxis
                 .scale(@xScale)
                 .tickSize(10, 10)
-                .ticks(xTicks)
+                .tickValues(tickValues)
                 .tickPadding(5)
                 .tickFormat((d)=>
                     tick = if @ordinal()
-                        xValues[d]
+                        xValuesRaw[d]
                     else
                         d
 

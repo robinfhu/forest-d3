@@ -74,7 +74,8 @@ describe 'Chart', ->
                         [1,1]
                     ]
                 ]
-                chart.data(sampleData).render()
+
+                chart.xTicks(1).data(sampleData).render()
 
                 xTicks = $(container).find('.x-axis .tick')
                 xTicks.length.should.be.greaterThan 0

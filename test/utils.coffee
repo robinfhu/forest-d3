@@ -276,3 +276,29 @@ describe 'Utilities', ->
             result = smartBisect [1]
             result.should.equal 0, 'result is 0'
 
+    describe 'tickValues', ->
+        tickValues = null
+        beforeEach -> tickValues = ForestD3.Utils.tickValues
+
+        it 'handles one or two ticks', ->
+            result = tickValues [0], 100
+
+            result.should.deep.equal [0]
+
+            result = tickValues [0,1], 100
+
+            result.should.deep.equal [0,1]
+
+        it 'xValues is less than numTicks', ->
+            result = tickValues [0,1,2,3,4], 10
+            result.should.deep.equal [0,1,2,3,4]
+
+        it 'numTicks is 3', ->
+            result = tickValues [0,1,2,3,4], 3
+            result.should.deep.equal [0,2,4]
+
+        it 'numTicks is 5', ->
+            width = 2
+            result = tickValues [0..10], 4, width
+            result.should.deep.equal [0, 3, 6, 10]
+

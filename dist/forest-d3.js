@@ -522,6 +522,52 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
             };
           })(this), delay);
         };
+      },
+      textWidthApprox: function(xValues, format) {
+        var sample;
+        if (xValues == null) {
+          return 100;
+        }
+        sample = '' + format(xValues[0] || '');
+        return sample.length * 10 + 40;
+      },
+
+      /*
+      Returns an array that is a good approximation for what ticks should
+      be shown on x-axis.
+      
+      xValues - array of all available x-axis values
+      numTicks - max number of ticks that can fit on the axis
+      widthThreshold - minimum distance between ticks allowed.
+       */
+      tickValues: function(xValues, numTicks, widthThreshold) {
+        var L, counter, dist, increment, result;
+        if (widthThreshold == null) {
+          widthThreshold = 1;
+        }
+        if (numTicks === 0) {
+          return [];
+        }
+        L = xValues.length;
+        if (L <= 2) {
+          return xValues;
+        }
+        result = [xValues[0]];
+        counter = 0;
+        increment = Math.ceil(L / numTicks);
+        while (counter < L - 1) {
+          counter += increment;
+          if (counter >= L - 1) {
+            break;
+          }
+          result.push(xValues[counter]);
+        }
+        dist = xValues[L - 1] - result[result.length - 1];
+        if (dist < widthThreshold) {
+          result.pop();
+        }
+        result.push(xValues[L - 1]);
+        return result;
       }
     };
   })();
@@ -1056,7 +1102,7 @@ Handles the guideline that moves along the x-axis
       'xTickFormat', function(d) {
         return d;
       }
-    ], ['yTickFormat', d3.format(',.2f')], ['yTicks', null], ['showXAxis', true], ['showYAxis', true], ['showTooltip', true], ['showGuideline', true], ['tooltipType', 'bisect']
+    ], ['yTickFormat', d3.format(',.2f')], ['xTicks', null], ['yTicks', null], ['showXAxis', true], ['showYAxis', true], ['showTooltip', true], ['showGuideline', true], ['tooltipType', 'bisect']
   ];
 
   getIdx = function(d, i) {
@@ -1279,17 +1325,30 @@ Handles the guideline that moves along the x-axis
      */
 
     Chart.prototype.updateChartFrame = function() {
-      var axesLabels, backdrop, canvasEnter, chart, chartLabel, xAxisGroup, xAxisLabel, xTicks, xValues, yAxisGroup, yAxisLabel;
+      var axesLabels, backdrop, canvasEnter, chart, chartLabel, tickValues, widthThreshold, xAxisGroup, xAxisLabel, xTickWidth, xTicks, xValues, xValuesRaw, yAxisGroup, yAxisLabel;
       backdrop = this.svg.selectAll('rect.backdrop').data([0]);
       backdrop.enter().append('rect').classed('backdrop', true);
       backdrop.attr('width', this.width).attr('height', this.height);
       if (this.showXAxis()) {
-        xTicks = Math.abs(this.xScale.range()[0] - this.xScale.range()[1]) / 100;
-        xValues = this.data().xValuesRaw();
-        this.xAxis.scale(this.xScale).tickSize(10, 10).ticks(xTicks).tickPadding(5).tickFormat((function(_this) {
+        tickValues = null;
+        xValuesRaw = this.data().xValuesRaw();
+        if (this.ordinal()) {
+
+          /*
+          For ordinal scales, attempts to fit as many x-ticks as possible.
+          Will always show the first and last ticks, and fill in the
+          space in between.
+           */
+          xTickWidth = ForestD3.Utils.textWidthApprox(xValuesRaw, this.xTickFormat());
+          xValues = this.data().xValues();
+          xTicks = this.canvasWidth / xTickWidth;
+          widthThreshold = Math.ceil(this.xScale.invert(xTickWidth));
+          tickValues = ForestD3.Utils.tickValues(xValues, xTicks, widthThreshold);
+        }
+        this.xAxis.scale(this.xScale).tickSize(10, 10).tickValues(tickValues).tickPadding(5).tickFormat((function(_this) {
           return function(d) {
             var tick;
-            tick = _this.ordinal() ? xValues[d] : d;
+            tick = _this.ordinal() ? xValuesRaw[d] : d;
             return _this.xTickFormat()(tick, d);
           };
         })(this));
