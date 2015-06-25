@@ -1142,6 +1142,8 @@ Handles the guideline that moves along the x-axis
       }
       this.container(domContainer);
       this._metadata = {};
+      this._dispatch = d3.dispatch('rendered', 'stateUpdate');
+      this.plugins = {};
       this.tooltip = new ForestD3.Tooltip(this);
       this.guideline = new ForestD3.Guideline(this);
       this.crosshairs = new ForestD3.Crosshairs(this);
@@ -1161,7 +1163,6 @@ Handles the guideline that moves along the x-axis
           }
         };
       })(this);
-      this.plugins = {};
 
       /*
       Auto resize the chart if user resizes the browser window.
@@ -1174,6 +1175,7 @@ Handles the guideline that moves along the x-axis
         };
       })(this);
       window.addEventListener('resize', this.resize);
+      this._attachStateHandlers();
     }
 
 
@@ -1218,6 +1220,41 @@ Handles the guideline that moves along the x-axis
       } else {
         return this._metadata;
       }
+    };
+
+    Chart.prototype.on = function(type, listener) {
+      return this._dispatch.on(type, listener);
+    };
+
+    Chart.prototype.trigger = function(type) {
+      return this._dispatch[type].apply(this, Array.prototype.slice.call(arguments, 1));
+    };
+
+    Chart.prototype._attachStateHandlers = function() {
+      return this.on('stateUpdate', (function(_this) {
+        return function(state) {
+          var attr, config, key, meta, results, val;
+          results = [];
+          for (key in state) {
+            config = state[key];
+            meta = _this.metadata()[key];
+            if (meta != null) {
+              results.push((function() {
+                var results1;
+                results1 = [];
+                for (attr in config) {
+                  val = config[attr];
+                  results1.push(meta[attr] = val);
+                }
+                return results1;
+              })());
+            } else {
+              results.push(void 0);
+            }
+          }
+          return results;
+        };
+      })(this));
     };
 
     Chart.prototype.container = function(d) {
@@ -1313,6 +1350,7 @@ Handles the guideline that moves along the x-axis
        */
       chartItems.order();
       this.renderPlugins();
+      this.trigger('rendered', this.metadata());
       return this;
     };
 
