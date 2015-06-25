@@ -464,7 +464,8 @@ getIdx = (d,i)-> i
                 There is an additional check to make sure tooltips are not
                 rendered for hidden chart series'.
                 ###
-                if dist < threshold and not point.series.hidden
+                isHidden = @metadata(point.series).hidden
+                if dist < threshold and not isHidden
                     content = ForestD3.TooltipContent.single @, point
 
                     @crosshairs.render xActual, yActual

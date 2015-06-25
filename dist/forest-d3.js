@@ -1436,7 +1436,7 @@ Handles the guideline that moves along the x-axis
      */
 
     Chart.prototype.updateTooltip = function(mouse, clientMouse) {
-      var content, dist, idx, point, threshold, x, xActual, xDiff, xPos, xValues, y, yActual, yDiff, yPos;
+      var content, dist, idx, isHidden, point, threshold, x, xActual, xDiff, xPos, xValues, y, yActual, yDiff, yPos;
       if (!this.showTooltip()) {
         return;
       }
@@ -1496,7 +1496,8 @@ Handles the guideline that moves along the x-axis
           There is an additional check to make sure tooltips are not
           rendered for hidden chart series'.
            */
-          if (dist < threshold && !point.series.hidden) {
+          isHidden = this.metadata(point.series).hidden;
+          if (dist < threshold && !isHidden) {
             content = ForestD3.TooltipContent.single(this, point);
             this.crosshairs.render(xActual, yActual);
             return this.tooltip.render(content, clientMouse);
