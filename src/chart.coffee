@@ -42,12 +42,13 @@ getIdx = (d,i)-> i
 
         @container domContainer
 
+        @_metadata = {}
         @tooltip = new ForestD3.Tooltip @
         @guideline = new ForestD3.Guideline @
         @crosshairs = new ForestD3.Crosshairs @
         @xAxis = d3.svg.axis()
         @yAxis = d3.svg.axis()
-        @seriesColor = (d)=> d.color or @color()(d._index)
+        @seriesColor = (d)=> d.color or @color()(@metadata(d).index)
         @getXInternal = =>
             if @ordinal()
                 getIdx
@@ -84,13 +85,21 @@ getIdx = (d,i)-> i
         unless d?
             return ForestD3.DataAPI.call @, @chartData
         else
-            d = ForestD3.Utils.indexify d
+            d = ForestD3.Utils.indexify d, @_metadata
             @chartData = d
 
             if @tooltipType() is 'spatial'
                 @quadtree = @data().quadtree()
 
             return @
+
+    metadata: (d)->
+        if typeof d is 'string'
+            @_metadata[d]
+        else if typeof d is 'object' and d.key?
+            @_metadata[d.key]
+        else
+            @_metadata
 
     container: (d)->
         unless d?

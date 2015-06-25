@@ -12,7 +12,6 @@ describe 'Data API', ->
         ,
             key: 'series2'
             label: 'World'
-            hidden: true
             values: []
         ,
             key: 'series3'
@@ -25,6 +24,8 @@ describe 'Data API', ->
         chart.data(data)
 
         api = chart.data()
+
+        api.hide 'series2'
 
         display = api.displayInfo()
 
@@ -90,7 +91,10 @@ describe 'Data API', ->
             values: []
         ]
 
-        api = ForestD3.DataAPI data
+        chart = new ForestD3.Chart()
+        chart.data(data)
+
+        api = chart.data()
 
         api.showOnly 'series2'
         visible = api.visible()
@@ -110,18 +114,18 @@ describe 'Data API', ->
         ,
             key: 'series2'
             label: 'World'
-            hidden: true
             values: []
         ,
             key: 'series3'
             color: '#00f'
             label: 'Foo'
-            hidden: true
             values: []
         ]
 
         chart = new ForestD3.Chart()
         chart.data(data)
+
+        chart.data().hide(['series2','series3'])
 
         visible = chart.data().visible()
         visible.length.should.equal 1
@@ -246,20 +250,21 @@ describe 'Data API', ->
         it 'keeps hidden data out of slice', ->
             it 'can get a slice of data at an index', ->
             data = [
+                key: 's1'
                 values: [
                     [70, 10]
                     [80, 100]
                     [90, 101]
                 ]
             ,
-                hidden: true
+                key: 's2'
                 values: [
                     [70, 10]
                     [80, 800]
                     [90, 709]
                 ]
             ,
-                hidden: true
+                key: 's3'
                 values: [
                     [70, 12]
                     [80, 300]
@@ -269,6 +274,7 @@ describe 'Data API', ->
 
             chart = new ForestD3.Chart()
             chart.data(data)
+            chart.data().hide(['s2','s3'])
 
             slice = chart.data().sliced(0)
             slice.length.should.equal 1, 'only one item'
@@ -297,7 +303,9 @@ describe 'Data API', ->
         ]
 
         it 'can count number of bar items', ->
-            api = ForestD3.DataAPI data
+            chart = new ForestD3.Chart()
+            chart.data(data)
+            api = chart.data()
 
             api.hide 's5'
             api.barCount().should.equal 2, 'two visible bars'
@@ -306,7 +314,9 @@ describe 'Data API', ->
             api.barCount().should.equal 3, 'three bars visible'
 
         it 'can get the relative bar index', ->
-            api = ForestD3.DataAPI data
+            chart = new ForestD3.Chart()
+            chart.data(data)
+            api = chart.data()
 
             api.barIndex('s5').should.equal 2
             api.barIndex('s4').should.equal 1

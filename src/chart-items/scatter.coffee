@@ -18,8 +18,9 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
     y = chart.getY()
 
     all = d3.svg.symbolTypes
+    seriesIndex = chart.metadata(selectionData).index
     shape =
-        selectionData.shape or all[selectionData._index % all.length]
+        selectionData.shape or all[seriesIndex % all.length]
 
     symbol = d3.svg.symbol().type shape
 
