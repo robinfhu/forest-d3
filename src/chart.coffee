@@ -43,6 +43,9 @@ getIdx = (d,i)-> i
         @container domContainer
 
         @_metadata = {}
+        @_dispatch = d3.dispatch 'rendered', 'stateUpdate'
+        @plugins = {}
+
         @tooltip = new ForestD3.Tooltip @
         @guideline = new ForestD3.Guideline @
         @crosshairs = new ForestD3.Crosshairs @
@@ -55,8 +58,6 @@ getIdx = (d,i)-> i
             else
                 @getX()
 
-        @plugins = {}
-
         ###
         Auto resize the chart if user resizes the browser window.
         ###
@@ -65,6 +66,7 @@ getIdx = (d,i)-> i
                 @render()
 
         window.addEventListener 'resize', @resize
+        @_attachStateHandlers()
 
     ###
     Call this method to remove chart from the document and any artifacts
@@ -100,6 +102,20 @@ getIdx = (d,i)-> i
             @_metadata[d.key]
         else
             @_metadata
+
+    on: (type, listener)->
+        @_dispatch.on type, listener
+
+    trigger: (type)->
+        @_dispatch[type].apply @, Array.prototype.slice.call(arguments, 1)
+
+    _attachStateHandlers: ->
+        @on 'stateUpdate', (state)=>
+            for key, config of state
+                meta = @metadata()[key]
+                if meta?
+                    for attr, val of config
+                        meta[attr] = val
 
     container: (d)->
         unless d?
@@ -188,6 +204,9 @@ getIdx = (d,i)-> i
         chartItems.order()
 
         @renderPlugins()
+
+        # Trigger the 'rendered' event
+        @trigger 'rendered', @metadata()
 
         @
     ###
