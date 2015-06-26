@@ -16,7 +16,6 @@ describe 'Data API', ->
         ,
             key: 'series3'
             color: '#00f'
-            label: 'Foo'
             values: []
         ]
 
@@ -38,6 +37,7 @@ describe 'Data API', ->
         display[2].color.should.equal '#00f'
         display[1].hidden.should.be.true
         display[0].label.should.equal 'Hello'
+        display[2].label.should.equal 'series3'
 
     it 'has methods to show/hide data series`', ->
         data = [

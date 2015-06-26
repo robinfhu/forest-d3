@@ -116,7 +116,7 @@
 }
 
 .forest-d3 .ohlc line {
-  stroke: #000;
+  stroke: #fff;
 }
 .forest-d3 .ohlc line.ohlc-range {
   stroke-width: 2px;

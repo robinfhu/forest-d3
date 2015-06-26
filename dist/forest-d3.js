@@ -602,7 +602,7 @@ Some operations can mutate the original chart data.
         return data.map(function(d) {
           return {
             key: d.key,
-            label: d.label,
+            label: d.label || d.key,
             hidden: chart.metadata(d).hidden === true,
             color: chart.seriesColor(d)
           };
@@ -876,17 +876,18 @@ Library of tooltip rendering utilities
       rows = slice.map(function(d) {
         var bgColor;
         bgColor = "background-color: " + d.color + ";";
-        return "<tr>\n    <td><div class='series-color' style='" + bgColor + "'></div></td>\n    <td class='series-label'>" + d.label + "</td>\n    <td class='series-value'>" + (chart.yTickFormat()(d.y)) + "</td>\n</tr>";
+        return "<tr>\n    <td><div class='series-color' style='" + bgColor + "'></div></td>\n    <td class='series-label'>" + (d.label || d.key) + "</td>\n    <td class='series-value'>" + (chart.yTickFormat()(d.y)) + "</td>\n</tr>";
       });
       rows = rows.join('');
       return "<div class='header'>" + xValue + "</div>\n<table>\n    " + rows + "\n</table>";
     },
     single: function(chart, point) {
-      var bgColor, color, xValue;
+      var bgColor, color, label, xValue;
       xValue = chart.xTickFormat()(point.xValue);
       color = chart.seriesColor(point.series);
       bgColor = "background-color: " + color + ";";
-      return "<div class='header'>" + xValue + "</div>\n<table>\n    <tr>\n        <td><div class='series-color' style='" + bgColor + "'></div></td>\n        <td class='series-label'>" + point.series.label + "</td>\n        <td class='series-value'>\n            " + (chart.yTickFormat()(point.y)) + "\n        </td>\n    </tr>\n</table>";
+      label = point.series.label || point.series.key;
+      return "<div class='header'>" + xValue + "</div>\n<table>\n    <tr>\n        <td><div class='series-color' style='" + bgColor + "'></div></td>\n        <td class='series-label'>" + label + "</td>\n        <td class='series-value'>\n            " + (chart.yTickFormat()(point.y)) + "\n        </td>\n    </tr>\n</table>";
     }
   };
 

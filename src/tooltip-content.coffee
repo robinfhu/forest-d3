@@ -13,7 +13,7 @@ Library of tooltip rendering utilities
             """
                 <tr>
                     <td><div class='series-color' style='#{bgColor}'></div></td>
-                    <td class='series-label'>#{d.label}</td>
+                    <td class='series-label'>#{d.label or d.key}</td>
                     <td class='series-value'>#{chart.yTickFormat()(d.y)}</td>
                 </tr>
             """
@@ -30,12 +30,13 @@ Library of tooltip rendering utilities
         xValue = chart.xTickFormat()(point.xValue)
         color = chart.seriesColor point.series
         bgColor = "background-color: #{color};"
+        label = point.series.label or point.series.key
         """
         <div class='header'>#{xValue}</div>
         <table>
             <tr>
                 <td><div class='series-color' style='#{bgColor}'></div></td>
-                <td class='series-label'>#{point.series.label}</td>
+                <td class='series-label'>#{label}</td>
                 <td class='series-value'>
                     #{chart.yTickFormat()(point.y)}
                 </td>

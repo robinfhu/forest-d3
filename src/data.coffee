@@ -14,7 +14,7 @@ Some operations can mutate the original chart data.
     displayInfo: ->
         data.map (d)->
             key: d.key
-            label: d.label
+            label: d.label or d.key
             hidden: chart.metadata(d).hidden is true
             color: chart.seriesColor d
 
