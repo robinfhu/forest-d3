@@ -18,6 +18,154 @@ Author:  Robin Hu
 }).call(this);
 
 (function() {
+  var BaseChart;
+
+  this.ForestD3.BaseChart = BaseChart = (function() {
+    function BaseChart(domContainer) {
+      this.properties = {};
+      this.container(domContainer);
+      this._metadata = {};
+      this._dispatch = d3.dispatch('rendered', 'stateUpdate');
+      this.plugins = {};
+
+      /*
+      Auto resize the chart if user resizes the browser window.
+       */
+      this.resize = (function(_this) {
+        return function() {
+          if (_this.autoResize()) {
+            return _this.render();
+          }
+        };
+      })(this);
+      window.addEventListener('resize', this.resize);
+      this._attachStateHandlers();
+    }
+
+
+    /*
+    Call this method to remove chart from the document and any artifacts
+    it has (like tooltips) and event handlers.
+     */
+
+    BaseChart.prototype.destroy = function() {
+      var domContainer;
+      domContainer = this.container();
+      if ((domContainer != null ? domContainer.parentNode : void 0) != null) {
+        domContainer.parentNode.removeChild(domContainer);
+      }
+      return window.removeEventListener('resize', this.resize);
+    };
+
+    BaseChart.prototype.metadata = function(d) {
+      if (typeof d === 'string') {
+        return this._metadata[d];
+      } else if (typeof d === 'object' && (d.key != null)) {
+        return this._metadata[d.key];
+      } else {
+        return this._metadata;
+      }
+    };
+
+    BaseChart.prototype.on = function(type, listener) {
+      return this._dispatch.on(type, listener);
+    };
+
+    BaseChart.prototype.trigger = function(type) {
+      return this._dispatch[type].apply(this, Array.prototype.slice.call(arguments, 1));
+    };
+
+    BaseChart.prototype._attachStateHandlers = function() {
+      return this.on('stateUpdate', (function(_this) {
+        return function(state) {
+          var attr, config, key, meta, results, val;
+          results = [];
+          for (key in state) {
+            config = state[key];
+            meta = _this.metadata()[key];
+            if (meta != null) {
+              results.push((function() {
+                var results1;
+                results1 = [];
+                for (attr in config) {
+                  val = config[attr];
+                  results1.push(meta[attr] = val);
+                }
+                return results1;
+              })());
+            } else {
+              results.push(void 0);
+            }
+          }
+          return results;
+        };
+      })(this));
+    };
+
+    BaseChart.prototype.container = function(d) {
+      if (d == null) {
+        return this.properties['container'];
+      } else {
+        if ((d.select != null) && (d.node != null)) {
+          d = d.node();
+        } else if (typeof d === 'string') {
+          d = document.querySelector(d);
+        }
+        this.properties['container'] = d;
+        this.svg = this.createSvg();
+        return this;
+      }
+    };
+
+
+    /*
+    Create an <svg> element to start rendering the chart.
+     */
+
+    BaseChart.prototype.createSvg = function() {
+      var container, exists;
+      container = this.container();
+      if (container != null) {
+        exists = d3.select(container).classed('forest-d3', true).select('svg');
+        if (exists.empty()) {
+          return d3.select(container).append('svg');
+        } else {
+          return exists;
+        }
+      }
+      return null;
+    };
+
+    BaseChart.prototype._setProperties = function(chartProperties) {
+      var defaultVal, i, len, prop, propPair, results;
+      results = [];
+      for (i = 0, len = chartProperties.length; i < len; i++) {
+        propPair = chartProperties[i];
+        prop = propPair[0], defaultVal = propPair[1];
+        this.properties[prop] = defaultVal;
+        results.push(this[prop] = (function(_this) {
+          return function(prop) {
+            return function(d) {
+              if (d == null) {
+                return _this.properties[prop];
+              } else {
+                _this.properties[prop] = d;
+                return _this;
+              }
+            };
+          };
+        })(this)(prop));
+      }
+      return results;
+    };
+
+    return BaseChart;
+
+  })();
+
+}).call(this);
+
+(function() {
   this.ForestD3.ChartItem.bar = function(selection, selectionData) {
     var barBase, barCount, barIndex, barWidth, bars, chart, fullSpace, maxFullSpace, maxPadding, x, xCentered, y;
     chart = this;
@@ -1098,7 +1246,9 @@ Handles the guideline that moves along the x-axis
 }).call(this);
 
 (function() {
-  var Chart, chartProperties, getIdx;
+  var Chart, chartProperties, getIdx,
+    extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    hasProp = {}.hasOwnProperty;
 
   chartProperties = [
     [
@@ -1120,31 +1270,12 @@ Handles the guideline that moves along the x-axis
     return i;
   };
 
-  this.ForestD3.Chart = Chart = (function() {
+  this.ForestD3.Chart = Chart = (function(superClass) {
+    extend(Chart, superClass);
+
     function Chart(domContainer) {
-      var defaultVal, j, len, prop, propPair;
-      this.properties = {};
-      for (j = 0, len = chartProperties.length; j < len; j++) {
-        propPair = chartProperties[j];
-        prop = propPair[0], defaultVal = propPair[1];
-        this.properties[prop] = defaultVal;
-        this[prop] = (function(_this) {
-          return function(prop) {
-            return function(d) {
-              if (d == null) {
-                return _this.properties[prop];
-              } else {
-                _this.properties[prop] = d;
-                return _this;
-              }
-            };
-          };
-        })(this)(prop);
-      }
-      this.container(domContainer);
-      this._metadata = {};
-      this._dispatch = d3.dispatch('rendered', 'stateUpdate');
-      this.plugins = {};
+      Chart.__super__.constructor.call(this, domContainer);
+      this._setProperties(chartProperties);
       this.tooltip = new ForestD3.Tooltip(this);
       this.guideline = new ForestD3.Guideline(this);
       this.crosshairs = new ForestD3.Crosshairs(this);
@@ -1164,35 +1295,11 @@ Handles the guideline that moves along the x-axis
           }
         };
       })(this);
-
-      /*
-      Auto resize the chart if user resizes the browser window.
-       */
-      this.resize = (function(_this) {
-        return function() {
-          if (_this.autoResize()) {
-            return _this.render();
-          }
-        };
-      })(this);
-      window.addEventListener('resize', this.resize);
-      this._attachStateHandlers();
     }
 
-
-    /*
-    Call this method to remove chart from the document and any artifacts
-    it has (like tooltips) and event handlers.
-     */
-
     Chart.prototype.destroy = function() {
-      var domContainer;
-      domContainer = this.container();
-      if ((domContainer != null ? domContainer.parentNode : void 0) != null) {
-        domContainer.parentNode.removeChild(domContainer);
-      }
-      this.tooltip.destroy();
-      return window.removeEventListener('resize', this.resize);
+      Chart.__super__.destroy.call(this);
+      return this.tooltip.destroy();
     };
 
 
@@ -1211,85 +1318,6 @@ Handles the guideline that moves along the x-axis
         }
         return this;
       }
-    };
-
-    Chart.prototype.metadata = function(d) {
-      if (typeof d === 'string') {
-        return this._metadata[d];
-      } else if (typeof d === 'object' && (d.key != null)) {
-        return this._metadata[d.key];
-      } else {
-        return this._metadata;
-      }
-    };
-
-    Chart.prototype.on = function(type, listener) {
-      return this._dispatch.on(type, listener);
-    };
-
-    Chart.prototype.trigger = function(type) {
-      return this._dispatch[type].apply(this, Array.prototype.slice.call(arguments, 1));
-    };
-
-    Chart.prototype._attachStateHandlers = function() {
-      return this.on('stateUpdate', (function(_this) {
-        return function(state) {
-          var attr, config, key, meta, results, val;
-          results = [];
-          for (key in state) {
-            config = state[key];
-            meta = _this.metadata()[key];
-            if (meta != null) {
-              results.push((function() {
-                var results1;
-                results1 = [];
-                for (attr in config) {
-                  val = config[attr];
-                  results1.push(meta[attr] = val);
-                }
-                return results1;
-              })());
-            } else {
-              results.push(void 0);
-            }
-          }
-          return results;
-        };
-      })(this));
-    };
-
-    Chart.prototype.container = function(d) {
-      if (d == null) {
-        return this.properties['container'];
-      } else {
-        if ((d.select != null) && (d.node != null)) {
-          d = d.node();
-        } else if (typeof d === 'string') {
-          d = document.querySelector(d);
-        }
-        this.properties['container'] = d;
-        this.svg = this.createSvg();
-        return this;
-      }
-    };
-
-
-    /*
-    Create an <svg> element to start rendering the chart.
-     */
-
-    Chart.prototype.createSvg = function() {
-      var container, exists;
-      container = this.container();
-      if (container != null) {
-        exists = d3.select(container).classed('forest-d3', true).select('svg');
-        if (exists.empty()) {
-          return d3.select(container).append('svg');
-        } else {
-          return exists;
-        }
-      }
-      return null;
     };
 
 
@@ -1573,6 +1601,6 @@ Handles the guideline that moves along the x-axis
 
     return Chart;
 
-  })();
+  })(ForestD3.BaseChart);
 
 }).call(this);
