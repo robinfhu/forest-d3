@@ -1604,3 +1604,68 @@ Handles the guideline that moves along the x-axis
   })(ForestD3.BaseChart);
 
 }).call(this);
+
+(function() {
+  var BarChart, chartProperties,
+    extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    hasProp = {}.hasOwnProperty;
+
+  chartProperties = [['autoSize', true], ['height', null], ['barHeight', 30]];
+
+  this.ForestD3.BarChart = BarChart = (function(superClass) {
+    extend(BarChart, superClass);
+
+    function BarChart(domContainer) {
+      BarChart.__super__.constructor.call(this, domContainer);
+      this._setProperties(chartProperties);
+    }
+
+    BarChart.prototype.data = function(d) {
+      return this;
+    };
+
+    BarChart.prototype.render = function() {
+      if (this.svg == null) {
+        return;
+      }
+      this.updateDimensions();
+      this.updateChartFrame();
+      return this;
+    };
+
+
+    /*
+    Get the chart's dimensions, based on the parent container <div>.
+    Calculate chart margins and canvas dimensions.
+     */
+
+    BarChart.prototype.updateDimensions = function() {
+      var bounds, container;
+      container = this.container();
+      if (container != null) {
+        bounds = container.getBoundingClientRect();
+        this.canvasHeight = bounds.height;
+        return this.canvasWidth = bounds.width;
+      }
+    };
+
+
+    /*
+    Draws the chart frame. Things like backdrop and canvas.
+     */
+
+    BarChart.prototype.updateChartFrame = function() {
+      var barGroup, labelGroup, valueGroup;
+      labelGroup = this.svg.selectAll('g.bar-labels').data([0]);
+      labelGroup.enter().append('g').classed('bar-labels', true);
+      barGroup = this.svg.selectAll('g.bars').data([0]);
+      barGroup.enter().append('g').classed('bars', true);
+      valueGroup = this.svg.selectAll('g.bar-values').data([0]);
+      return valueGroup.enter().append('g').classed('bar-values', true);
+    };
+
+    return BarChart;
+
+  })(ForestD3.BaseChart);
+
+}).call(this);
