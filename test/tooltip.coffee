@@ -50,6 +50,6 @@ describe 'Tooltip and Guideline', ->
 
         setTimeout ->
             crosshair = $(container).find('line.crosshair-x')
-            crosshair.css('opacity').should.equal '0.5'
+            crosshair.css('stroke-opacity').should.equal '0.5'
             done()
         , 200

@@ -1610,7 +1610,17 @@ Handles the guideline that moves along the x-axis
     extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     hasProp = {}.hasOwnProperty;
 
-  chartProperties = [['autoSize', true], ['height', null], ['barHeight', 30]];
+  chartProperties = [
+    ['autoResize', true], [
+      'getX', function(d) {
+        return d[0];
+      }
+    ], [
+      'getY', function(d) {
+        return d[1];
+      }
+    ], ['height', null], ['barHeight', 30]
+  ];
 
   this.ForestD3.BarChart = BarChart = (function(superClass) {
     extend(BarChart, superClass);
@@ -1618,18 +1628,61 @@ Handles the guideline that moves along the x-axis
     function BarChart(domContainer) {
       BarChart.__super__.constructor.call(this, domContainer);
       this._setProperties(chartProperties);
+      this.getXInternal = function(d, i) {
+        return i;
+      };
     }
 
+
+    /*
+    Set chart data.
+     */
+
     BarChart.prototype.data = function(d) {
-      return this;
+      if (d == null) {
+        return ForestD3.DataAPI.call(this, this.chartData);
+      } else {
+        this.chartData = d;
+        return this;
+      }
     };
 
     BarChart.prototype.render = function() {
+      var barHeight, bars, chart, labels, valueLabels;
       if (this.svg == null) {
         return;
       }
       this.updateDimensions();
+      this.updateChartScale();
       this.updateChartFrame();
+      barHeight = 40;
+      chart = this;
+      labels = this.labelGroup.selectAll('text').data(this.data().xValuesRaw());
+      labels.enter().append('text').attr('text-anchor', 'end');
+      labels.exit().remove();
+      labels.each(function(d, i) {
+        return d3.select(this).text(function(d) {
+          return d;
+        }).attr('x', chart.yScale(0)).attr('y', barHeight * i + 10 * i + barHeight / 2);
+      });
+      bars = this.barGroup.selectAll('rect').data(this.data().get()[0].values);
+      bars.enter().append('rect');
+      bars.exit().remove();
+      bars.each(function(d, i) {
+        return d3.select(this).attr('x', chart.yScale(0)).attr('y', barHeight * i + 10 * i).attr('height', barHeight).attr('width', function(d, i) {
+          return chart.yScale(chart.getY()(d, i));
+        }).style('fill', '#ccc');
+      });
+      valueLabels = this.valueGroup.selectAll('text').data(this.data().get()[0].values);
+      valueLabels.enter().append('text');
+      valueLabels.exit().remove();
+      valueLabels.each(function(d, i) {
+        return d3.select(this).text(function(d, i) {
+          return chart.getY()(d, i);
+        }).attr('x', function(d, i) {
+          return chart.yScale(chart.getY()(d, i));
+        }).attr('y', barHeight * i + 10 * i + barHeight / 2);
+      });
       return this;
     };
 
@@ -1645,8 +1698,15 @@ Handles the guideline that moves along the x-axis
       if (container != null) {
         bounds = container.getBoundingClientRect();
         this.canvasHeight = bounds.height;
-        return this.canvasWidth = bounds.width;
+        return this.canvasWidth = bounds.width - 200;
       }
+    };
+
+    BarChart.prototype.updateChartScale = function() {
+      var extent;
+      extent = ForestD3.Utils.extent(this.data().get(), this.getXInternal(), this.getY());
+      extent.y = d3.extent(extent.y.concat([0]));
+      return this.yScale = d3.scale.linear().domain(extent.y).range([0, this.canvasWidth]);
     };
 
 
@@ -1655,13 +1715,15 @@ Handles the guideline that moves along the x-axis
      */
 
     BarChart.prototype.updateChartFrame = function() {
-      var barGroup, labelGroup, valueGroup;
-      labelGroup = this.svg.selectAll('g.bar-labels').data([0]);
-      labelGroup.enter().append('g').classed('bar-labels', true);
-      barGroup = this.svg.selectAll('g.bars').data([0]);
-      barGroup.enter().append('g').classed('bars', true);
-      valueGroup = this.svg.selectAll('g.bar-values').data([0]);
-      return valueGroup.enter().append('g').classed('bar-values', true);
+      this.labelGroup = this.svg.selectAll('g.bar-labels').data([0]);
+      this.labelGroup.enter().append('g').classed('bar-labels', true);
+      this.labelGroup.attr('transform', "translate(100,0)");
+      this.barGroup = this.svg.selectAll('g.bars').data([0]);
+      this.barGroup.enter().append('g').classed('bars', true);
+      this.barGroup.attr('transform', "translate(100,0)");
+      this.valueGroup = this.svg.selectAll('g.bar-values').data([0]);
+      this.valueGroup.enter().append('g').classed('bar-values', true);
+      return this.valueGroup.attr('transform', "translate(100,0)");
     };
 
     return BarChart;

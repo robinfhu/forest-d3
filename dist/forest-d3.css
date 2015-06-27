@@ -1,6 +1,10 @@
 .forest-d3 rect.bar {
   fill-opacity: 0.7;
 }
+.forest-d3 .bar-labels,
+.forest-d3 .bar-values {
+  fill: #333;
+}
 
 .forest-d3 svg {
   width: 100%;

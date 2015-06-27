@@ -17,6 +17,9 @@ describe 'Horizontal Bar Chart', ->
         $(container).hasClass('forest-d3').should.be.true
         $(container).find('svg').length.should.equal 1
 
+    it 'has autoResize function', ->
+        should.exist chart.autoResize
+
     it 'can render a chart frame', ->
         data = [
             key: 'series1'
