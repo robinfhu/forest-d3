@@ -1207,11 +1207,11 @@ Handles the guideline that moves along the x-axis
       }
       this.xLine = canvas.selectAll('line.crosshair-x').data([this.chart.canvasHeight]);
       this.yLine = canvas.selectAll('line.crosshair-y').data([this.chart.canvasWidth]);
-      this.xLine.enter().append('line').classed('crosshair-x', true).style('opacity', 0);
+      this.xLine.enter().append('line').classed('crosshair-x', true).style('stroke-opacity', 0);
       this.xLine.attr('y1', 0).attr('y2', function(d) {
         return d;
       });
-      this.yLine.enter().append('line').classed('crosshair-y', true).style('opacity', 0);
+      this.yLine.enter().append('line').classed('crosshair-y', true).style('stroke-opacity', 0);
       return this.yLine.attr('x1', 0).attr('x2', function(d) {
         return d;
       });
@@ -1224,8 +1224,8 @@ Handles the guideline that moves along the x-axis
       if (this.xLine == null) {
         return;
       }
-      this.xLine.transition().duration(50).attr('x1', x).attr('x2', x).style('opacity', 0.5);
-      return this.yLine.transition().duration(50).attr('y1', y).attr('y2', y).style('opacity', 0.5);
+      this.xLine.transition().duration(50).attr('x1', x).attr('x2', x).style('stroke-opacity', 0.5);
+      return this.yLine.transition().duration(50).attr('y1', y).attr('y2', y).style('stroke-opacity', 0.5);
     };
 
     Crosshairs.prototype.hide = function() {
@@ -1235,8 +1235,8 @@ Handles the guideline that moves along the x-axis
       if (this.xLine == null) {
         return;
       }
-      this.xLine.transition().delay(250).style('opacity', 0);
-      return this.yLine.transition().delay(250).style('opacity', 0);
+      this.xLine.transition().delay(250).style('stroke-opacity', 0);
+      return this.yLine.transition().delay(250).style('stroke-opacity', 0);
     };
 
     return Crosshairs;
