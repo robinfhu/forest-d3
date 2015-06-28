@@ -146,7 +146,7 @@ Author:  Robin Hu
         results.push(this[prop] = (function(_this) {
           return function(prop) {
             return function(d) {
-              if (d == null) {
+              if (typeof d === 'undefined') {
                 return _this.properties[prop];
               } else {
                 _this.properties[prop] = d;
@@ -1207,11 +1207,11 @@ Handles the guideline that moves along the x-axis
       }
       this.xLine = canvas.selectAll('line.crosshair-x').data([this.chart.canvasHeight]);
       this.yLine = canvas.selectAll('line.crosshair-y').data([this.chart.canvasWidth]);
-      this.xLine.enter().append('line').classed('crosshair-x', true).style('opacity', 0);
+      this.xLine.enter().append('line').classed('crosshair-x', true).style('stroke-opacity', 0);
       this.xLine.attr('y1', 0).attr('y2', function(d) {
         return d;
       });
-      this.yLine.enter().append('line').classed('crosshair-y', true).style('opacity', 0);
+      this.yLine.enter().append('line').classed('crosshair-y', true).style('stroke-opacity', 0);
       return this.yLine.attr('x1', 0).attr('x2', function(d) {
         return d;
       });
@@ -1224,8 +1224,8 @@ Handles the guideline that moves along the x-axis
       if (this.xLine == null) {
         return;
       }
-      this.xLine.transition().duration(50).attr('x1', x).attr('x2', x).style('opacity', 0.5);
-      return this.yLine.transition().duration(50).attr('y1', y).attr('y2', y).style('opacity', 0.5);
+      this.xLine.transition().duration(50).attr('x1', x).attr('x2', x).style('stroke-opacity', 0.5);
+      return this.yLine.transition().duration(50).attr('y1', y).attr('y2', y).style('stroke-opacity', 0.5);
     };
 
     Crosshairs.prototype.hide = function() {
@@ -1235,8 +1235,8 @@ Handles the guideline that moves along the x-axis
       if (this.xLine == null) {
         return;
       }
-      this.xLine.transition().delay(250).style('opacity', 0);
-      return this.yLine.transition().delay(250).style('opacity', 0);
+      this.xLine.transition().delay(250).style('stroke-opacity', 0);
+      return this.yLine.transition().delay(250).style('stroke-opacity', 0);
     };
 
     return Crosshairs;
@@ -1600,6 +1600,151 @@ Handles the guideline that moves along the x-axis
     };
 
     return Chart;
+
+  })(ForestD3.BaseChart);
+
+}).call(this);
+
+(function() {
+  var BarChart, chartProperties,
+    extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    hasProp = {}.hasOwnProperty;
+
+  chartProperties = [
+    ['autoResize', true], [
+      'getX', function(d) {
+        return d[0];
+      }
+    ], [
+      'getY', function(d) {
+        return d[1];
+      }
+    ], ['height', null], ['barHeight', 40], ['barPadding', 10]
+  ];
+
+  this.ForestD3.BarChart = BarChart = (function(superClass) {
+    extend(BarChart, superClass);
+
+    function BarChart(domContainer) {
+      BarChart.__super__.constructor.call(this, domContainer);
+      d3.select(this.container()).classed('auto-height', true);
+      this._setProperties(chartProperties);
+      this.getXInternal = function(d, i) {
+        return i;
+      };
+    }
+
+
+    /*
+    Set chart data.
+     */
+
+    BarChart.prototype.data = function(d) {
+      if (d == null) {
+        return ForestD3.DataAPI.call(this, this.chartData);
+      } else {
+        this.chartData = d;
+        return this;
+      }
+    };
+
+    BarChart.prototype._barData = function() {
+      return this.data().get()[0].values;
+    };
+
+    BarChart.prototype.render = function() {
+      var barCenter, barY, bars, chart, color, labels, valueLabels;
+      if (this.svg == null) {
+        return;
+      }
+      if (this.chartData == null) {
+        return;
+      }
+      this.updateDimensions();
+      this.updateChartScale();
+      this.updateChartFrame();
+      barY = (function(_this) {
+        return function(i) {
+          return _this.barHeight() * i + _this.barPadding() * i;
+        };
+      })(this);
+      barCenter = this.barHeight() / 2;
+      chart = this;
+      color = this.data().get()[0].color;
+      labels = this.labelGroup.selectAll('text').data(this.data().xValuesRaw());
+      labels.enter().append('text').attr('text-anchor', 'end');
+      labels.exit().remove();
+      labels.each(function(d, i) {
+        return d3.select(this).text(function(d) {
+          return d;
+        }).attr('x', chart.yScale(0)).attr('y', barY(i) + barCenter);
+      });
+      bars = this.barGroup.selectAll('rect').data(this._barData());
+      bars.enter().append('rect').attr('x', chart.yScale(0)).attr('y', 0).style('fill-opacity', 0);
+      bars.exit().remove();
+      bars.each(function(d, i) {
+        return d3.select(this).attr('height', chart.barHeight()).attr('width', function(d, i) {
+          return chart.yScale(chart.getY()(d, i));
+        }).style('fill', color).transition().duration(700).delay(i * 50).attr('x', chart.yScale(0)).attr('y', barY(i)).style('fill-opacity', 1);
+      });
+      valueLabels = this.valueGroup.selectAll('text').data(this.data().get()[0].values);
+      valueLabels.enter().append('text');
+      valueLabels.exit().remove();
+      valueLabels.each(function(d, i) {
+        return d3.select(this).text(function(d, i) {
+          return chart.getY()(d, i);
+        }).attr('x', function(d, i) {
+          return chart.yScale(chart.getY()(d, i));
+        }).attr('y', barY(i) + barCenter);
+      });
+      return this;
+    };
+
+
+    /*
+    Get the chart's dimensions, based on the parent container <div>.
+    Calculate chart margins and canvas dimensions.
+     */
+
+    BarChart.prototype.updateDimensions = function() {
+      var barCount, bounds, container, height;
+      container = this.container();
+      if (container != null) {
+        bounds = container.getBoundingClientRect();
+        this.canvasWidth = bounds.width - 200;
+        if (!this.height()) {
+          barCount = this._barData().length;
+          height = barCount * (this.barHeight() + this.barPadding());
+          return this.svg.attr('height', height);
+        }
+      }
+    };
+
+    BarChart.prototype.updateChartScale = function() {
+      var extent;
+      extent = ForestD3.Utils.extent(this.data().get(), this.getXInternal(), this.getY());
+      extent.y = d3.extent(extent.y.concat([0]));
+      return this.yScale = d3.scale.linear().domain(extent.y).range([0, this.canvasWidth]);
+    };
+
+
+    /*
+    Draws the chart frame. Things like backdrop and canvas.
+     */
+
+    BarChart.prototype.updateChartFrame = function() {
+      this.labelGroup = this.svg.selectAll('g.bar-labels').data([0]);
+      this.labelGroup.enter().append('g').classed('bar-labels', true);
+      this.labelGroup.attr('transform', "translate(100,0)");
+      this.barGroup = this.svg.selectAll('g.bars').data([0]);
+      this.barGroup.enter().append('g').classed('bars', true);
+      this.barGroup.attr('transform', "translate(100,0)");
+      this.valueGroup = this.svg.selectAll('g.bar-values').data([0]);
+      this.valueGroup.enter().append('g').classed('bar-values', true);
+      return this.valueGroup.attr('transform', "translate(100,0)");
+    };
+
+    return BarChart;
 
   })(ForestD3.BaseChart);
 

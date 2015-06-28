@@ -59,6 +59,7 @@ module.exports = (grunt)->
                         'src/guideline.coffee'
                         'src/crosshairs.coffee'
                         'src/chart.coffee'
+                        'src/bar-chart.coffee'
                     ]
             examples:
                 expand: true

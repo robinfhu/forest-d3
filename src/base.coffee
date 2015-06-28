@@ -89,7 +89,7 @@
 
             @[prop] = do (prop)=>
                 (d)=>
-                    unless d?
+                    if typeof(d) is 'undefined'
                         return @properties[prop]
 
                     else
