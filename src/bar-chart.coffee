@@ -36,7 +36,6 @@ chartProperties = [
         @updateChartFrame()
 
         barY = (i)=> @barHeight()*i + @barPadding()*i
-        barCenter = @barHeight() / 2
 
         chart = @
 
@@ -47,6 +46,9 @@ chartProperties = [
             .enter()
             .append('text')
             .attr('text-anchor', 'end')
+            .attr('x', 0)
+            .attr('y', 0)
+            .style('fill-opacity', 0)
 
         labels
             .exit()
@@ -55,8 +57,11 @@ chartProperties = [
         labels.each (d,i)->
             d3.select(@)
                 .text((d)-> d)
-                .attr('x', chart.yScale(0))
-                .attr('y', barY(i) + barCenter)
+                .transition()
+                .duration(700)
+                .delay(i*20)
+                .attr('y', barY(i))
+                .style('fill-opacity', 1)
 
         bars = @barGroup.selectAll('rect').data(@_barData())
 
@@ -74,15 +79,14 @@ chartProperties = [
         bars.each (d,i)->
             d3.select(@)
                 .attr('height', chart.barHeight())
+                .transition()
                 .attr('width', (d,i)-> chart.yScale(chart.getY()(d,i)))
                 .style('fill', color)
-                .transition()
                 .duration(700)
                 .delay(i*50)
                 .attr('x', chart.yScale(0))
                 .attr('y', barY(i))
                 .style('fill-opacity', 1)
-
 
         valueLabels = @valueGroup
             .selectAll('text')
@@ -91,6 +95,9 @@ chartProperties = [
         valueLabels
             .enter()
             .append('text')
+            .attr('x', 0)
+            .transition()
+            .duration(700)
 
         valueLabels
             .exit()
@@ -98,9 +105,12 @@ chartProperties = [
 
         valueLabels.each (d,i)->
             d3.select(@)
+                .attr('y', barY(i))
+                .transition()
+                .duration(700)
+                .delay(i*20)
                 .text((d,i)-> chart.getY()(d,i))
                 .attr('x', (d,i)-> chart.yScale(chart.getY()(d,i)))
-                .attr('y', barY(i) + barCenter)
 
         @
 
@@ -132,10 +142,11 @@ chartProperties = [
     Draws the chart frame. Things like backdrop and canvas.
     ###
     updateChartFrame: ->
+        barCenter = @barHeight() / 2 + 5
         @labelGroup = @svg.selectAll('g.bar-labels').data([0])
         @labelGroup.enter().append('g').classed('bar-labels', true)
         @labelGroup
-            .attr('transform', "translate(100,0)")
+            .attr('transform', "translate(90,#{barCenter})")
 
         @barGroup = @svg.selectAll('g.bars').data([0])
         @barGroup.enter().append('g').classed('bars', true)
@@ -145,4 +156,4 @@ chartProperties = [
         @valueGroup = @svg.selectAll('g.bar-values').data([0])
         @valueGroup.enter().append('g').classed('bar-values', true)
         @valueGroup
-            .attr('transform', "translate(100,0)")
+            .attr('transform', "translate(110,#{barCenter})")

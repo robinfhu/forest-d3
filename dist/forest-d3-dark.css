@@ -3,6 +3,7 @@
 }
 .forest-d3 .bar-labels,
 .forest-d3 .bar-values {
+  font-size: 20px;
   fill: #dcdcdc;
 }
 
