@@ -6,3 +6,12 @@
     .bar-labels, .bar-values
         font-size 20px
         fill $axisTextColor
+
+    .bars
+        rect
+            stroke $axisLineColor
+
+        line
+            &.zero-line
+                stroke $axisLineColor
+                stroke-opacity 0.7

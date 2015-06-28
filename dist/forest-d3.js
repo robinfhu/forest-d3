@@ -1653,7 +1653,7 @@ Handles the guideline that moves along the x-axis
     };
 
     BarChart.prototype.render = function() {
-      var barY, bars, chart, color, labels, valueLabels;
+      var barY, bars, chart, color, labels, valueLabels, zeroLine;
       if (this.svg == null) {
         return;
       }
@@ -1679,12 +1679,12 @@ Handles the guideline that moves along the x-axis
         }).transition().duration(700).delay(i * 20).attr('y', barY(i)).style('fill-opacity', 1);
       });
       bars = this.barGroup.selectAll('rect').data(this._barData());
-      bars.enter().append('rect').attr('x', chart.yScale(0)).attr('y', 0).style('fill-opacity', 0);
+      bars.enter().append('rect').attr('x', chart.yScale(0)).attr('y', 0).style('fill-opacity', 0).style('stroke-opacity', 0);
       bars.exit().remove();
       bars.each(function(d, i) {
         return d3.select(this).attr('height', chart.barHeight()).transition().attr('width', function(d, i) {
           return chart.yScale(chart.getY()(d, i));
-        }).style('fill', color).duration(700).delay(i * 50).attr('x', chart.yScale(0)).attr('y', barY(i)).style('fill-opacity', 1);
+        }).style('fill', color).duration(700).delay(i * 50).attr('x', chart.yScale(0)).attr('y', barY(i)).style('fill-opacity', 1).style('stroke-opacity', 0.7);
       });
       valueLabels = this.valueGroup.selectAll('text').data(this.data().get()[0].values);
       valueLabels.enter().append('text').attr('x', 0).transition().duration(700);
@@ -1696,6 +1696,9 @@ Handles the guideline that moves along the x-axis
           return chart.yScale(chart.getY()(d, i));
         });
       });
+      zeroLine = this.barGroup.selectAll('line.zero-line').data([0]);
+      zeroLine.enter().append('line').classed('zero-line', true);
+      zeroLine.transition().attr('x1', this.yScale(0)).attr('x2', this.yScale(0)).attr('y1', 0).attr('y2', this.canvasHeight);
       return this;
     };
 
@@ -1706,15 +1709,15 @@ Handles the guideline that moves along the x-axis
      */
 
     BarChart.prototype.updateDimensions = function() {
-      var barCount, bounds, container, height;
+      var barCount, bounds, container;
       container = this.container();
       if (container != null) {
         bounds = container.getBoundingClientRect();
         this.canvasWidth = bounds.width - 200;
         if (!this.height()) {
           barCount = this._barData().length;
-          height = barCount * (this.barHeight() + this.barPadding());
-          return this.svg.attr('height', height);
+          this.canvasHeight = barCount * (this.barHeight() + this.barPadding());
+          return this.svg.attr('height', this.canvasHeight);
         }
       }
     };

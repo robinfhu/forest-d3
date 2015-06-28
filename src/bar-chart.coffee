@@ -71,6 +71,7 @@ chartProperties = [
             .attr('x', chart.yScale(0))
             .attr('y', 0)
             .style('fill-opacity', 0)
+            .style('stroke-opacity', 0)
 
         bars
             .exit()
@@ -87,6 +88,7 @@ chartProperties = [
                 .attr('x', chart.yScale(0))
                 .attr('y', barY(i))
                 .style('fill-opacity', 1)
+                .style('stroke-opacity', 0.7)
 
         valueLabels = @valueGroup
             .selectAll('text')
@@ -112,6 +114,16 @@ chartProperties = [
                 .text((d,i)-> chart.getY()(d,i))
                 .attr('x', (d,i)-> chart.yScale(chart.getY()(d,i)))
 
+        zeroLine = @barGroup.selectAll('line.zero-line').data([0])
+        zeroLine.enter().append('line').classed('zero-line', true)
+
+        zeroLine
+            .transition()
+            .attr('x1', @yScale(0))
+            .attr('x2', @yScale(0))
+            .attr('y1', 0)
+            .attr('y2', @canvasHeight)
+
         @
 
     ###
@@ -127,8 +139,9 @@ chartProperties = [
 
             unless @height()
                 barCount = @_barData().length
-                height = barCount * (@barHeight() + @barPadding())
-                @svg.attr('height', height)
+                @canvasHeight = barCount * (@barHeight() + @barPadding())
+
+                @svg.attr('height', @canvasHeight)
 
     updateChartScale: ->
         extent = ForestD3.Utils.extent @data().get(), @getXInternal(), @getY()
