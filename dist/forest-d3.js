@@ -146,7 +146,7 @@ Author:  Robin Hu
         results.push(this[prop] = (function(_this) {
           return function(prop) {
             return function(d) {
-              if (d == null) {
+              if (typeof d === 'undefined') {
                 return _this.properties[prop];
               } else {
                 _this.properties[prop] = d;
@@ -1619,7 +1619,7 @@ Handles the guideline that moves along the x-axis
       'getY', function(d) {
         return d[1];
       }
-    ], ['height', null], ['barHeight', 30]
+    ], ['height', null], ['barHeight', 40], ['barPadding', 10]
   ];
 
   this.ForestD3.BarChart = BarChart = (function(superClass) {
@@ -1627,6 +1627,7 @@ Handles the guideline that moves along the x-axis
 
     function BarChart(domContainer) {
       BarChart.__super__.constructor.call(this, domContainer);
+      d3.select(this.container()).classed('auto-height', true);
       this._setProperties(chartProperties);
       this.getXInternal = function(d, i) {
         return i;
@@ -1647,15 +1648,27 @@ Handles the guideline that moves along the x-axis
       }
     };
 
+    BarChart.prototype._barData = function() {
+      return this.data().get()[0].values;
+    };
+
     BarChart.prototype.render = function() {
-      var barHeight, bars, chart, labels, valueLabels;
+      var barCenter, barY, bars, chart, labels, valueLabels;
       if (this.svg == null) {
+        return;
+      }
+      if (this.chartData == null) {
         return;
       }
       this.updateDimensions();
       this.updateChartScale();
       this.updateChartFrame();
-      barHeight = 40;
+      barY = (function(_this) {
+        return function(i) {
+          return _this.barHeight() * i + _this.barPadding() * i;
+        };
+      })(this);
+      barCenter = this.barHeight() / 2;
       chart = this;
       labels = this.labelGroup.selectAll('text').data(this.data().xValuesRaw());
       labels.enter().append('text').attr('text-anchor', 'end');
@@ -1663,13 +1676,13 @@ Handles the guideline that moves along the x-axis
       labels.each(function(d, i) {
         return d3.select(this).text(function(d) {
           return d;
-        }).attr('x', chart.yScale(0)).attr('y', barHeight * i + 10 * i + barHeight / 2);
+        }).attr('x', chart.yScale(0)).attr('y', barY(i) + barCenter);
       });
-      bars = this.barGroup.selectAll('rect').data(this.data().get()[0].values);
+      bars = this.barGroup.selectAll('rect').data(this._barData());
       bars.enter().append('rect');
       bars.exit().remove();
       bars.each(function(d, i) {
-        return d3.select(this).attr('x', chart.yScale(0)).attr('y', barHeight * i + 10 * i).attr('height', barHeight).attr('width', function(d, i) {
+        return d3.select(this).attr('x', chart.yScale(0)).attr('y', barY(i)).attr('height', chart.barHeight()).attr('width', function(d, i) {
           return chart.yScale(chart.getY()(d, i));
         }).style('fill', '#ccc');
       });
@@ -1681,7 +1694,7 @@ Handles the guideline that moves along the x-axis
           return chart.getY()(d, i);
         }).attr('x', function(d, i) {
           return chart.yScale(chart.getY()(d, i));
-        }).attr('y', barHeight * i + 10 * i + barHeight / 2);
+        }).attr('y', barY(i) + barCenter);
       });
       return this;
     };
@@ -1693,12 +1706,16 @@ Handles the guideline that moves along the x-axis
      */
 
     BarChart.prototype.updateDimensions = function() {
-      var bounds, container;
+      var barCount, bounds, container, height;
       container = this.container();
       if (container != null) {
         bounds = container.getBoundingClientRect();
-        this.canvasHeight = bounds.height;
-        return this.canvasWidth = bounds.width - 200;
+        this.canvasWidth = bounds.width - 200;
+        if (!this.height()) {
+          barCount = this._barData().length;
+          height = barCount * (this.barHeight() + this.barPadding());
+          return this.svg.attr('height', height);
+        }
       }
     };
 

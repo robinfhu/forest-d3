@@ -59,3 +59,26 @@ describe 'Horizontal Bar Chart', ->
         values.length.should.equal 1
 
         labels.get(0).textContent.should.equal 'Population'
+
+    it 'automatically figures out SVG height', ->
+        data = [
+            key: 'series1'
+            label: 'Short'
+            values: [
+                ['Experiment 1', 100]
+                ['Experiment 2', 90]
+                ['Experiment 3', 80]
+            ]
+        ]
+
+        chart
+            .barHeight(40)
+            .barPadding(10)
+            .height(null)
+            .data(data)
+            .render()
+
+        svg = $(container).find('svg')
+
+        height = "#{50*3}"
+        svg.get(0).getAttribute('height').should.equal height

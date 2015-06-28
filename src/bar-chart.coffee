@@ -3,12 +3,14 @@ chartProperties = [
     ['getX', (d)-> d[0]]
     ['getY', (d)-> d[1]]
     ['height', null]
-    ['barHeight', 30]
+    ['barHeight', 40]
+    ['barPadding', 10]
 ]
 
 @ForestD3.BarChart = class BarChart extends ForestD3.BaseChart
     constructor: (domContainer)->
         super domContainer
+        d3.select(@container()).classed('auto-height', true)
         @_setProperties chartProperties
 
         @getXInternal = (d,i)-> i
@@ -23,13 +25,19 @@ chartProperties = [
             @chartData = d
             return @
 
+    _barData: ->
+        @data().get()[0].values
+
     render: ->
         return unless @svg?
+        return unless @chartData?
         @updateDimensions()
         @updateChartScale()
         @updateChartFrame()
 
-        barHeight = 40
+        barY = (i)=> @barHeight()*i + @barPadding()*i
+        barCenter = @barHeight() / 2
+
         chart = @
 
         labels = @labelGroup.selectAll('text').data(@data().xValuesRaw())
@@ -46,9 +54,9 @@ chartProperties = [
             d3.select(@)
                 .text((d)-> d)
                 .attr('x', chart.yScale(0))
-                .attr('y', barHeight*i + 10*i + barHeight/2)
+                .attr('y', barY(i) + barCenter)
 
-        bars = @barGroup.selectAll('rect').data(@data().get()[0].values)
+        bars = @barGroup.selectAll('rect').data(@_barData())
 
         bars
             .enter()
@@ -61,8 +69,8 @@ chartProperties = [
         bars.each (d,i)->
             d3.select(@)
                 .attr('x', chart.yScale(0))
-                .attr('y', barHeight*i + 10*i)
-                .attr('height', barHeight)
+                .attr('y', barY(i))
+                .attr('height', chart.barHeight())
                 .attr('width', (d,i)-> chart.yScale(chart.getY()(d,i)))
                 .style('fill', '#ccc')
 
@@ -82,7 +90,7 @@ chartProperties = [
             d3.select(@)
                 .text((d,i)-> chart.getY()(d,i))
                 .attr('x', (d,i)-> chart.yScale(chart.getY()(d,i)))
-                .attr('y', barHeight*i + 10*i + barHeight/2)
+                .attr('y', barY(i) + barCenter)
 
         @
 
@@ -95,8 +103,12 @@ chartProperties = [
         if container?
             bounds = container.getBoundingClientRect()
 
-            @canvasHeight = bounds.height
             @canvasWidth = bounds.width - 200
+
+            unless @height()
+                barCount = @_barData().length
+                height = barCount * (@barHeight() + @barPadding())
+                @svg.attr('height', height)
 
     updateChartScale: ->
         extent = ForestD3.Utils.extent @data().get(), @getXInternal(), @getY()
