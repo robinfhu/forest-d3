@@ -40,6 +40,8 @@ chartProperties = [
 
         chart = @
 
+        color = @data().get()[0].color
+
         labels = @labelGroup.selectAll('text').data(@data().xValuesRaw())
         labels
             .enter()
@@ -61,6 +63,9 @@ chartProperties = [
         bars
             .enter()
             .append('rect')
+            .attr('x', chart.yScale(0))
+            .attr('y', 0)
+            .style('fill-opacity', 0)
 
         bars
             .exit()
@@ -68,11 +73,16 @@ chartProperties = [
 
         bars.each (d,i)->
             d3.select(@)
-                .attr('x', chart.yScale(0))
-                .attr('y', barY(i))
                 .attr('height', chart.barHeight())
                 .attr('width', (d,i)-> chart.yScale(chart.getY()(d,i)))
-                .style('fill', '#ccc')
+                .style('fill', color)
+                .transition()
+                .duration(700)
+                .delay(i*50)
+                .attr('x', chart.yScale(0))
+                .attr('y', barY(i))
+                .style('fill-opacity', 1)
+
 
         valueLabels = @valueGroup
             .selectAll('text')

@@ -1653,7 +1653,7 @@ Handles the guideline that moves along the x-axis
     };
 
     BarChart.prototype.render = function() {
-      var barCenter, barY, bars, chart, labels, valueLabels;
+      var barCenter, barY, bars, chart, color, labels, valueLabels;
       if (this.svg == null) {
         return;
       }
@@ -1670,6 +1670,7 @@ Handles the guideline that moves along the x-axis
       })(this);
       barCenter = this.barHeight() / 2;
       chart = this;
+      color = this.data().get()[0].color;
       labels = this.labelGroup.selectAll('text').data(this.data().xValuesRaw());
       labels.enter().append('text').attr('text-anchor', 'end');
       labels.exit().remove();
@@ -1679,12 +1680,12 @@ Handles the guideline that moves along the x-axis
         }).attr('x', chart.yScale(0)).attr('y', barY(i) + barCenter);
       });
       bars = this.barGroup.selectAll('rect').data(this._barData());
-      bars.enter().append('rect');
+      bars.enter().append('rect').attr('x', chart.yScale(0)).attr('y', 0).style('fill-opacity', 0);
       bars.exit().remove();
       bars.each(function(d, i) {
-        return d3.select(this).attr('x', chart.yScale(0)).attr('y', barY(i)).attr('height', chart.barHeight()).attr('width', function(d, i) {
+        return d3.select(this).attr('height', chart.barHeight()).attr('width', function(d, i) {
           return chart.yScale(chart.getY()(d, i));
-        }).style('fill', '#ccc');
+        }).style('fill', color).transition().duration(700).delay(i * 50).attr('x', chart.yScale(0)).attr('y', barY(i)).style('fill-opacity', 1);
       });
       valueLabels = this.valueGroup.selectAll('text').data(this.data().get()[0].values);
       valueLabels.enter().append('text');
