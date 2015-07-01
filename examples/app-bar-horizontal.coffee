@@ -8,6 +8,7 @@ data = [
         ['Honda', 80]
         ['Mazda', 70]
         ['Prius', 10]
+        ['Ford F150', 87]
     ]
 ]
 

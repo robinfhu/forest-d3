@@ -1652,6 +1652,38 @@ Handles the guideline that moves along the x-axis
       return this.data().get()[0].values;
     };
 
+
+    /*
+    A function that finds the longest label and computes an approximate
+    pixel width for it. Used to determine how much left margin there should
+    be.
+    The technique used is: create a temporary <text> element and put
+    the longest label in it. Then use getBoundingClientRect to find the width.
+    Quickly remove it after.
+     */
+
+    BarChart.prototype.calcMaxTextWidth = function() {
+      var j, label, labels, len, maxL, maxLabel, size, text;
+      labels = this._barData().map((function(_this) {
+        return function(d, i) {
+          return _this.getX()(d, i);
+        };
+      })(this));
+      maxL = 0;
+      maxLabel = '';
+      for (j = 0, len = labels.length; j < len; j++) {
+        label = labels[j];
+        if (label.length > maxL) {
+          maxL = label.length;
+          maxLabel = label;
+        }
+      }
+      text = this.svg.append('text').text(label).style('font-size', '20px');
+      size = text.node().getBoundingClientRect().width;
+      text.remove();
+      return size + 20;
+    };
+
     BarChart.prototype.render = function() {
       var barY, bars, chart, color, labels, valueLabels, zeroLine;
       if (this.svg == null) {
@@ -1713,7 +1745,11 @@ Handles the guideline that moves along the x-axis
       container = this.container();
       if (container != null) {
         bounds = container.getBoundingClientRect();
-        this.canvasWidth = bounds.width - 200;
+        this.margin = {
+          left: this.calcMaxTextWidth(),
+          right: 50
+        };
+        this.canvasWidth = bounds.width - this.margin.left - this.margin.right;
         if (!this.height()) {
           barCount = this._barData().length;
           this.canvasHeight = barCount * (this.barHeight() + this.barPadding());
@@ -1735,17 +1771,18 @@ Handles the guideline that moves along the x-axis
      */
 
     BarChart.prototype.updateChartFrame = function() {
-      var barCenter;
+      var barCenter, padding;
+      padding = 10;
       barCenter = this.barHeight() / 2 + 5;
       this.labelGroup = this.svg.selectAll('g.bar-labels').data([0]);
       this.labelGroup.enter().append('g').classed('bar-labels', true);
-      this.labelGroup.attr('transform', "translate(90," + barCenter + ")");
+      this.labelGroup.attr('transform', "translate(" + (this.margin.left - padding) + "," + barCenter + ")");
       this.barGroup = this.svg.selectAll('g.bars').data([0]);
       this.barGroup.enter().append('g').classed('bars', true);
-      this.barGroup.attr('transform', "translate(100,0)");
+      this.barGroup.attr('transform', "translate(" + this.margin.left + ",0)");
       this.valueGroup = this.svg.selectAll('g.bar-values').data([0]);
       this.valueGroup.enter().append('g').classed('bar-values', true);
-      return this.valueGroup.attr('transform', "translate(110," + barCenter + ")");
+      return this.valueGroup.attr('transform', "translate(" + (this.margin.left + padding) + "," + barCenter + ")");
     };
 
     return BarChart;

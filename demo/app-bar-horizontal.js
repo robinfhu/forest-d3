@@ -8,7 +8,7 @@
       key: 'series1',
       label: 'Long',
       color: '#555',
-      values: [['Toyota', 100], ['Honda', 80], ['Mazda', 70], ['Prius', 10]]
+      values: [['Toyota', 100], ['Honda', 80], ['Mazda', 70], ['Prius', 10], ['Ford F150', 87]]
     }
   ];
 

@@ -28,6 +28,32 @@ chartProperties = [
     _barData: ->
         @data().get()[0].values
 
+    ###
+    A function that finds the longest label and computes an approximate
+    pixel width for it. Used to determine how much left margin there should
+    be.
+    The technique used is: create a temporary <text> element and put
+    the longest label in it. Then use getBoundingClientRect to find the width.
+    Quickly remove it after.
+    ###
+    calcMaxTextWidth: ->
+        labels = @_barData().map (d,i)=>
+            @getX()(d,i)
+
+        maxL = 0
+        maxLabel = ''
+
+        for label in labels
+            if label.length > maxL
+                maxL = label.length
+                maxLabel = label
+
+        text = @svg.append('text').text(label).style('font-size', '20px')
+        size = text.node().getBoundingClientRect().width
+        text.remove()
+
+        size + 20
+
     render: ->
         return unless @svg?
         return unless @chartData?
@@ -135,7 +161,11 @@ chartProperties = [
         if container?
             bounds = container.getBoundingClientRect()
 
-            @canvasWidth = bounds.width - 200
+            @margin =
+                left: @calcMaxTextWidth()
+                right: 50
+
+            @canvasWidth = bounds.width - @margin.left - @margin.right
 
             unless @height()
                 barCount = @_barData().length
@@ -155,18 +185,23 @@ chartProperties = [
     Draws the chart frame. Things like backdrop and canvas.
     ###
     updateChartFrame: ->
+        padding = 10
         barCenter = @barHeight() / 2 + 5
         @labelGroup = @svg.selectAll('g.bar-labels').data([0])
         @labelGroup.enter().append('g').classed('bar-labels', true)
         @labelGroup
-            .attr('transform', "translate(90,#{barCenter})")
+            .attr('transform',
+                "translate(#{@margin.left - padding},#{barCenter})"
+            )
 
         @barGroup = @svg.selectAll('g.bars').data([0])
         @barGroup.enter().append('g').classed('bars', true)
         @barGroup
-            .attr('transform', "translate(100,0)")
+            .attr('transform', "translate(#{@margin.left},0)")
 
         @valueGroup = @svg.selectAll('g.bar-values').data([0])
         @valueGroup.enter().append('g').classed('bar-values', true)
         @valueGroup
-            .attr('transform', "translate(110,#{barCenter})")
+            .attr('transform',
+                "translate(#{@margin.left + padding},#{barCenter})"
+            )

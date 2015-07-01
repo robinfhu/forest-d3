@@ -82,3 +82,34 @@ describe 'Horizontal Bar Chart', ->
 
         height = "#{50*3}"
         svg.get(0).getAttribute('height').should.equal height
+
+    it 'automatically figures out left margin', (done)->
+        data = [
+            key: 'series1'
+            label: 'Short'
+            values: [
+                ['A', 1]
+                ['BBBBBBBBBB', 2]
+            ]
+        ]
+
+        chart.data(data).render()
+
+        chart.margin.left.should.be.greaterThan 100
+
+        data = [
+            key: 'series1'
+            label: 'Short'
+            values: [
+                ['A', 1]
+                ['B', 2]
+            ]
+        ]
+
+        chart.data(data).render()
+
+        chart.margin.left.should.be.lessThan 40
+
+        setTimeout ->
+            done()
+        , 600
