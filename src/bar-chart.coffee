@@ -67,7 +67,7 @@ chartProperties = [
 
         color = @data().get()[0].color
 
-        labels = @labelGroup.selectAll('text').data(@data().xValuesRaw())
+        labels = @labelGroup.selectAll('text').data(@_barData())
         labels
             .enter()
             .append('text')
@@ -82,7 +82,7 @@ chartProperties = [
 
         labels.each (d,i)->
             d3.select(@)
-                .text((d)-> d)
+                .text(chart.getX()(d,i))
                 .transition()
                 .duration(700)
                 .delay(i*20)
@@ -118,7 +118,7 @@ chartProperties = [
 
         valueLabels = @valueGroup
             .selectAll('text')
-            .data(@data().get()[0].values)
+            .data(@_barData())
 
         valueLabels
             .enter()

@@ -1702,13 +1702,11 @@ Handles the guideline that moves along the x-axis
       })(this);
       chart = this;
       color = this.data().get()[0].color;
-      labels = this.labelGroup.selectAll('text').data(this.data().xValuesRaw());
+      labels = this.labelGroup.selectAll('text').data(this._barData());
       labels.enter().append('text').attr('text-anchor', 'end').attr('x', 0).attr('y', 0).style('fill-opacity', 0);
       labels.exit().remove();
       labels.each(function(d, i) {
-        return d3.select(this).text(function(d) {
-          return d;
-        }).transition().duration(700).delay(i * 20).attr('y', barY(i)).style('fill-opacity', 1);
+        return d3.select(this).text(chart.getX()(d, i)).transition().duration(700).delay(i * 20).attr('y', barY(i)).style('fill-opacity', 1);
       });
       bars = this.barGroup.selectAll('rect').data(this._barData());
       bars.enter().append('rect').attr('x', chart.yScale(0)).attr('y', 0).style('fill-opacity', 0).style('stroke-opacity', 0);
@@ -1718,7 +1716,7 @@ Handles the guideline that moves along the x-axis
           return chart.yScale(chart.getY()(d, i));
         }).style('fill', color).duration(700).delay(i * 50).attr('x', chart.yScale(0)).attr('y', barY(i)).style('fill-opacity', 1).style('stroke-opacity', 0.7);
       });
-      valueLabels = this.valueGroup.selectAll('text').data(this.data().get()[0].values);
+      valueLabels = this.valueGroup.selectAll('text').data(this._barData());
       valueLabels.enter().append('text').attr('x', 0).transition().duration(700);
       valueLabels.exit().remove();
       valueLabels.each(function(d, i) {
