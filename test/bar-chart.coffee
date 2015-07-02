@@ -148,3 +148,34 @@ describe 'Horizontal Bar Chart', ->
         setTimeout ->
             done()
         , 600
+
+    it 'translates negative bars and labels', (done)->
+        data = [
+            key: 'series1'
+            label: 'Short'
+            values: [
+                ['A', 100]
+                ['B', 60]
+                ['C', -60]
+                ['D', -100]
+            ]
+        ]
+
+        chart.data(data).render()
+
+        bars = $(container).find('.bars rect')
+        bars.get(2).getAttribute('transform').should.contain 'translate'
+        bars.get(3).getAttribute('transform').should.contain 'translate'
+
+        bars.get(1).getAttribute('class').should.contain 'positive'
+        bars.get(2).getAttribute('class').should.contain 'negative'
+
+        values = $(container).find('.bar-values text')
+        values.get(1).getAttribute('class').should.contain 'positive'
+        values.get(2).getAttribute('class').should.contain 'negative'
+
+        values.get(2).getAttribute('x').should.equal values.get(3).getAttribute('x')
+
+        setTimeout ->
+            done()
+        , 600

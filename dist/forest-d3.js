@@ -1713,7 +1713,7 @@ Handles the guideline that moves along the x-axis
     };
 
     BarChart.prototype.render = function() {
-      var barY, bars, chart, color, labels, valueLabels, zeroLine;
+      var barY, bars, chart, color, labels, valueLabels, zeroLine, zeroPosition;
       if (this.svg == null) {
         return;
       }
@@ -1736,17 +1736,26 @@ Handles the guideline that moves along the x-axis
       labels.enter().append('text').attr('text-anchor', 'end').attr('x', 0).attr('y', 0).style('fill-opacity', 0);
       labels.exit().remove();
       labels.each(function(d, i) {
-        return d3.select(this).text(chart.getX()(d, i)).transition().duration(700).delay(i * 20).attr('y', barY(i)).style('fill-opacity', 1);
+        var isNegative;
+        isNegative = chart.getY()(d, i) < 0;
+        return d3.select(this).classed('positive', !isNegative).classed('negative', isNegative).text(chart.getX()(d, i)).transition().duration(700).delay(i * 20).attr('y', barY(i)).style('fill-opacity', 1);
       });
+      zeroPosition = chart.yScale(0);
       bars = this.barGroup.selectAll('rect').data(this._barDataSorted(), function(d) {
         return d;
       });
-      bars.enter().append('rect').attr('x', chart.yScale(0)).attr('y', 0).style('fill-opacity', 0).style('stroke-opacity', 0);
+      bars.enter().append('rect').attr('x', zeroPosition).attr('y', 0).style('fill-opacity', 0).style('stroke-opacity', 0);
       bars.exit().remove();
       bars.each(function(d, i) {
-        return d3.select(this).attr('height', chart.barHeight()).transition().attr('width', function(d, i) {
-          return chart.yScale(chart.getY()(d, i));
-        }).style('fill', color).duration(700).delay(i * 50).attr('x', chart.yScale(0)).attr('y', barY(i)).style('fill-opacity', 1).style('stroke-opacity', 0.7);
+        var isNegative, translate, width;
+        width = (function() {
+          var yPos;
+          yPos = chart.yScale(chart.getY()(d, i));
+          return Math.abs(yPos - zeroPosition);
+        })();
+        isNegative = chart.getY()(d, i) < 0;
+        translate = isNegative ? "translate(" + (-width) + ", 0)" : '';
+        return d3.select(this).attr('height', chart.barHeight()).attr('transform', translate).classed('positive', !isNegative).classed('negative', isNegative).transition().attr('width', width).style('fill', color).duration(700).delay(i * 50).attr('x', zeroPosition).attr('y', barY(i)).style('fill-opacity', 1).style('stroke-opacity', 0.7);
       });
       valueLabels = this.valueGroup.selectAll('text').data(this._barDataSorted(), function(d) {
         return d;
@@ -1754,15 +1763,15 @@ Handles the guideline that moves along the x-axis
       valueLabels.enter().append('text').attr('x', 0);
       valueLabels.exit().remove();
       valueLabels.each(function(d, i) {
-        return d3.select(this).transition().duration(700).attr('y', barY(i)).delay(i * 20).text(function(d, i) {
-          return chart.getY()(d, i);
-        }).attr('x', function(d, i) {
-          return chart.yScale(chart.getY()(d, i));
-        });
+        var isNegative, xPos, yVal;
+        yVal = chart.getY()(d, i);
+        isNegative = yVal < 0;
+        xPos = isNegative ? zeroPosition : chart.yScale(yVal);
+        return d3.select(this).classed('positive', !isNegative).classed('negative', isNegative).transition().duration(700).attr('y', barY(i)).delay(i * 20).text(yVal).attr('x', xPos);
       });
       zeroLine = this.barGroup.selectAll('line.zero-line').data([0]);
       zeroLine.enter().append('line').classed('zero-line', true);
-      zeroLine.transition().attr('x1', this.yScale(0)).attr('x2', this.yScale(0)).attr('y1', 0).attr('y2', this.canvasHeight);
+      zeroLine.transition().attr('x1', zeroPosition).attr('x2', zeroPosition).attr('y1', 0).attr('y2', this.canvasHeight);
       return this;
     };
 

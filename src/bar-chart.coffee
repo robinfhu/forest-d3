@@ -105,13 +105,19 @@ chartProperties = [
             .remove()
 
         labels.each (d,i)->
+            isNegative = chart.getY()(d,i) < 0
+
             d3.select(@)
+                .classed('positive', not isNegative)
+                .classed('negative', isNegative)
                 .text(chart.getX()(d,i))
                 .transition()
                 .duration(700)
                 .delay(i*20)
                 .attr('y', barY(i))
                 .style('fill-opacity', 1)
+
+        zeroPosition = chart.yScale 0
 
         bars = @barGroup
             .selectAll('rect')
@@ -120,7 +126,7 @@ chartProperties = [
         bars
             .enter()
             .append('rect')
-            .attr('x', chart.yScale(0))
+            .attr('x', zeroPosition)
             .attr('y', 0)
             .style('fill-opacity', 0)
             .style('stroke-opacity', 0)
@@ -130,14 +136,29 @@ chartProperties = [
             .remove()
 
         bars.each (d,i)->
+            width = do->
+                yPos = chart.yScale chart.getY()(d,i)
+                Math.abs (yPos - zeroPosition)
+
+            isNegative = chart.getY()(d,i) < 0
+
+            translate =
+                if isNegative
+                    "translate(#{-width}, 0)"
+                else
+                    ''
+
             d3.select(@)
                 .attr('height', chart.barHeight())
+                .attr('transform', translate)
+                .classed('positive', not isNegative)
+                .classed('negative', isNegative)
                 .transition()
-                .attr('width', (d,i)-> chart.yScale(chart.getY()(d,i)))
+                .attr('width', width)
                 .style('fill', color)
                 .duration(700)
                 .delay(i*50)
-                .attr('x', chart.yScale(0))
+                .attr('x', zeroPosition)
                 .attr('y', barY(i))
                 .style('fill-opacity', 1)
                 .style('stroke-opacity', 0.7)
@@ -156,21 +177,32 @@ chartProperties = [
             .remove()
 
         valueLabels.each (d,i)->
+            yVal = chart.getY()(d,i)
+            isNegative = yVal < 0
+
+            xPos =
+                if isNegative
+                    zeroPosition
+                else
+                    chart.yScale yVal
+
             d3.select(@)
+                .classed('positive', not isNegative)
+                .classed('negative', isNegative)
                 .transition()
                 .duration(700)
                 .attr('y', barY(i))
                 .delay(i*20)
-                .text((d,i)-> chart.getY()(d,i))
-                .attr('x', (d,i)-> chart.yScale(chart.getY()(d,i)))
+                .text(yVal)
+                .attr('x', xPos)
 
         zeroLine = @barGroup.selectAll('line.zero-line').data([0])
         zeroLine.enter().append('line').classed('zero-line', true)
 
         zeroLine
             .transition()
-            .attr('x1', @yScale(0))
-            .attr('x2', @yScale(0))
+            .attr('x1', zeroPosition)
+            .attr('x2', zeroPosition)
             .attr('y1', 0)
             .attr('y2', @canvasHeight)
 

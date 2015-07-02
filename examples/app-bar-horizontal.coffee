@@ -12,6 +12,9 @@ data = [
         ['Hyundai', 23.4]
         ['Chrysler', 1]
         ['Lincoln', 102]
+        ['Accord', -60]
+        ['Hummer', -5.6]
+        ['Dodge', -11]
     ]
 ]
 
