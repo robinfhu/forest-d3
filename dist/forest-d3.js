@@ -1619,7 +1619,11 @@ Handles the guideline that moves along the x-axis
       'getY', function(d) {
         return d[1];
       }
-    ], ['height', null], ['barHeight', 40], ['barPadding', 10]
+    ], ['height', null], ['barHeight', 40], ['barPadding', 10], [
+      'sortBy', function(d) {
+        return d[0];
+      }
+    ], ['sortDirection', null]
   ];
 
   this.ForestD3.BarChart = BarChart = (function(superClass) {
@@ -1627,7 +1631,7 @@ Handles the guideline that moves along the x-axis
 
     function BarChart(domContainer) {
       BarChart.__super__.constructor.call(this, domContainer);
-      d3.select(this.container()).classed('auto-height', true);
+      d3.select(this.container()).classed('auto-height bar-chart', true);
       this._setProperties(chartProperties);
       this.getXInternal = function(d, i) {
         return i;
@@ -1650,6 +1654,30 @@ Handles the guideline that moves along the x-axis
 
     BarChart.prototype._barData = function() {
       return this.data().get()[0].values;
+    };
+
+    BarChart.prototype._barDataSorted = function() {
+      var d, getVal, j, len, ref, result;
+      if (!this.sortDirection()) {
+        return this._barData();
+      }
+      result = [];
+      ref = this._barData();
+      for (j = 0, len = ref.length; j < len; j++) {
+        d = ref[j];
+        result.push(d);
+      }
+      getVal = this.sortBy();
+      if (this.sortDirection() === 'asc') {
+        result.sort(function(a, b) {
+          return d3.ascending(getVal(a), getVal(b));
+        });
+      } else {
+        result.sort(function(a, b) {
+          return d3.descending(getVal(a), getVal(b));
+        });
+      }
+      return result;
     };
 
 
@@ -1678,7 +1706,7 @@ Handles the guideline that moves along the x-axis
           maxLabel = label;
         }
       }
-      text = this.svg.append('text').text(label).style('font-size', '20px');
+      text = this.svg.append('text').text(maxLabel);
       size = text.node().getBoundingClientRect().width;
       text.remove();
       return size + 20;
@@ -1702,13 +1730,17 @@ Handles the guideline that moves along the x-axis
       })(this);
       chart = this;
       color = this.data().get()[0].color;
-      labels = this.labelGroup.selectAll('text').data(this._barData());
+      labels = this.labelGroup.selectAll('text').data(this._barDataSorted(), function(d) {
+        return d;
+      });
       labels.enter().append('text').attr('text-anchor', 'end').attr('x', 0).attr('y', 0).style('fill-opacity', 0);
       labels.exit().remove();
       labels.each(function(d, i) {
         return d3.select(this).text(chart.getX()(d, i)).transition().duration(700).delay(i * 20).attr('y', barY(i)).style('fill-opacity', 1);
       });
-      bars = this.barGroup.selectAll('rect').data(this._barData());
+      bars = this.barGroup.selectAll('rect').data(this._barDataSorted(), function(d) {
+        return d;
+      });
       bars.enter().append('rect').attr('x', chart.yScale(0)).attr('y', 0).style('fill-opacity', 0).style('stroke-opacity', 0);
       bars.exit().remove();
       bars.each(function(d, i) {
@@ -1716,11 +1748,13 @@ Handles the guideline that moves along the x-axis
           return chart.yScale(chart.getY()(d, i));
         }).style('fill', color).duration(700).delay(i * 50).attr('x', chart.yScale(0)).attr('y', barY(i)).style('fill-opacity', 1).style('stroke-opacity', 0.7);
       });
-      valueLabels = this.valueGroup.selectAll('text').data(this._barData());
-      valueLabels.enter().append('text').attr('x', 0).transition().duration(700);
+      valueLabels = this.valueGroup.selectAll('text').data(this._barDataSorted(), function(d) {
+        return d;
+      });
+      valueLabels.enter().append('text').attr('x', 0);
       valueLabels.exit().remove();
       valueLabels.each(function(d, i) {
-        return d3.select(this).attr('y', barY(i)).transition().duration(700).delay(i * 20).text(function(d, i) {
+        return d3.select(this).transition().duration(700).attr('y', barY(i)).delay(i * 20).text(function(d, i) {
           return chart.getY()(d, i);
         }).attr('x', function(d, i) {
           return chart.yScale(chart.getY()(d, i));

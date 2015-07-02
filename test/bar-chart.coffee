@@ -113,3 +113,38 @@ describe 'Horizontal Bar Chart', ->
         setTimeout ->
             done()
         , 600
+
+    it 'can sort things by label, ascending', (done)->
+        data = [
+            key: 'series1'
+            label: 'Short'
+            values: [
+                ['A', 1]
+                ['E', 2]
+                ['B', 3]
+                ['Z', 4]
+                ['C', 5]
+            ]
+        ]
+
+        chart.data(data)
+        chart.sortBy((d)-> d[0]).sortDirection('asc').render()
+
+        labels = $(container).find('.bar-labels text')
+
+        for text, i in ['A','B','C','E','Z']
+            labels.get(i).textContent.should.equal text
+
+        # original data kept intact
+
+        data[0].values.should.deep.equal [
+            ['A', 1]
+            ['E', 2]
+            ['B', 3]
+            ['Z', 4]
+            ['C', 5]
+        ]
+
+        setTimeout ->
+            done()
+        , 600

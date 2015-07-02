@@ -5,12 +5,14 @@ chartProperties = [
     ['height', null]
     ['barHeight', 40]
     ['barPadding', 10]
+    ['sortBy', (d)-> d[0]]
+    ['sortDirection', null]
 ]
 
 @ForestD3.BarChart = class BarChart extends ForestD3.BaseChart
     constructor: (domContainer)->
         super domContainer
-        d3.select(@container()).classed('auto-height', true)
+        d3.select(@container()).classed('auto-height bar-chart', true)
         @_setProperties chartProperties
 
         @getXInternal = (d,i)-> i
@@ -28,6 +30,25 @@ chartProperties = [
     _barData: ->
         @data().get()[0].values
 
+    _barDataSorted: ->
+        unless @sortDirection()
+            return @_barData()
+
+        result = []
+
+        # Creates a copy of the values array, so original is not touched
+        for d in @_barData()
+            result.push d
+
+        getVal = @sortBy()
+        if @sortDirection() is 'asc'
+            result.sort (a,b)->
+                d3.ascending getVal(a), getVal(b)
+        else
+            result.sort (a,b)->
+                d3.descending getVal(a), getVal(b)
+
+        result
     ###
     A function that finds the longest label and computes an approximate
     pixel width for it. Used to determine how much left margin there should
@@ -48,7 +69,7 @@ chartProperties = [
                 maxL = label.length
                 maxLabel = label
 
-        text = @svg.append('text').text(label).style('font-size', '20px')
+        text = @svg.append('text').text(maxLabel)
         size = text.node().getBoundingClientRect().width
         text.remove()
 
@@ -67,7 +88,10 @@ chartProperties = [
 
         color = @data().get()[0].color
 
-        labels = @labelGroup.selectAll('text').data(@_barData())
+        labels = @labelGroup
+            .selectAll('text')
+            .data(@_barDataSorted(), (d)-> d)
+
         labels
             .enter()
             .append('text')
@@ -89,7 +113,9 @@ chartProperties = [
                 .attr('y', barY(i))
                 .style('fill-opacity', 1)
 
-        bars = @barGroup.selectAll('rect').data(@_barData())
+        bars = @barGroup
+            .selectAll('rect')
+            .data(@_barDataSorted(), (d)-> d)
 
         bars
             .enter()
@@ -118,14 +144,12 @@ chartProperties = [
 
         valueLabels = @valueGroup
             .selectAll('text')
-            .data(@_barData())
+            .data(@_barDataSorted(), (d)-> d)
 
         valueLabels
             .enter()
             .append('text')
             .attr('x', 0)
-            .transition()
-            .duration(700)
 
         valueLabels
             .exit()
@@ -133,9 +157,9 @@ chartProperties = [
 
         valueLabels.each (d,i)->
             d3.select(@)
-                .attr('y', barY(i))
                 .transition()
                 .duration(700)
+                .attr('y', barY(i))
                 .delay(i*20)
                 .text((d,i)-> chart.getY()(d,i))
                 .attr('x', (d,i)-> chart.yScale(chart.getY()(d,i)))
