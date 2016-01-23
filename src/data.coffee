@@ -26,7 +26,7 @@ Some operations can mutate the original chart data.
                 break
         @
 
-    # Mark a given data series as hidden. Mutates the data.
+    # Mark a given data series as hidden.
     hide: (keys, flag = true)->
         metadata = chart.metadata()
         if not (keys instanceof Array)
@@ -38,11 +38,11 @@ Some operations can mutate the original chart data.
 
         @
 
-    # Un-hide data series.  Mutates the data.
+    # Un-hide data series.
     show: (keys)->
         @hide keys, false
 
-    # Flip data series on/off.  Mutates the data.
+    # Flip data series on/off.
     toggle: (keys)->
         metadata = chart.metadata()
         if not (keys instanceof Array)
@@ -54,7 +54,7 @@ Some operations can mutate the original chart data.
 
         @
 
-    # Turn everything off except for the given data series.  Mutates the data.
+    # Turn everything off except for the given data series.
     showOnly: (key)->
         metadata = chart.metadata()
         for d in data
@@ -62,7 +62,7 @@ Some operations can mutate the original chart data.
 
         @
 
-    # Turn everything on.  Mutates the data.
+    # Turn everything on.
     showAll: ->
         metadata = chart.metadata()
         for d in data
