@@ -95,3 +95,27 @@ document.getElementById('update-data').addEventListener 'click', ->
         .data()
         .updateValues('series1', getStocks(206, 0.07, 200))
         .render()
+
+# ******************* Log Scale Chart Example *******************
+chartLog = new ForestD3.Chart '#example-log-scale'
+chartLog
+    .ordinal(true)
+    .yScaleType(d3.scale.log())
+    .yPadding(0)
+    .chartLabel('Logarithmic Scale Example')
+    .xTickFormat((d)->
+        if d?
+            d3.time.format('%Y-%m')(new Date d)
+        else
+            ''
+    )
+
+dataLog = [
+    key: 'series1'
+    label: 'AAPL'
+    type: 'line'
+    color: '#efefef'
+    values: getStocks(200, 0.4, 100)
+]
+
+chartLog.data(dataLog).render()

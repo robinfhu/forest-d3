@@ -1,5 +1,5 @@
 (function() {
-  var chart, chartUpdate, data, dataUpdate, getStocks, legend;
+  var chart, chartLog, chartUpdate, data, dataLog, dataUpdate, getStocks, legend;
 
   chart = new ForestD3.Chart(d3.select('#example'));
 
@@ -95,5 +95,27 @@
   document.getElementById('update-data').addEventListener('click', function() {
     return chartUpdate.data().updateValues('series1', getStocks(206, 0.07, 200)).render();
   });
+
+  chartLog = new ForestD3.Chart('#example-log-scale');
+
+  chartLog.ordinal(true).yScaleType(d3.scale.log()).yPadding(0).chartLabel('Logarithmic Scale Example').xTickFormat(function(d) {
+    if (d != null) {
+      return d3.time.format('%Y-%m')(new Date(d));
+    } else {
+      return '';
+    }
+  });
+
+  dataLog = [
+    {
+      key: 'series1',
+      label: 'AAPL',
+      type: 'line',
+      color: '#efefef',
+      values: getStocks(200, 0.4, 100)
+    }
+  ];
+
+  chartLog.data(dataLog).render();
 
 }).call(this);
