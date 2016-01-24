@@ -157,6 +157,34 @@ describe 'Utilities', ->
                 x: [-1, 1]
                 y: [0.5,0.5]
 
+        it 'accepts a "force" property, forcing values onto the extent', ->
+            data = [
+                values: [
+                    [-1,1]
+                    [0,2]
+                    [1,3]
+                ]
+            ]
+
+            force =
+                x: [0]
+                y: [0]
+
+            result = extent data, null, null, force
+
+            result.should.deep.equal
+                x: [-1, 1]
+                y: [0, 3]
+
+            force =
+                x: -4
+                y: 0
+
+            result = extent data, null, null, force
+            result.should.deep.equal
+                x: [-4, 1]
+                y: [0, 3]
+
     describe 'Indexify', ->
         it 'adds _index to each series', ->
             data = [

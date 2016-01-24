@@ -3,6 +3,7 @@ legend = new ForestD3.Legend '#legend'
 
 chart
     .ordinal(true)
+    .chartLabel('Trading Volume')
     .xLabel('Date')
     .yLabel('Volume')
     .yTickFormat(d3.format(',.3f'))
@@ -59,7 +60,7 @@ chart.data(data).render()
 
 # ******************* SINGLE BAR EXAMPLE **************** #
 chartSingle = new ForestD3.Chart '#example-single'
-chartSingle.ordinal(true)
+chartSingle.ordinal(true).chartLabel('Single Bar')
 dataSingle = [
     key: 'k1'
     type: 'bar'
@@ -73,7 +74,7 @@ chartSingle.data(dataSingle).render()
 
 # ******************* ONE GROUP BAR EXAMPLE **************** #
 chartOneGroup = new ForestD3.Chart '#example-onegroup'
-chartOneGroup.ordinal(true).yPadding(0.3)
+chartOneGroup.ordinal(true).yPadding(0.3).chartLabel('One Group')
 dataOneGroup = [
     key: 'k1'
     type: 'bar'
@@ -94,7 +95,13 @@ chartOneGroup.data(dataOneGroup).render()
 
 # ******************* TWO GROUPS BAR EXAMPLE **************** #
 chartTwoGroups = new ForestD3.Chart '#example-twogroups'
-chartTwoGroups.ordinal(true).yPadding(0.3).xPadding(1.5)
+chartTwoGroups
+    .ordinal(true)
+    .xPadding(1.5)
+    .yPadding(0)
+    .forceDomain({y: 0})
+    .chartLabel('Two Groups')
+
 dataTwoGroups = [
     key: 'k1'
     type: 'bar'

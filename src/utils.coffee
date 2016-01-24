@@ -7,6 +7,8 @@
     data: Array of series'
     x: function to get X value
     y: function to get Y value
+    force: values to force onto domains. Example: {y: [0]},
+        force 0 onto y domain.
 
     Returns:
         {
@@ -14,7 +16,7 @@
             y: [min, max]
         }
     ###
-    extent: (data, x, y)->
+    extent: (data, x, y, force)->
         defaultExtent = [-1, 1]
         if not data or data.length is 0
             return {
@@ -24,6 +26,11 @@
 
         x ?= (d,i)-> d[0]
         y ?= (d,i)-> d[1]
+        force ?= {}
+        force.x ?= []
+        force.y ?= []
+        force.x = [force.x] if not (force.x instanceof Array)
+        force.y = [force.y] if not (force.y instanceof Array)
 
         xAllPoints = data.map (series)->
             if series.values? and series.type isnt 'region'
@@ -53,6 +60,10 @@
                 xExt = xExt.concat region.values
             else
                 yExt = yExt.concat region.values
+
+        # Factor in any forced domain values
+        xExt = xExt.concat force.x
+        yExt = yExt.concat force.y
 
         xExt = d3.extent xExt
         yExt = d3.extent yExt

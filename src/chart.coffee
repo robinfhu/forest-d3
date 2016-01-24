@@ -1,6 +1,7 @@
 chartProperties = [
     ['getX', (d,i)-> d[0] ]
     ['getY', (d,i)-> d[1] ]
+    ['forceDomain', null]
     ['ordinal', false]
     ['autoResize', true]
     ['color', ForestD3.Utils.defaultColor]
@@ -149,7 +150,7 @@ getIdx = (d,i)-> i
             else
                 args = Array.prototype.slice.apply arguments
                 for arg,i in args
-                    if (typeof arg) is 'number' and i < 4
+                    if (typeof arg) is 'number' and i < keyOrder.length
                         @_chartMargins[keyOrder[i]] = arg
 
             return @
@@ -337,7 +338,8 @@ getIdx = (d,i)-> i
         extent = ForestD3.Utils.extent(
             @data().visible(),
             @getXInternal(),
-            @getY()
+            @getY(),
+            @forceDomain()
         )
         extent = ForestD3.Utils.extentPadding extent, {
             x: @xPadding()

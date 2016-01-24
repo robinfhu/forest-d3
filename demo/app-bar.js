@@ -5,7 +5,7 @@
 
   legend = new ForestD3.Legend('#legend');
 
-  chart.ordinal(true).xLabel('Date').yLabel('Volume').yTickFormat(d3.format(',.3f')).xTickFormat(function(d) {
+  chart.ordinal(true).chartLabel('Trading Volume').xLabel('Date').yLabel('Volume').yTickFormat(d3.format(',.3f')).xTickFormat(function(d) {
     if (d != null) {
       return d3.time.format('%Y-%m-%d')(new Date(d));
     } else {
@@ -58,7 +58,7 @@
 
   chartSingle = new ForestD3.Chart('#example-single');
 
-  chartSingle.ordinal(true);
+  chartSingle.ordinal(true).chartLabel('Single Bar');
 
   dataSingle = [
     {
@@ -73,7 +73,7 @@
 
   chartOneGroup = new ForestD3.Chart('#example-onegroup');
 
-  chartOneGroup.ordinal(true).yPadding(0.3);
+  chartOneGroup.ordinal(true).yPadding(0.3).chartLabel('One Group');
 
   dataOneGroup = [
     {
@@ -93,7 +93,9 @@
 
   chartTwoGroups = new ForestD3.Chart('#example-twogroups');
 
-  chartTwoGroups.ordinal(true).yPadding(0.3).xPadding(1.5);
+  chartTwoGroups.ordinal(true).xPadding(1.5).yPadding(0).forceDomain({
+    y: 0
+  }).chartLabel('Two Groups');
 
   dataTwoGroups = [
     {

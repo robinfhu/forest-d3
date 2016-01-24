@@ -446,6 +446,8 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
       data: Array of series'
       x: function to get X value
       y: function to get Y value
+      force: values to force onto domains. Example: {y: [0]},
+          force 0 onto y domain.
       
       Returns:
           {
@@ -453,7 +455,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
               y: [min, max]
           }
        */
-      extent: function(data, x, y) {
+      extent: function(data, x, y, force) {
         var defaultExtent, roundOff, xAllPoints, xExt, yAllPoints, yExt;
         defaultExtent = [-1, 1];
         if (!data || data.length === 0) {
@@ -471,6 +473,21 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
           y = function(d, i) {
             return d[1];
           };
+        }
+        if (force == null) {
+          force = {};
+        }
+        if (force.x == null) {
+          force.x = [];
+        }
+        if (force.y == null) {
+          force.y = [];
+        }
+        if (!(force.x instanceof Array)) {
+          force.x = [force.x];
+        }
+        if (!(force.y instanceof Array)) {
+          force.y = [force.y];
         }
         xAllPoints = data.map(function(series) {
           if ((series.values != null) && series.type !== 'region') {
@@ -506,6 +523,8 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
             return yExt = yExt.concat(region.values);
           }
         });
+        xExt = xExt.concat(force.x);
+        yExt = yExt.concat(force.y);
         xExt = d3.extent(xExt);
         yExt = d3.extent(yExt);
         roundOff = function(d, i) {
@@ -1259,7 +1278,7 @@ Handles the guideline that moves along the x-axis
       'getY', function(d, i) {
         return d[1];
       }
-    ], ['ordinal', false], ['autoResize', true], ['color', ForestD3.Utils.defaultColor], ['pointSize', 4], ['xPadding', 0.1], ['yPadding', 0.1], ['xLabel', ''], ['yLabel', ''], ['chartLabel', ''], [
+    ], ['forceDomain', null], ['ordinal', false], ['autoResize', true], ['color', ForestD3.Utils.defaultColor], ['pointSize', 4], ['xPadding', 0.1], ['yPadding', 0.1], ['xLabel', ''], ['yLabel', ''], ['chartLabel', ''], [
       'xTickFormat', function(d) {
         return d;
       }
@@ -1419,7 +1438,7 @@ Handles the guideline that moves along the x-axis
           args = Array.prototype.slice.apply(arguments);
           for (i = k = 0, len1 = args.length; k < len1; i = ++k) {
             arg = args[i];
-            if ((typeof arg) === 'number' && i < 4) {
+            if ((typeof arg) === 'number' && i < keyOrder.length) {
               this._chartMargins[keyOrder[i]] = arg;
             }
           }
@@ -1526,7 +1545,7 @@ Handles the guideline that moves along the x-axis
 
     Chart.prototype.updateChartScale = function() {
       var extent;
-      extent = ForestD3.Utils.extent(this.data().visible(), this.getXInternal(), this.getY());
+      extent = ForestD3.Utils.extent(this.data().visible(), this.getXInternal(), this.getY(), this.forceDomain());
       extent = ForestD3.Utils.extentPadding(extent, {
         x: this.xPadding(),
         y: this.yPadding()
