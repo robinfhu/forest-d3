@@ -1278,7 +1278,7 @@ Handles the guideline that moves along the x-axis
       'getY', function(d, i) {
         return d[1];
       }
-    ], ['forceDomain', null], ['ordinal', false], ['autoResize', true], ['color', ForestD3.Utils.defaultColor], ['pointSize', 4], ['xPadding', 0.1], ['yPadding', 0.1], ['xLabel', ''], ['yLabel', ''], ['chartLabel', ''], ['xScaleType', d3.scale.linear()], ['yScaleType', d3.scale.linear()], [
+    ], ['forceDomain', null], ['ordinal', false], ['autoResize', true], ['color', ForestD3.Utils.defaultColor], ['pointSize', 4], ['xPadding', 0.1], ['yPadding', 0.1], ['xLabel', ''], ['yLabel', ''], ['chartLabel', ''], ['xScaleType', d3.scale.linear], ['yScaleType', d3.scale.linear], [
       'xTickFormat', function(d) {
         return d;
       }
@@ -1550,8 +1550,8 @@ Handles the guideline that moves along the x-axis
         x: this.xPadding(),
         y: this.yPadding()
       });
-      this.yScale = this.yScaleType().domain(extent.y).range([this.canvasHeight, 0]);
-      return this.xScale = this.xScaleType().domain(extent.x).range([0, this.canvasWidth]);
+      this.yScale = this.yScaleType()().domain(extent.y).range([this.canvasHeight, 0]);
+      return this.xScale = this.xScaleType()().domain(extent.x).range([0, this.canvasWidth]);
     };
 
 

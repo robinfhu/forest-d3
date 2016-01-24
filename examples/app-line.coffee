@@ -100,7 +100,7 @@ document.getElementById('update-data').addEventListener 'click', ->
 chartLog = new ForestD3.Chart '#example-log-scale'
 chartLog
     .ordinal(true)
-    .yScaleType(d3.scale.log())
+    .yScaleType(d3.scale.log)
     .yPadding(0)
     .chartLabel('Logarithmic Scale Example')
     .xTickFormat((d)->

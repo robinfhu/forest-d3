@@ -11,8 +11,8 @@ chartProperties = [
     ['xLabel', '']
     ['yLabel', '']
     ['chartLabel', '']
-    ['xScaleType', d3.scale.linear()]
-    ['yScaleType', d3.scale.linear()]
+    ['xScaleType', d3.scale.linear]
+    ['yScaleType', d3.scale.linear]
     ['xTickFormat', (d)-> d]
     ['yTickFormat', d3.format(',.2f')]
     ['xTicks', null]
@@ -348,8 +348,8 @@ getIdx = (d,i)-> i
             y: @yPadding()
         }
 
-        @yScale = @yScaleType().domain(extent.y).range([@canvasHeight, 0])
-        @xScale = @xScaleType().domain(extent.x).range([0, @canvasWidth])
+        @yScale = @yScaleType()().domain(extent.y).range([@canvasHeight, 0])
+        @xScale = @xScaleType()().domain(extent.x).range([0, @canvasWidth])
 
     ###
     Updates where the guideline and tooltip is.

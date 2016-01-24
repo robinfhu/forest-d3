@@ -98,7 +98,7 @@
 
   chartLog = new ForestD3.Chart('#example-log-scale');
 
-  chartLog.ordinal(true).yScaleType(d3.scale.log()).yPadding(0).chartLabel('Logarithmic Scale Example').xTickFormat(function(d) {
+  chartLog.ordinal(true).yScaleType(d3.scale.log).yPadding(0).chartLabel('Logarithmic Scale Example').xTickFormat(function(d) {
     if (d != null) {
       return d3.time.format('%Y-%m')(new Date(d));
     } else {
