@@ -364,3 +364,55 @@ describe 'Chart', ->
                     width.should.be.lessThan 300
                     done()
                 , 300
+
+        describe 'Chart Options', ->
+            it 'can set chart margins', ->
+                data = [
+                    key: 'line1'
+                    type: 'line'
+                    values: [
+                        [0,0]
+                        [1,1]
+                        [2,4]
+                    ]
+                ]
+
+                chart = new ForestD3.Chart container
+                chart.margin
+                    left: 130
+                    top: 80
+                    bottom: 40
+                    right: 60
+                chart.data(data).render()
+
+                canvas = $(container).find('g.canvas')
+                canvas.attr('transform').should.equal "translate(130, 80)"
+
+                chart.margin().should.deep.equal
+                    left: 130
+                    top: 80
+                    bottom: 40
+                    right: 60
+
+                chart.margin
+                    left:  83
+
+                chart.margin().should.deep.equal
+                    left: 83
+                    top: 80
+                    bottom: 40
+                    right: 60
+
+                chart.margin 88,11,33,66
+                chart.margin().should.deep.equal
+                    top: 88
+                    right: 11
+                    bottom: 33
+                    left: 66
+
+                chart.margin 99, null, null, 23
+                chart.margin().should.deep.equal
+                    top: 99
+                    right: 11
+                    bottom: 33
+                    left: 23

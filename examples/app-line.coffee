@@ -3,6 +3,7 @@ legend = new ForestD3.Legend d3.select('#legend')
 
 chart
     .ordinal(true)
+    .margin({left: 50})
     .xLabel('Date')
     .yLabel('Price')
     .yTickFormat(d3.format(',.3f'))

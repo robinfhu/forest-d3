@@ -120,6 +120,39 @@ getIdx = (d,i)-> i
         @trigger 'rendered', @metadata()
 
         @
+
+    ###
+    Get or set the chart's margins.
+    Takes an object or a list of arguments (top, right, bottom, left)
+
+    Example:
+        margin({left: 90, top: 30})
+        margin(30,null,null,90)
+    ###
+    margin: (m)->
+        defaults =
+            left: 80
+            bottom: 50
+            right: 20
+            top: 20
+
+        if not @_chartMargins
+            @_chartMargins = defaults
+
+        if arguments.length is 0
+            return @_chartMargins
+        else
+            keyOrder = ['top','right','bottom','left']
+            if m? and (typeof m) is 'object'
+                for key in keyOrder
+                    @_chartMargins[key] = m[key] if m[key]?
+            else
+                args = Array.prototype.slice.apply arguments
+                for arg,i in args
+                    if (typeof arg) is 'number' and i < 4
+                        @_chartMargins[keyOrder[i]] = arg
+
+            return @
     ###
     Get the chart's dimensions, based on the parent container <div>.
     Calculate chart margins and canvas dimensions.
@@ -132,14 +165,10 @@ getIdx = (d,i)-> i
             @height = bounds.height
             @width = bounds.width
 
-            @margin =
-                left: 80
-                bottom: 50
-                right: 20
-                top: 20
+            margin = @margin()
 
-            @canvasHeight = @height - @margin.bottom - @margin.top
-            @canvasWidth = @width - @margin.left - @margin.right
+            @canvasHeight = @height - margin.bottom - margin.top
+            @canvasWidth = @width - margin.left - margin.right
 
     ###
     Draws the chart frame. Things like backdrop and canvas.
@@ -155,6 +184,7 @@ getIdx = (d,i)-> i
             .attr('width', @width)
             .attr('height', @height)
 
+        margin = @margin()
         # Add axes
         if @showXAxis()
             tickValues = null
@@ -205,7 +235,7 @@ getIdx = (d,i)-> i
 
             xAxisGroup.attr(
                 'transform',
-                "translate(#{@margin.left}, #{@canvasHeight + @margin.top})"
+                "translate(#{margin.left}, #{@canvasHeight + margin.top})"
             )
 
             xAxisGroup.transition().call @xAxis
@@ -226,7 +256,7 @@ getIdx = (d,i)-> i
 
             yAxisGroup.attr(
                 'transform',
-                "translate(#{@margin.left}, #{@margin.top})"
+                "translate(#{margin.left}, #{margin.top})"
             )
 
             yAxisGroup.transition().call @yAxis
@@ -237,7 +267,7 @@ getIdx = (d,i)-> i
         canvasEnter = @canvas.enter().append('g').classed('canvas', true)
 
         @canvas
-            .attr('transform',"translate(#{@margin.left}, #{@margin.top})")
+            .attr('transform',"translate(#{margin.left}, #{margin.top})")
 
         canvasEnter
             .append('rect')

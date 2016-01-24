@@ -1385,25 +1385,65 @@ Handles the guideline that moves along the x-axis
 
 
     /*
+    Get or set the chart's margins.
+    Takes an object or a list of arguments (top, right, bottom, left)
+    
+    Example:
+        margin({left: 90, top: 30})
+        margin(30,null,null,90)
+     */
+
+    Chart.prototype.margin = function(m) {
+      var arg, args, defaults, i, j, k, key, keyOrder, len, len1;
+      defaults = {
+        left: 80,
+        bottom: 50,
+        right: 20,
+        top: 20
+      };
+      if (!this._chartMargins) {
+        this._chartMargins = defaults;
+      }
+      if (arguments.length === 0) {
+        return this._chartMargins;
+      } else {
+        keyOrder = ['top', 'right', 'bottom', 'left'];
+        if ((m != null) && (typeof m) === 'object') {
+          for (j = 0, len = keyOrder.length; j < len; j++) {
+            key = keyOrder[j];
+            if (m[key] != null) {
+              this._chartMargins[key] = m[key];
+            }
+          }
+        } else {
+          args = Array.prototype.slice.apply(arguments);
+          for (i = k = 0, len1 = args.length; k < len1; i = ++k) {
+            arg = args[i];
+            if ((typeof arg) === 'number' && i < 4) {
+              this._chartMargins[keyOrder[i]] = arg;
+            }
+          }
+        }
+        return this;
+      }
+    };
+
+
+    /*
     Get the chart's dimensions, based on the parent container <div>.
     Calculate chart margins and canvas dimensions.
      */
 
     Chart.prototype.updateDimensions = function() {
-      var bounds, container;
+      var bounds, container, margin;
       container = this.container();
       if (container != null) {
         bounds = container.getBoundingClientRect();
         this.height = bounds.height;
         this.width = bounds.width;
-        this.margin = {
-          left: 80,
-          bottom: 50,
-          right: 20,
-          top: 20
-        };
-        this.canvasHeight = this.height - this.margin.bottom - this.margin.top;
-        return this.canvasWidth = this.width - this.margin.left - this.margin.right;
+        margin = this.margin();
+        this.canvasHeight = this.height - margin.bottom - margin.top;
+        return this.canvasWidth = this.width - margin.left - margin.right;
       }
     };
 
@@ -1413,10 +1453,11 @@ Handles the guideline that moves along the x-axis
      */
 
     Chart.prototype.updateChartFrame = function() {
-      var axesLabels, backdrop, canvasEnter, chart, chartLabel, tickValues, widthThreshold, xAxisGroup, xAxisLabel, xTickWidth, xTicks, xValues, xValuesRaw, yAxisGroup, yAxisLabel;
+      var axesLabels, backdrop, canvasEnter, chart, chartLabel, margin, tickValues, widthThreshold, xAxisGroup, xAxisLabel, xTickWidth, xTicks, xValues, xValuesRaw, yAxisGroup, yAxisLabel;
       backdrop = this.svg.selectAll('rect.backdrop').data([0]);
       backdrop.enter().append('rect').classed('backdrop', true);
       backdrop.attr('width', this.width).attr('height', this.height);
+      margin = this.margin();
       if (this.showXAxis()) {
         tickValues = null;
         xValuesRaw = this.data().xValuesRaw();
@@ -1442,19 +1483,19 @@ Handles the guideline that moves along the x-axis
         })(this));
         xAxisGroup = this.svg.selectAll('g.x-axis').data([0]);
         xAxisGroup.enter().append('g').attr('class', 'x-axis axis');
-        xAxisGroup.attr('transform', "translate(" + this.margin.left + ", " + (this.canvasHeight + this.margin.top) + ")");
+        xAxisGroup.attr('transform', "translate(" + margin.left + ", " + (this.canvasHeight + margin.top) + ")");
         xAxisGroup.transition().call(this.xAxis);
       }
       if (this.showYAxis()) {
         this.yAxis.scale(this.yScale).orient('left').ticks(this.yTicks()).tickSize(-this.canvasWidth, 10).tickPadding(10).tickFormat(this.yTickFormat());
         yAxisGroup = this.svg.selectAll('g.y-axis').data([0]);
         yAxisGroup.enter().append('g').attr('class', 'y-axis axis');
-        yAxisGroup.attr('transform', "translate(" + this.margin.left + ", " + this.margin.top + ")");
+        yAxisGroup.attr('transform', "translate(" + margin.left + ", " + margin.top + ")");
         yAxisGroup.transition().call(this.yAxis);
       }
       this.canvas = this.svg.selectAll('g.canvas').data([0]);
       canvasEnter = this.canvas.enter().append('g').classed('canvas', true);
-      this.canvas.attr('transform', "translate(" + this.margin.left + ", " + this.margin.top + ")");
+      this.canvas.attr('transform', "translate(" + margin.left + ", " + margin.top + ")");
       canvasEnter.append('rect').classed('canvas-backdrop', true);
       chart = this;
       this.canvas.select('rect.canvas-backdrop').attr('width', this.canvasWidth).attr('height', this.canvasHeight).on('mousemove', function() {
