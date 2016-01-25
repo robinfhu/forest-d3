@@ -5,6 +5,7 @@ chartProperties = [
     ['ordinal', false]
     ['autoResize', true]
     ['color', ForestD3.Utils.defaultColor]
+    ['duration', 250]
     ['pointSize', 4]
     ['xPadding', 0.1]
     ['yPadding', 0.1]
@@ -24,8 +25,6 @@ chartProperties = [
     ['tooltipType', 'bisect']  # Can be 'bisect' or 'spatial'
 ]
 
-getIdx = (d,i)-> i
-
 @ForestD3.Chart = class Chart extends ForestD3.BaseChart
     constructor: (domContainer)->
         super domContainer
@@ -39,7 +38,7 @@ getIdx = (d,i)-> i
         @seriesColor = (d)=> d.color or @color()(@metadata(d).index)
         @getXInternal = =>
             if @ordinal()
-                getIdx
+                (d,i)-> i
             else
                 @getX()
 
@@ -83,6 +82,7 @@ getIdx = (d,i)-> i
 
         chartItems.exit()
             .transition()
+            .duration(@duration())
             .style('opacity', 0)
             .remove()
 
@@ -241,7 +241,7 @@ getIdx = (d,i)-> i
                 "translate(#{margin.left}, #{@canvasHeight + margin.top})"
             )
 
-            xAxisGroup.transition().call @xAxis
+            xAxisGroup.transition().duration(@duration()).call @xAxis
 
         if @showYAxis()
             @yAxis
@@ -262,7 +262,7 @@ getIdx = (d,i)-> i
                 "translate(#{margin.left}, #{margin.top})"
             )
 
-            yAxisGroup.transition().call @yAxis
+            yAxisGroup.transition().duration(@duration()).call @yAxis
 
         # Create a canvas, where all data points will be plotted.
         @canvas = @svg.selectAll('g.canvas').data([0])
@@ -309,6 +309,7 @@ getIdx = (d,i)-> i
         xAxisLabel
             .text((d)-> d)
             .transition()
+            .duration(@duration())
             .attr('x', @canvasWidth)
 
         yAxisLabel = axesLabels.selectAll('text.y-axis').data([@yLabel()])

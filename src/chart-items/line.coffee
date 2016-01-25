@@ -23,9 +23,11 @@ If you set area=true, turns it into an area graph
         .classed('line', true)
         .attr('d',lineFn.y(chart.canvasHeight))
 
+    duration = selectionData.duration or chart.duration()
+
     path
         .transition()
-        .duration(800)
+        .duration(duration)
         .attr('d', lineFn.y((d,i)-> chart.yScale(y(d,i))))
 
     # Draw an area graph if area option is turned on
@@ -52,7 +54,7 @@ If you set area=true, turns it into an area graph
 
         area
             .transition()
-            .duration(800)
+            .duration(duration)
             .style('fill', chart.seriesColor(selectionData))
             .attr('d', areaFn.y1((d,i)-> chart.yScale(y(d,i))))
 

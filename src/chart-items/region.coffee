@@ -15,6 +15,8 @@ region.
     start = d3.min selectionData.values
     end = d3.max selectionData.values
 
+    duration = selectionData.duration or chart.duration()
+
     if selectionData.axis is 'x'
         x = chart.xScale start
         width = Math.abs(chart.xScale(start) - chart.xScale(end))
@@ -26,6 +28,7 @@ region.
             .attr('y', 0)
             .attr('height', chart.canvasHeight)
             .transition()
+            .duration(duration)
             .attr('width', width)
     else
         y = chart.yScale end
@@ -37,5 +40,6 @@ region.
             .attr('x', 0)
             .attr('y', y)
             .transition()
+            .duration(duration)
             .attr('width', chart.canvasWidth)
             .attr('height', height)

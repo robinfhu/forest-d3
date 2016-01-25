@@ -202,7 +202,7 @@ Author:  Robin Hu
     bars.exit().remove();
     barIndex = chart.data().barIndex(selectionData.key);
     barWidth = fullSpace / barCount;
-    return bars.transition().delay(function(d, i) {
+    return bars.transition().duration(selectionData.duration || chart.duration()).delay(function(d, i) {
       return i * 20;
     }).attr('x', function(d, i) {
 
@@ -234,7 +234,7 @@ If you set area=true, turns it into an area graph
 
 (function() {
   this.ForestD3.ChartItem.line = function(selection, selectionData) {
-    var area, areaBase, areaFn, chart, interpolate, lineFn, path, x, y;
+    var area, areaBase, areaFn, chart, duration, interpolate, lineFn, path, x, y;
     chart = this;
     selection.style('stroke', chart.seriesColor);
     interpolate = selectionData.interpolate || 'linear';
@@ -245,7 +245,8 @@ If you set area=true, turns it into an area graph
     });
     path = selection.selectAll('path.line').data([selectionData.values]);
     path.enter().append('path').classed('line', true).attr('d', lineFn.y(chart.canvasHeight));
-    path.transition().duration(800).attr('d', lineFn.y(function(d, i) {
+    duration = selectionData.duration || chart.duration();
+    path.transition().duration(duration).attr('d', lineFn.y(function(d, i) {
       return chart.yScale(y(d, i));
     }));
     if (selectionData.area) {
@@ -260,7 +261,7 @@ If you set area=true, turns it into an area graph
       }).y0(areaBase);
       area = selection.selectAll('path.area').data([selectionData.values]);
       area.enter().append('path').classed('area', true).attr('d', areaFn.y1(areaBase));
-      return area.transition().duration(800).style('fill', chart.seriesColor(selectionData)).attr('d', areaFn.y1(function(d, i) {
+      return area.transition().duration(duration).style('fill', chart.seriesColor(selectionData)).attr('d', areaFn.y1(function(d, i) {
         return chart.yScale(y(d, i));
       }));
     }
@@ -275,7 +276,7 @@ Draws a horizontal or vertical line at the specified x or y location.
 
 (function() {
   this.ForestD3.ChartItem.markerLine = function(selection, selectionData) {
-    var chart, label, labelEnter, labelOffset, labelPadding, labelRotate, line, x, y;
+    var chart, duration, label, labelEnter, labelOffset, labelPadding, labelRotate, line, x, y;
     chart = this;
     line = selection.selectAll('line.marker').data(function(d) {
       return [d.value];
@@ -285,19 +286,20 @@ Draws a horizontal or vertical line at the specified x or y location.
       return d;
     }).attr('x', 0).attr('y', 0);
     labelPadding = 10;
+    duration = selectionData.duration || chart.duration();
     if (selectionData.axis === 'x') {
       x = chart.xScale(selectionData.value);
       line.enter().append('line').classed('marker', true).attr('x1', 0).attr('x2', 0).attr('y1', 0);
-      line.attr('y2', chart.canvasHeight).transition().attr('x1', x).attr('x2', x);
+      line.attr('y2', chart.canvasHeight).transition().duration(duration).attr('x1', x).attr('x2', x);
       labelRotate = "rotate(-90 " + x + " " + chart.canvasHeight + ")";
       labelOffset = "translate(0 " + (-labelPadding) + ")";
       labelEnter.attr('transform', labelRotate);
-      return label.attr('y', chart.canvasHeight).transition().attr('transform', labelRotate + " " + labelOffset).attr('x', x);
+      return label.attr('y', chart.canvasHeight).transition().duration(duration).attr('transform', labelRotate + " " + labelOffset).attr('x', x);
     } else {
       y = chart.yScale(selectionData.value);
       line.enter().append('line').classed('marker', true).attr('x1', 0).attr('y1', 0).attr('y2', 0);
-      line.attr('x2', chart.canvasWidth).transition().attr('y1', y).attr('y2', y);
-      return label.attr('text-anchor', 'end').transition().attr('x', chart.canvasWidth).attr('y', y + labelPadding);
+      line.attr('x2', chart.canvasWidth).transition().duration(duration).attr('y1', y).attr('y2', y);
+      return label.attr('text-anchor', 'end').transition().duration(duration).attr('x', chart.canvasWidth).attr('y', y + labelPadding);
     }
   };
 
@@ -305,7 +307,7 @@ Draws a horizontal or vertical line at the specified x or y location.
 
 (function() {
   this.ForestD3.ChartItem.ohlc = function(selection, selectionData) {
-    var chart, close, closeMarks, hi, lo, open, openMarks, rangeLines, x;
+    var chart, close, closeMarks, duration, hi, lo, open, openMarks, rangeLines, x;
     chart = this;
     selection.classed('ohlc', true);
     rangeLines = selection.selectAll('line.ohlc-range').data(selectionData.values);
@@ -322,13 +324,14 @@ Draws a horizontal or vertical line at the specified x or y location.
     close = selectionData.getClose || function(d, i) {
       return d[4];
     };
+    duration = selectionData.duration || chart.duration();
     rangeLines.enter().append('line').classed('ohlc-range', true).attr('x1', function(d, i) {
       return chart.xScale(x(d, i));
     }).attr('x2', function(d, i) {
       return chart.xScale(x(d, i));
     }).attr('y1', 0).attr('y2', 0);
     rangeLines.exit().remove();
-    rangeLines.transition().delay(function(d, i) {
+    rangeLines.transition().duration(duration).delay(function(d, i) {
       return i * 20;
     }).attr('x1', function(d, i) {
       return chart.xScale(x(d, i));
@@ -342,7 +345,7 @@ Draws a horizontal or vertical line at the specified x or y location.
     openMarks = selection.selectAll('line.ohlc-open').data(selectionData.values);
     openMarks.enter().append('line').classed('ohlc-open', true).attr('y1', 0).attr('y2', 0);
     openMarks.exit().remove();
-    openMarks.transition().delay(function(d, i) {
+    openMarks.transition().duration(duration).delay(function(d, i) {
       return i * 20;
     }).attr('y1', function(d, i) {
       return chart.yScale(open(d, i));
@@ -356,7 +359,7 @@ Draws a horizontal or vertical line at the specified x or y location.
     closeMarks = selection.selectAll('line.ohlc-close').data(selectionData.values);
     closeMarks.enter().append('line').classed('ohlc-close', true).attr('y1', 0).attr('y2', 0);
     closeMarks.exit().remove();
-    return closeMarks.transition().delay(function(d, i) {
+    return closeMarks.transition().duration(duration).delay(function(d, i) {
       return i * 20;
     }).attr('y1', function(d, i) {
       return chart.yScale(close(d, i));
@@ -379,22 +382,23 @@ region.
 
 (function() {
   this.ForestD3.ChartItem.region = function(selection, selectionData) {
-    var chart, end, height, region, regionEnter, start, width, x, y;
+    var chart, duration, end, height, region, regionEnter, start, width, x, y;
     chart = this;
     region = selection.selectAll('rect.region').data([selectionData]);
     regionEnter = region.enter().append('rect').classed('region', true);
     start = d3.min(selectionData.values);
     end = d3.max(selectionData.values);
+    duration = selectionData.duration || chart.duration();
     if (selectionData.axis === 'x') {
       x = chart.xScale(start);
       width = Math.abs(chart.xScale(start) - chart.xScale(end));
       regionEnter.attr('width', 0);
-      return region.attr('x', x).attr('y', 0).attr('height', chart.canvasHeight).transition().attr('width', width);
+      return region.attr('x', x).attr('y', 0).attr('height', chart.canvasHeight).transition().duration(duration).attr('width', width);
     } else {
       y = chart.yScale(end);
       height = Math.abs(chart.yScale(start) - chart.yScale(end));
       regionEnter.attr('height', 0);
-      return region.attr('x', 0).attr('y', y).transition().attr('width', chart.canvasWidth).attr('height', height);
+      return region.attr('x', 0).attr('y', y).transition().duration(duration).attr('width', chart.canvasWidth).attr('height', height);
     }
   };
 
@@ -424,7 +428,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
     symbol = d3.svg.symbol().type(shape);
     points.enter().append('path').classed('point', true).attr('transform', "translate(" + (chart.canvasWidth / 2) + "," + (chart.canvasHeight / 2) + ")").attr('d', symbol.size(0));
     points.exit().remove();
-    return points.transition().delay(function(d, i) {
+    return points.transition().duration(selectionData.duration || chart.duration()).delay(function(d, i) {
       return i * 10;
     }).ease('quad').attr('transform', function(d, i) {
       return "translate(" + (chart.xScale(x(d, i))) + "," + (chart.yScale(y(d, i))) + ")";
@@ -1265,7 +1269,7 @@ Handles the guideline that moves along the x-axis
 }).call(this);
 
 (function() {
-  var Chart, chartProperties, getIdx,
+  var Chart, chartProperties,
     extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     hasProp = {}.hasOwnProperty;
 
@@ -1278,16 +1282,12 @@ Handles the guideline that moves along the x-axis
       'getY', function(d, i) {
         return d[1];
       }
-    ], ['forceDomain', null], ['ordinal', false], ['autoResize', true], ['color', ForestD3.Utils.defaultColor], ['pointSize', 4], ['xPadding', 0.1], ['yPadding', 0.1], ['xLabel', ''], ['yLabel', ''], ['chartLabel', ''], ['xScaleType', d3.scale.linear], ['yScaleType', d3.scale.linear], [
+    ], ['forceDomain', null], ['ordinal', false], ['autoResize', true], ['color', ForestD3.Utils.defaultColor], ['duration', 250], ['pointSize', 4], ['xPadding', 0.1], ['yPadding', 0.1], ['xLabel', ''], ['yLabel', ''], ['chartLabel', ''], ['xScaleType', d3.scale.linear], ['yScaleType', d3.scale.linear], [
       'xTickFormat', function(d) {
         return d;
       }
     ], ['yTickFormat', d3.format(',.2f')], ['xTicks', null], ['yTicks', null], ['showXAxis', true], ['showYAxis', true], ['showTooltip', true], ['showGuideline', true], ['tooltipType', 'bisect']
   ];
-
-  getIdx = function(d, i) {
-    return i;
-  };
 
   this.ForestD3.Chart = Chart = (function(superClass) {
     extend(Chart, superClass);
@@ -1308,7 +1308,9 @@ Handles the guideline that moves along the x-axis
       this.getXInternal = (function(_this) {
         return function() {
           if (_this.ordinal()) {
-            return getIdx;
+            return function(d, i) {
+              return i;
+            };
           } else {
             return _this.getX();
           }
@@ -1362,7 +1364,7 @@ Handles the guideline that moves along the x-axis
       chartItems.enter().append('g').attr('class', function(d, i) {
         return "chart-item item-" + (d.key || i);
       });
-      chartItems.exit().transition().style('opacity', 0).remove();
+      chartItems.exit().transition().duration(this.duration()).style('opacity', 0).remove();
       chart = this;
 
       /*
@@ -1503,14 +1505,14 @@ Handles the guideline that moves along the x-axis
         xAxisGroup = this.svg.selectAll('g.x-axis').data([0]);
         xAxisGroup.enter().append('g').attr('class', 'x-axis axis');
         xAxisGroup.attr('transform', "translate(" + margin.left + ", " + (this.canvasHeight + margin.top) + ")");
-        xAxisGroup.transition().call(this.xAxis);
+        xAxisGroup.transition().duration(this.duration()).call(this.xAxis);
       }
       if (this.showYAxis()) {
         this.yAxis.scale(this.yScale).orient('left').ticks(this.yTicks()).tickSize(-this.canvasWidth, 10).tickPadding(10).tickFormat(this.yTickFormat());
         yAxisGroup = this.svg.selectAll('g.y-axis').data([0]);
         yAxisGroup.enter().append('g').attr('class', 'y-axis axis');
         yAxisGroup.attr('transform', "translate(" + margin.left + ", " + margin.top + ")");
-        yAxisGroup.transition().call(this.yAxis);
+        yAxisGroup.transition().duration(this.duration()).call(this.yAxis);
       }
       this.canvas = this.svg.selectAll('g.canvas').data([0]);
       canvasEnter = this.canvas.enter().append('g').classed('canvas', true);
@@ -1530,7 +1532,7 @@ Handles the guideline that moves along the x-axis
       xAxisLabel.enter().append('text').classed('x-axis', true).attr('text-anchor', 'end').attr('x', 0).attr('y', this.canvasHeight);
       xAxisLabel.text(function(d) {
         return d;
-      }).transition().attr('x', this.canvasWidth);
+      }).transition().duration(this.duration()).attr('x', this.canvasWidth);
       yAxisLabel = axesLabels.selectAll('text.y-axis').data([this.yLabel()]);
       yAxisLabel.enter().append('text').classed('y-axis', true).attr('text-anchor', 'end').attr('transform', 'translate(10,0) rotate(-90 0 0)');
       yAxisLabel.text(function(d) {

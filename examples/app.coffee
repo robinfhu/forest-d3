@@ -57,6 +57,7 @@ lineChart
             ''
     )
     .showXAxis(false)
+    .duration(500)
     .addPlugin(legend)
     .data(lineData)
     .render()

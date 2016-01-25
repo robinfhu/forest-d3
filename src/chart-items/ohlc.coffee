@@ -12,6 +12,7 @@
     hi = selectionData.getHi or (d,i)-> d[2]
     lo = selectionData.getLo or (d,i)-> d[3]
     close = selectionData.getClose or (d,i)-> d[4]
+    duration = selectionData.duration or chart.duration()
 
     rangeLines
         .enter()
@@ -28,6 +29,7 @@
 
     rangeLines
         .transition()
+        .duration(duration)
         .delay((d,i)-> i*20)
         .attr('x1', (d,i)-> chart.xScale(x(d,i)))
         .attr('x2', (d,i)-> chart.xScale(x(d,i)))
@@ -51,6 +53,7 @@
 
     openMarks
         .transition()
+        .duration(duration)
         .delay((d,i)-> i*20)
         .attr('y1', (d,i)-> chart.yScale(open(d,i)))
         .attr('y2', (d,i)-> chart.yScale(open(d,i)))
@@ -74,6 +77,7 @@
 
     closeMarks
         .transition()
+        .duration(duration)
         .delay((d,i)-> i*20)
         .attr('y1', (d,i)-> chart.yScale(close(d,i)))
         .attr('y2', (d,i)-> chart.yScale(close(d,i)))

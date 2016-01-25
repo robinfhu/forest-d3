@@ -58,6 +58,7 @@
     barWidth = fullSpace / barCount
     bars
         .transition()
+        .duration(selectionData.duration or chart.duration())
         .delay((d,i)-> i * 20)
         .attr('x', (d,i)->
             ###

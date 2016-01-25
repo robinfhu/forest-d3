@@ -62,7 +62,7 @@
     } else {
       return '';
     }
-  }).showXAxis(false).addPlugin(legend).data(lineData).render();
+  }).showXAxis(false).duration(500).addPlugin(legend).data(lineData).render();
 
   barData = [
     {

@@ -36,6 +36,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
 
     points
         .transition()
+        .duration(selectionData.duration or chart.duration())
         .delay((d,i)-> i * 10)
         .ease('quad')
         .attr('transform', (d,i)->

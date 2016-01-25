@@ -17,6 +17,8 @@ Draws a horizontal or vertical line at the specified x or y location.
 
     labelPadding = 10
 
+    duration = selectionData.duration or chart.duration()
+
     if selectionData.axis is 'x'
         x = chart.xScale selectionData.value
 
@@ -31,6 +33,7 @@ Draws a horizontal or vertical line at the specified x or y location.
         line
             .attr('y2', chart.canvasHeight)
             .transition()
+            .duration(duration)
             .attr('x1', x)
             .attr('x2', x)
 
@@ -42,6 +45,7 @@ Draws a horizontal or vertical line at the specified x or y location.
         label
             .attr('y', chart.canvasHeight)
             .transition()
+            .duration(duration)
             .attr('transform', "#{labelRotate} #{labelOffset}")
             .attr('x', x)
 
@@ -59,11 +63,13 @@ Draws a horizontal or vertical line at the specified x or y location.
         line
             .attr('x2', chart.canvasWidth)
             .transition()
+            .duration(duration)
             .attr('y1', y)
             .attr('y2', y)
 
         label
             .attr('text-anchor', 'end')
             .transition()
+            .duration(duration)
             .attr('x', chart.canvasWidth)
             .attr('y', y + labelPadding)
