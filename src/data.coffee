@@ -146,6 +146,7 @@ Some operations can mutate the original chart data.
                 y: chart.getY()(d,i)
                 xValue: chart.getX()(d,i)
                 series: s
+                data: d
 
         allPoints = d3.merge allPoints
 

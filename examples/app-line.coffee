@@ -103,6 +103,7 @@ chartLog
     .yScaleType(d3.scale.log)
     .yPadding(0)
     .chartLabel('Logarithmic Scale Example')
+    .tooltipType('spatial')
     .xTickFormat((d)->
         if d?
             d3.time.format('%Y-%m')(new Date d)

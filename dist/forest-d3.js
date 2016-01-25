@@ -939,7 +939,8 @@ Some operations can mutate the original chart data.
               x: chart.getXInternal()(d, i),
               y: chart.getY()(d, i),
               xValue: chart.getX()(d, i),
-              series: s
+              series: s,
+              data: d
             };
           });
         });
