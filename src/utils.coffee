@@ -249,3 +249,20 @@
 
         result
 
+    ###
+    Create a clone of a chart data object.
+    ###
+    clone: (data)->
+        copy = data
+        if data instanceof Array
+            copy = data.slice()
+
+            copy = copy.map (d)->
+                newObj = {}
+                newObj[key] = val for key, val of d
+
+                if newObj.values?
+                    newObj.values = newObj.values.slice()
+
+                newObj
+        copy

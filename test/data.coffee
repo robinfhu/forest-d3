@@ -195,6 +195,34 @@ describe 'Data API', ->
         chart.data().xValueAt(2).should.equal 90
         should.not.exist chart.data().xValueAt(4)
 
+    it 'makes a copy of the data', ->
+        data = [
+            key: 'line1'
+            type: 'line'
+            values: [
+                [0,0]
+                [1,1]
+                [2,4]
+            ]
+        ,
+            key: 'line2'
+            type: 'line'
+            values: [
+                [0,7]
+                [1,8]
+                [2,9]
+            ]
+        ]
+
+        chart = new ForestD3.Chart()
+        chart.data(data)
+
+        internalData = chart.data().get()
+
+        (internalData is data).should.be.false
+        (internalData[0].values is data[0].values).should.be.false
+        (internalData[1].values is data[1].values).should.be.false
+
     describe 'Data Slice', ->
         it 'can get a slice of data at an index', ->
             data = [

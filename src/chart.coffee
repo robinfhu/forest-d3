@@ -50,11 +50,11 @@ chartProperties = [
     Set chart data.
     ###
     data: (d)->
-        unless d?
+        if arguments.length is 0
             return ForestD3.DataAPI.call @, @chartData
         else
-            d = ForestD3.Utils.indexify d, @_metadata
-            @chartData = d
+            ForestD3.Utils.indexify d, @_metadata
+            @chartData = ForestD3.Utils.clone d
 
             if @tooltipType() is 'spatial'
                 @quadtree = @data().quadtree()
