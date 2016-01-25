@@ -249,20 +249,29 @@
 
         result
 
+    convertObjectToArray: (obj)->
+        if obj instanceof Array
+            return obj.slice()
+        else
+            array = []
+            for key, data of obj
+                data.key ?= key
+                array.push data
+
+            return array
+
     ###
     Create a clone of a chart data object.
     ###
     clone: (data)->
-        copy = data
-        if data instanceof Array
-            copy = data.slice()
+        copy = @convertObjectToArray data
 
-            copy = copy.map (d)->
-                newObj = {}
-                newObj[key] = val for key, val of d
+        copy = copy.map (d)->
+            newObj = {}
+            newObj[key] = val for key, val of d
 
-                if newObj.values?
-                    newObj.values = newObj.values.slice()
+            if newObj.values?
+                newObj.values = newObj.values.slice()
 
-                newObj
+            newObj
         copy

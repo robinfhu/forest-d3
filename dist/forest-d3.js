@@ -746,28 +746,41 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         result.push(xValues[L - 1]);
         return result;
       },
+      convertObjectToArray: function(obj) {
+        var array, data, key;
+        if (obj instanceof Array) {
+          return obj.slice();
+        } else {
+          array = [];
+          for (key in obj) {
+            data = obj[key];
+            if (data.key == null) {
+              data.key = key;
+            }
+            array.push(data);
+          }
+          return array;
+        }
+      },
 
       /*
       Create a clone of a chart data object.
        */
       clone: function(data) {
         var copy;
-        copy = data;
-        if (data instanceof Array) {
-          copy = data.slice();
-          copy = copy.map(function(d) {
-            var key, newObj, val;
-            newObj = {};
-            for (key in d) {
-              val = d[key];
-              newObj[key] = val;
-            }
-            if (newObj.values != null) {
-              newObj.values = newObj.values.slice();
-            }
-            return newObj;
-          });
-        }
+        copy = this.convertObjectToArray(data);
+        copy = copy.map(function(d) {
+          var key, newObj, val;
+          newObj = {};
+          for (key in d) {
+            val = d[key];
+            newObj[key] = val;
+          }
+          if (newObj.values != null) {
+            newObj.values = newObj.values.slice();
+          }
+          return newObj;
+        });
         return copy;
       }
     };
@@ -1357,8 +1370,8 @@ Handles the guideline that moves along the x-axis
       if (arguments.length === 0) {
         return ForestD3.DataAPI.call(this, this.chartData);
       } else {
-        ForestD3.Utils.indexify(d, this._metadata);
         this.chartData = ForestD3.Utils.clone(d);
+        ForestD3.Utils.indexify(this.chartData, this._metadata);
         if (this.tooltipType() === 'spatial') {
           this.quadtree = this.data().quadtree();
         }

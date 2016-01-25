@@ -223,6 +223,39 @@ describe 'Data API', ->
         (internalData[0].values is data[0].values).should.be.false
         (internalData[1].values is data[1].values).should.be.false
 
+    it 'accepts an object of objects as chart data', ->
+        data =
+            'line1':
+                type: 'line'
+                values: [
+                    [0,0]
+                    [1,1]
+                    [2,4]
+                ]
+            'bar1':
+                type: 'bar'
+                values: [
+                    [0,0]
+                    [1,1]
+                    [2,4]
+                ]
+
+        chart = new ForestD3.Chart()
+        chart.data(data)
+
+        internalData = chart.data().get()
+
+        internalData.should.be.instanceof Array
+        internalData[0].key.should.equal 'line1'
+        internalData[0].values.should.deep.equal [
+            [0,0]
+            [1,1]
+            [2,4]
+        ]
+
+        internalData[1].key.should.equal 'bar1'
+        internalData[1].type.should.equal 'bar'
+
     describe 'Data Slice', ->
         it 'can get a slice of data at an index', ->
             data = [

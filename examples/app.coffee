@@ -20,33 +20,29 @@ getStocks = (startPrice, volatility, points=20)->
 
     result
 
-lineData = [
-    key: 'series1'
-    label: 'AAPL'
-    type: 'line'
-    color: 'rgb(143,228,94)'
-    values: getStocks(320, 0.23, 100)
-,
-    key: 'series2'
-    label: 'AAPL Volatility'
-    type: 'line'
-    area: true
-    values: getStocks(304, 0.34, 100)
-,
-    key: 'series3'
-    label: 'Benchmark S&P'
-    type: 'scatter'
-    shape: 'triangle-down'
-    size: 64
-    color: 'rgb(108, 109, 186)'
-    values: getStocks(306, 0.289, 100)
-,
-    key: 'marker1'
-    label: 'DOW Average'
-    type: 'marker'
-    axis: 'y'
-    value: 404
-]
+lineData =
+    series1:
+        label: 'AAPL'
+        type: 'line'
+        color: 'rgb(143,228,94)'
+        values: getStocks(320, 0.23, 100)
+    series2:
+        label: 'AAPL Volatility'
+        type: 'line'
+        area: true
+        values: getStocks(304, 0.34, 100)
+    series3:
+        label: 'Benchmark S&P'
+        type: 'scatter'
+        shape: 'triangle-down'
+        size: 64
+        color: 'rgb(108, 109, 186)'
+        values: getStocks(306, 0.289, 100)
+    marker1:
+        label: 'DOW Average'
+        type: 'marker'
+        axis: 'y'
+        value: 404
 
 lineChart
     .ordinal(true)
