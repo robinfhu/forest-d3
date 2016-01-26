@@ -16,8 +16,12 @@
   <body class="dark">
     <div class="container-fluid">
       <div class="page-header">
-        <h1>Forest D3<small>&nbsp;&nbsp; A javascript charting library by Robin Hu</small></h1>
-        <h3><a href="https://github.com/robinfhu/forest-d3">Source Code</a></h3>
+        <h1><span id="forest-d3-title">Forest D3</span><small>&nbsp;&nbsp; A Javascript charting library by Robin Hu</small></h1>
+        <h4>
+          This webpage showcases some live examples of my charting library. Please enjoy!
+          
+        </h4>
+        <h3><a href="https://github.com/robinfhu/forest-d3">Github Page</a></h3>
       </div>
       <div class="row">
         <ul class="nav nav-pills">
@@ -55,8 +59,12 @@
         <script src="app-bar.js"></script>
       </div>
       <footer>
-        <div class="text-center"><small>&copy; 2015 Robin Hu</small></div>
+        <div class="text-center"><small>&copy; 2015-2016 Robin Hu</small></div>
       </footer>
     </div>
+    <script type="text/javascript">
+      var version = ForestD3.version;
+      document.getElementById('forest-d3-title').textContent = "Forest D3 " + version;
+    </script>
   </body>
 </html>

@@ -17,12 +17,14 @@ html(lang="en")
         .container-fluid
             .page-header
                 h1
-                    | Forest D3
-                    small &nbsp;&nbsp; A javascript charting library by Robin Hu
+                    span#forest-d3-title Forest D3
+                    small &nbsp;&nbsp; A Javascript charting library by Robin Hu
 
+                h4.
+                    This webpage showcases some live examples of my charting library. Please enjoy!
 
                 h3
-                    a(href="https://github.com/robinfhu/forest-d3") Source Code
+                    a(href="https://github.com/robinfhu/forest-d3") Github Page
 
             .row
                 ul.nav.nav-pills
@@ -44,4 +46,8 @@ html(lang="en")
 
             footer
                 .text-center
-                    small &copy; 2015 Robin Hu
+                    small &copy; 2015-2016 Robin Hu
+
+        script(type="text/javascript").
+            var version = ForestD3.version;
+            document.getElementById('forest-d3-title').textContent = "Forest D3 " + version;

@@ -10,7 +10,7 @@ Author:  Robin Hu
 
 (function() {
   this.ForestD3 = {
-    version: '1.0.0'
+    version: '0.1.0-beta'
   };
 
   this.ForestD3.ChartItem = {};
