@@ -447,6 +447,97 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
       Calculates the minimum and maximum point across all series'.
       Useful for setting the domain for a d3.scale()
       
+      data: chart data that has been passed through normalization function.
+      It should be an array of objects, where each object contains an extent
+      property. Example:
+      [
+          key: 'line1'
+          extent:
+              x: [1,3]
+              y: [3,4]
+      ,
+          key: 'line2'
+          extent:
+              x: [1,3]
+              y: [3,4]
+      ]
+      
+      the 'force' argument allows you to force certain values onto the final
+      extent. Example:
+          {y: [0], x: [0]}
+      
+      Returns an object with the x,y axis extents:
+      {
+          x: [min, max]
+          y: [min, max]
+      }
+       */
+      extent: function(data, force) {
+        var defaultExtent, roundOff, xExt, yExt;
+        defaultExtent = [-1, 1];
+        if (!data || data.length === 0) {
+          return {
+            x: defaultExtent,
+            y: defaultExtent
+          };
+        }
+        xExt = d3.extent(d3.merge(data.map(function(series) {
+          var ref;
+          return ((ref = series.extent) != null ? ref.x : void 0) || [];
+        })));
+        yExt = d3.extent(d3.merge(data.map(function(series) {
+          var ref;
+          return ((ref = series.extent) != null ? ref.y : void 0) || [];
+        })));
+        if (force == null) {
+          force = {};
+        }
+        if (force.x == null) {
+          force.x = [];
+        }
+        if (force.y == null) {
+          force.y = [];
+        }
+        if (!(force.x instanceof Array)) {
+          force.x = [force.x];
+        }
+        if (!(force.y instanceof Array)) {
+          force.y = [force.y];
+        }
+        xExt = xExt.concat(force.x);
+        yExt = yExt.concat(force.y);
+        xExt = d3.extent(xExt);
+        yExt = d3.extent(yExt);
+        roundOff = function(d, i) {
+          if (Math.abs(d) < 1) {
+            return d;
+          }
+          if (i === 0) {
+            if (isNaN(d)) {
+              return -1;
+            } else {
+              return Math.floor(d);
+            }
+          } else {
+            if (isNaN(d)) {
+              return 1;
+            } else {
+              return Math.ceil(d);
+            }
+          }
+        };
+        xExt = xExt.map(roundOff);
+        yExt = yExt.map(roundOff);
+        return {
+          x: xExt,
+          y: yExt
+        };
+      },
+
+      /*
+      Calculates the minimum and maximum point across all series'.
+      Useful for setting the domain for a d3.scale()
+      
       data: Array of series'
       x: function to get X value
       y: function to get Y value
@@ -459,7 +550,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
               y: [min, max]
           }
        */
-      extent: function(data, x, y, force) {
+      extent_old: function(data, x, y, force) {
         var defaultExtent, roundOff, xAllPoints, xExt, yAllPoints, yExt;
         defaultExtent = [-1, 1];
         if (!data || data.length === 0) {
@@ -779,7 +870,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
       Converts the input data into a normalized format.
        */
       normalize: function(data, options) {
-        var getX, getY, ordinal;
+        var findExtent, getX, getY, ordinal;
         if (options == null) {
           options = {};
         }
@@ -787,18 +878,38 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         getX = options.getX;
         getY = options.getY;
         ordinal = options.ordinal;
+        findExtent = function(values, key) {
+          return d3.extent(values.map(function(d) {
+            return d[key];
+          }));
+        };
         data.forEach(function(series) {
           if (series.type === 'region') {
+            series.extent = {
+              x: series.axis === 'x' ? series.values : [],
+              y: series.axis !== 'x' ? series.values : []
+            };
+            return;
+          }
+          if (series.type === 'marker') {
+            series.extent = {
+              x: series.axis === 'x' ? [series.value] : [],
+              y: series.axis !== 'x' ? [series.value] : []
+            };
             return;
           }
           if (series.values instanceof Array) {
-            return series.values = series.values.map(function(d, i) {
+            series.values = series.values.map(function(d, i) {
               return {
                 x: ordinal ? i : getX(d, i),
                 y: getY(d, i),
                 data: d
               };
             });
+            series.extent = {
+              x: findExtent(series.values, 'x'),
+              y: findExtent(series.values, 'y')
+            };
           }
         });
         return data;
@@ -1608,7 +1719,7 @@ Handles the guideline that moves along the x-axis
 
     Chart.prototype.updateChartScale = function() {
       var extent;
-      extent = ForestD3.Utils.extent(this.data().visible(), this.getXInternal, this.getYInternal, this.forceDomain());
+      extent = ForestD3.Utils.extent(this.data().visible(), this.forceDomain());
       extent = ForestD3.Utils.extentPadding(extent, {
         x: this.xPadding(),
         y: this.yPadding()
@@ -1925,8 +2036,9 @@ Handles the guideline that moves along the x-axis
 
     BarChart.prototype.updateChartScale = function() {
       var extent;
-      extent = ForestD3.Utils.extent(this.data().get(), this.getXInternal, this.getYInternal);
-      extent.y = d3.extent(extent.y.concat([0]));
+      extent = ForestD3.Utils.extent(this.data().get(), {
+        y: 0
+      });
       return this.yScale = d3.scale.linear().domain(extent.y).range([0, this.canvasWidth]);
     };
 

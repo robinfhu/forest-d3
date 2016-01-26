@@ -1,22 +1,36 @@
 @ForestD3.Utils = do ->
     colors20 = d3.scale.category20().range()
+
     ###
     Calculates the minimum and maximum point across all series'.
     Useful for setting the domain for a d3.scale()
 
-    data: Array of series'
-    x: function to get X value
-    y: function to get Y value
-    force: values to force onto domains. Example: {y: [0]},
-        force 0 onto y domain.
+    data: chart data that has been passed through normalization function.
+    It should be an array of objects, where each object contains an extent
+    property. Example:
+    [
+        key: 'line1'
+        extent:
+            x: [1,3]
+            y: [3,4]
+    ,
+        key: 'line2'
+        extent:
+            x: [1,3]
+            y: [3,4]
+    ]
 
-    Returns:
-        {
-            x: [min, max]
-            y: [min, max]
-        }
+    the 'force' argument allows you to force certain values onto the final
+    extent. Example:
+        {y: [0], x: [0]}
+
+    Returns an object with the x,y axis extents:
+    {
+        x: [min, max]
+        y: [min, max]
+    }
     ###
-    extent: (data, x, y, force)->
+    extent: (data, force)->
         defaultExtent = [-1, 1]
         if not data or data.length is 0
             return {
@@ -24,44 +38,16 @@
                 y: defaultExtent
             }
 
-        x ?= (d,i)-> d[0]
-        y ?= (d,i)-> d[1]
+        xExt = d3.extent d3.merge data.map((series)-> series.extent?.x or [])
+        yExt = d3.extent d3.merge data.map((series)-> series.extent?.y or [])
+
+        # Factor in any forced domain values
         force ?= {}
         force.x ?= []
         force.y ?= []
         force.x = [force.x] if not (force.x instanceof Array)
         force.y = [force.y] if not (force.y instanceof Array)
 
-        xAllPoints = data.map (series)->
-            if series.values? and series.type isnt 'region'
-                d3.extent series.values, x
-            else
-                []
-
-        yAllPoints = data.map (series)->
-            if series.values? and series.type isnt 'region'
-                d3.extent series.values, y
-            else
-                []
-
-        xExt = d3.extent d3.merge xAllPoints
-        yExt = d3.extent d3.merge yAllPoints
-
-        # Factor in any markers
-        data.filter((d)-> d.type is 'marker').forEach (marker)->
-            if marker.axis is 'x'
-                xExt.push marker.value
-            else
-                yExt.push marker.value
-
-        # Factor in any regions
-        data.filter((d)-> d.type is 'region').forEach (region)->
-            if region.axis is 'x'
-                xExt = xExt.concat region.values
-            else
-                yExt = yExt.concat region.values
-
-        # Factor in any forced domain values
         xExt = xExt.concat force.x
         yExt = yExt.concat force.y
 
@@ -269,6 +255,22 @@
 
     ###
     Converts the input data into a normalized format.
+    Also clones the data so the chart operates on copy of the data.
+    It converts the 'values' array into a normal format, that looks like this:
+        {
+            x: (raw x value, or an index if ordinal=true)
+            y: (the raw y value)
+            data: (reference to the original data point)
+        }
+
+    It also adds an 'extent' property to the series data.
+
+    @param data - the chart data to normalize.
+    @param options - object with the following properties:
+        getX: function to get the raw x value
+        getY: function to get the raw y value
+        ordinal: boolean describing whether the data is uniformly distributed
+            on the x-axis or not.
     ###
     normalize: (data, options={})->
         data = @clone data
@@ -277,12 +279,31 @@
         getY = options.getY
         ordinal = options.ordinal
 
+        findExtent = (values, key)->
+            d3.extent values.map (d)-> d[key]
+
         data.forEach (series)->
-            return if series.type is 'region'
+            if series.type is 'region'
+                series.extent =
+                    x: if series.axis is 'x' then series.values else []
+                    y: if series.axis isnt 'x' then series.values else []
+                return
+
+            if series.type is 'marker'
+                series.extent =
+                    x: if series.axis is 'x' then [series.value] else []
+                    y: if series.axis isnt 'x' then [series.value] else []
+                return
 
             if series.values instanceof Array
                 series.values = series.values.map (d,i)->
                     x: if ordinal then i else getX(d,i)
                     y: getY(d,i)
                     data: d
+
+                series.extent =
+                    x: findExtent(series.values, 'x')
+                    y: findExtent(series.values, 'y')
+                return
+
         data

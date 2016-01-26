@@ -281,6 +281,68 @@ describe 'Data API', ->
 
         internalData[1].values[2].data.should.deep.equal [2,4]
 
+    it 'calculates the x,y extent of each series', ->
+        data = [
+            type: 'line'
+            values: [
+                [-3,4]
+                [0,6]
+                [4,8]
+            ]
+        ,
+            type: 'line'
+            values: [
+                [4,-1]
+                [5,3]
+                [6,2]
+            ]
+        ,
+            type: 'marker'
+            axis: 'x'
+            value: 30
+        ,
+            type: 'marker'
+            axis: 'y'
+            value: 40
+        ,
+            type: 'region'
+            axis: 'x'
+            values: [3,10]
+        ,
+            type: 'region'
+            axis: 'y'
+            values: [-10,11]
+        ]
+
+        chart = new ForestD3.Chart()
+        chart.ordinal(true).data(data)
+        internalData = chart.data().get()
+
+        internalData[0].extent.should.deep.equal
+            x: [0,2]
+            y: [4,8]
+
+        internalData[1].extent.should.deep.equal
+            x: [0,2]
+            y: [-1,3]
+
+        internalData[2].extent.should.deep.equal
+            x: [30]
+            y: []
+
+        internalData[3].extent.should.deep.equal
+            x: []
+            y: [40]
+
+        internalData[4].extent.should.deep.equal
+            x: [3,10]
+            y: []
+
+        internalData[5].extent.should.deep.equal
+            x: []
+            y: [-10,11]
+
+
     describe 'Data Slice', ->
         it 'can get a slice of data at an index', ->
             data = [

@@ -342,8 +342,6 @@ chartProperties = [
     updateChartScale: ->
         extent = ForestD3.Utils.extent(
             @data().visible(),
-            @getXInternal,
-            @getYInternal,
             @forceDomain()
         )
         extent = ForestD3.Utils.extentPadding extent, {

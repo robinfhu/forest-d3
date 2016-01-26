@@ -235,12 +235,7 @@ chartProperties = [
                 @svg.attr('height', @canvasHeight)
 
     updateChartScale: ->
-        extent = ForestD3.Utils.extent(
-            @data().get(),
-            @getXInternal,
-            @getYInternal
-        )
-        extent.y = d3.extent extent.y.concat([0])
+        extent = ForestD3.Utils.extent @data().get(), {y: 0}
 
         @yScale = d3.scale.linear()
             .domain(extent.y)

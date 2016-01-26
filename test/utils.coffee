@@ -16,13 +16,9 @@ describe 'Utilities', ->
 
         it 'handles simple case', ->
             data = [
-                values: [
-                    [1,1]
-                    [2,1]
-                    [3,2]
-                    [4,2]
-                    [5,1.3]
-                ]
+                extent:
+                    x: [1, 5]
+                    y: [1, 2]
             ]
 
             result = extent data
@@ -33,47 +29,42 @@ describe 'Utilities', ->
 
         it 'handles multiple series', ->
             data = [
-                values: [
-                    [1,5]
-                    [2,3]
-                ]
+                extent:
+                    x: [1,5]
+                    y: [2,3]
             ,
-                values: [
-                    [1,7]
-                    [0,5]
-                ]
+                extent:
+                    x: [1,9]
+                    y: [-2,3]
             ,
-                values: [
-                    [1,1]
-                    [1.6,2.9]
-                ]
+                extent:
+                    x: [-1,5]
+                    y: [2,30]
             ]
 
             result = extent data
 
             result.should.deep.equal
-                x: [0, 2]
-                y: [1, 7]
+                x: [-1, 9]
+                y: [-2, 30]
 
         it 'rounds extent to nearest integer', ->
             data = [
-                values: [
-                    [5.1, 5.1]
-                    [80.9, 8.9]
-                ]
+                extent:
+                    x: [4.1, 5.1]
+                    y: [8.9, 11.7]
             ]
 
             result = extent data
             result.should.deep.equal
-                x: [5, 81]
-                y: [5, 9]
+                x: [4, 6]
+                y: [8, 12]
 
         it 'skips the integer rounding if extent range is small', ->
             data = [
-                values: [
-                    [0, -0.02]
-                    [1, 0.8]
-                ]
+                extent:
+                    x: [0, 1]
+                    y: [-0.02, 0.8]
             ]
 
             result = extent data
@@ -83,18 +74,15 @@ describe 'Utilities', ->
 
         it 'factors in chart markers as part of the computation', ->
             data = [
-                values: [
-                    [0, 5]
-                    [-3, 8]
-                ]
+                extent:
+                    x: [-3, 0]
+                    y: [5, 8]
             ,
-                type: 'marker'
-                axis: 'y'
-                value: 10
+                extent:
+                    y: [10]
             ,
-                type: 'marker'
-                axis: 'x'
-                value: 1
+                extent:
+                    x: [1]
             ]
 
             result = extent data
@@ -103,53 +91,10 @@ describe 'Utilities', ->
                 x: [-3, 1]
                 y: [5, 10]
 
-        it 'factors in region values as part of the computation', ->
-            data = [
-                values: [
-                    [0, 5]
-                    [-3, 8]
-                ]
-            ,
-                type: 'region'
-                axis: 'x'
-                values: [-4, 1]
-            ,
-                type: 'region'
-                axis: 'y'
-                values: [3, 9]
-            ]
-
-            result = extent data
-
-            result.should.deep.equal
-                x: [-4, 1]
-                y: [3, 9]
-
-        it 'handles case where getter returns index', ->
-            data = [
-                values: [
-                    [1,1]
-                    [2,2]
-                ]
-            ,
-                values: [
-                    [3,3]
-                    [4,4]
-                ]
-            ]
-
-            getX = (d,i)-> i
-            result = extent data, getX
-
-            result.should.deep.equal
-                x: [0,1]
-                y: [1,4]
-
         it 'defaults to [-1,1] extent if no valid values', ->
             data = [
-                type: 'marker'
-                axis: 'y'
-                value: 0.5
+                extent:
+                    y: [0.5]
             ]
 
             result = extent data
@@ -159,18 +104,16 @@ describe 'Utilities', ->
 
         it 'accepts a "force" property, forcing values onto the extent', ->
             data = [
-                values: [
-                    [-1,1]
-                    [0,2]
-                    [1,3]
-                ]
+                extent:
+                    x: [-1, 1]
+                    y: [1, 3]
             ]
 
             force =
                 x: [0]
                 y: [0]
 
-            result = extent data, null, null, force
+            result = extent data, force
 
             result.should.deep.equal
                 x: [-1, 1]
@@ -180,7 +123,7 @@ describe 'Utilities', ->
                 x: -4
                 y: 0
 
-            result = extent data, null, null, force
+            result = extent data, force
             result.should.deep.equal
                 x: [-4, 1]
                 y: [0, 3]
