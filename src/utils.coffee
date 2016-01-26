@@ -138,12 +138,6 @@
         data
 
     ###
-    TODO: Add data normalization routine
-    It should fill in missing gaps and sort the data in ascending order.
-    ###
-    normalize: (data)->
-
-    ###
     Utility class that uses d3.bisect to find the index in a given array,
     where a search value can be inserted.
     This is different from normal bisectLeft; this function finds the nearest
@@ -270,8 +264,25 @@
             newObj = {}
             newObj[key] = val for key, val of d
 
-            if newObj.values?
-                newObj.values = newObj.values.slice()
-
             newObj
         copy
+
+    ###
+    Converts the input data into a normalized format.
+    ###
+    normalize: (data, options={})->
+        data = @clone data
+
+        getX = options.getX
+        getY = options.getY
+        ordinal = options.ordinal
+
+        data.forEach (series)->
+            return if series.type is 'region'
+
+            if series.values instanceof Array
+                series.values = series.values.map (d,i)->
+                    x: if ordinal then i else getX(d,i)
+                    y: getY(d,i)
+                    data: d
+        data

@@ -247,11 +247,7 @@ describe 'Data API', ->
 
         internalData.should.be.instanceof Array
         internalData[0].key.should.equal 'line1'
-        internalData[0].values.should.deep.equal [
-            [0,0]
-            [1,1]
-            [2,4]
-        ]
+        internalData[0].type.should.equal 'line'
 
         internalData[1].key.should.equal 'bar1'
         internalData[1].type.should.equal 'bar'

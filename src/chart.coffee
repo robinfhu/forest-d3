@@ -36,11 +36,8 @@ chartProperties = [
         @xAxis = d3.svg.axis()
         @yAxis = d3.svg.axis()
         @seriesColor = (d)=> d.color or @color()(@metadata(d).index)
-        @getXInternal = =>
-            if @ordinal()
-                (d,i)-> i
-            else
-                @getX()
+        @getXInternal = (d)-> d.x
+        @getYInternal = (d)-> d.y
 
     destroy: ->
         super()
@@ -53,7 +50,12 @@ chartProperties = [
         if arguments.length is 0
             return ForestD3.DataAPI.call @, @chartData
         else
-            @chartData = ForestD3.Utils.clone d
+            @chartData = ForestD3.Utils.normalize d, {
+                getX: @getX(),
+                getY: @getY(),
+                ordinal: @ordinal()
+            }
+
             ForestD3.Utils.indexify @chartData, @_metadata
 
             if @tooltipType() is 'spatial'
@@ -340,8 +342,8 @@ chartProperties = [
     updateChartScale: ->
         extent = ForestD3.Utils.extent(
             @data().visible(),
-            @getXInternal(),
-            @getY(),
+            @getXInternal,
+            @getYInternal,
             @forceDomain()
         )
         extent = ForestD3.Utils.extentPadding extent, {

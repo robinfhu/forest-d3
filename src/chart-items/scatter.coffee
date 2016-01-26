@@ -14,8 +14,8 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         .selectAll('path.point')
         .data((d)-> d.values)
 
-    x = chart.getXInternal()
-    y = chart.getY()
+    x = chart.getXInternal
+    y = chart.getYInternal
 
     all = d3.svg.symbolTypes
     seriesIndex = chart.metadata(selectionData).index

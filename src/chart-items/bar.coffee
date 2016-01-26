@@ -2,8 +2,8 @@
     chart = @
     bars = selection.selectAll('rect.bar').data(selectionData.values)
 
-    x = chart.getXInternal()
-    y = chart.getY()
+    x = chart.getXInternal
+    y = chart.getYInternal
 
     ###
     Ensure the bars are based at the zero line, but does not extend past

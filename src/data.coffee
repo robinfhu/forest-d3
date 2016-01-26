@@ -86,11 +86,12 @@ Some operations can mutate the original chart data.
     # Get array of all X-axis data points
     # Returns natural ordered indices if chart.ordinal is true
     xValues: ->
-        @._xValues chart.getXInternal()
+        @._xValues chart.getXInternal
 
     # Get array of all X-axis data points, returning the raw x value
     xValuesRaw: ->
-        @._xValues chart.getX()
+        getX = (d,i)-> chart.getX()(d.data,i)
+        @._xValues getX
 
     # Get the x raw value at a certain position
     xValueAt: (i)->
@@ -99,7 +100,7 @@ Some operations can mutate the original chart data.
 
         point = dataObjs[0].values[i]
         if point?
-            chart.getX()(point)
+            chart.getX()(point.data)
         else
             null
 
@@ -111,8 +112,8 @@ Some operations can mutate the original chart data.
         @._getSliceable().filter((d)-> not chart.metadata(d).hidden).map (d)->
             point = d.values[idx]
 
-            x: chart.getX()(point, idx)
-            y: chart.getY()(point, idx)
+            x: chart.getX()(point.data, idx)
+            y: chart.getY()(point.data, idx)
             key: d.key
             label: d.label
             color: chart.seriesColor d
@@ -142,9 +143,9 @@ Some operations can mutate the original chart data.
         .filter((d)-> not chart.metadata(d).hidden)
         .map (s, i)->
             s.values.map (d,i)->
-                x: chart.getXInternal()(d,i)
-                y: chart.getY()(d,i)
-                xValue: chart.getX()(d,i)
+                x: chart.getXInternal(d,i)
+                y: chart.getYInternal(d,i)
+                xValue: chart.getX()(d.data,i)
                 series: s
                 data: d
 

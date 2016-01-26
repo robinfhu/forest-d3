@@ -170,8 +170,8 @@ Author:  Robin Hu
     var barBase, barCount, barIndex, barWidth, bars, chart, fullSpace, maxFullSpace, maxPadding, x, xCentered, y;
     chart = this;
     bars = selection.selectAll('rect.bar').data(selectionData.values);
-    x = chart.getXInternal();
-    y = chart.getY();
+    x = chart.getXInternal;
+    y = chart.getYInternal;
 
     /*
     Ensure the bars are based at the zero line, but does not extend past
@@ -238,8 +238,8 @@ If you set area=true, turns it into an area graph
     chart = this;
     selection.style('stroke', chart.seriesColor);
     interpolate = selectionData.interpolate || 'linear';
-    x = chart.getXInternal();
-    y = chart.getY();
+    x = chart.getXInternal;
+    y = chart.getYInternal;
     lineFn = d3.svg.line().interpolate(interpolate).x(function(d, i) {
       return chart.xScale(x(d, i));
     });
@@ -311,7 +311,7 @@ Draws a horizontal or vertical line at the specified x or y location.
     chart = this;
     selection.classed('ohlc', true);
     rangeLines = selection.selectAll('line.ohlc-range').data(selectionData.values);
-    x = chart.getXInternal();
+    x = chart.getXInternal;
     open = selectionData.getOpen || function(d, i) {
       return d[1];
     };
@@ -338,9 +338,9 @@ Draws a horizontal or vertical line at the specified x or y location.
     }).attr('x2', function(d, i) {
       return chart.xScale(x(d, i));
     }).attr('y1', function(d, i) {
-      return chart.yScale(hi(d, i));
+      return chart.yScale(hi(d.data, i));
     }).attr('y2', function(d, i) {
-      return chart.yScale(lo(d, i));
+      return chart.yScale(lo(d.data, i));
     });
     openMarks = selection.selectAll('line.ohlc-open').data(selectionData.values);
     openMarks.enter().append('line').classed('ohlc-open', true).attr('y1', 0).attr('y2', 0);
@@ -348,9 +348,9 @@ Draws a horizontal or vertical line at the specified x or y location.
     openMarks.transition().duration(duration).delay(function(d, i) {
       return i * 20;
     }).attr('y1', function(d, i) {
-      return chart.yScale(open(d, i));
+      return chart.yScale(open(d.data, i));
     }).attr('y2', function(d, i) {
-      return chart.yScale(open(d, i));
+      return chart.yScale(open(d.data, i));
     }).attr('x1', function(d, i) {
       return chart.xScale(x(d, i));
     }).attr('x2', function(d, i) {
@@ -362,9 +362,9 @@ Draws a horizontal or vertical line at the specified x or y location.
     return closeMarks.transition().duration(duration).delay(function(d, i) {
       return i * 20;
     }).attr('y1', function(d, i) {
-      return chart.yScale(close(d, i));
+      return chart.yScale(close(d.data, i));
     }).attr('y2', function(d, i) {
-      return chart.yScale(close(d, i));
+      return chart.yScale(close(d.data, i));
     }).attr('x1', function(d, i) {
       return chart.xScale(x(d, i));
     }).attr('x2', function(d, i) {
@@ -420,8 +420,8 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
     points = selection.selectAll('path.point').data(function(d) {
       return d.values;
     });
-    x = chart.getXInternal();
-    y = chart.getY();
+    x = chart.getXInternal;
+    y = chart.getYInternal;
     all = d3.svg.symbolTypes;
     seriesIndex = chart.metadata(selectionData).index;
     shape = selectionData.shape || all[seriesIndex % all.length];
@@ -613,12 +613,6 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
       },
 
       /*
-      TODO: Add data normalization routine
-      It should fill in missing gaps and sort the data in ascending order.
-       */
-      normalize: function(data) {},
-
-      /*
       Utility class that uses d3.bisect to find the index in a given array,
       where a search value can be inserted.
       This is different from normal bisectLeft; this function finds the nearest
@@ -776,12 +770,38 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
             val = d[key];
             newObj[key] = val;
           }
-          if (newObj.values != null) {
-            newObj.values = newObj.values.slice();
-          }
           return newObj;
         });
         return copy;
+      },
+
+      /*
+      Converts the input data into a normalized format.
+       */
+      normalize: function(data, options) {
+        var getX, getY, ordinal;
+        if (options == null) {
+          options = {};
+        }
+        data = this.clone(data);
+        getX = options.getX;
+        getY = options.getY;
+        ordinal = options.ordinal;
+        data.forEach(function(series) {
+          if (series.type === 'region') {
+            return;
+          }
+          if (series.values instanceof Array) {
+            return series.values = series.values.map(function(d, i) {
+              return {
+                x: ordinal ? i : getX(d, i),
+                y: getY(d, i),
+                data: d
+              };
+            });
+          }
+        });
+        return data;
       }
     };
   })();
@@ -898,10 +918,14 @@ Some operations can mutate the original chart data.
         return dataObjs[0].values.map(getX);
       },
       xValues: function() {
-        return this._xValues(chart.getXInternal());
+        return this._xValues(chart.getXInternal);
       },
       xValuesRaw: function() {
-        return this._xValues(chart.getX());
+        var getX;
+        getX = function(d, i) {
+          return chart.getX()(d.data, i);
+        };
+        return this._xValues(getX);
       },
       xValueAt: function(i) {
         var dataObjs, point;
@@ -911,7 +935,7 @@ Some operations can mutate the original chart data.
         }
         point = dataObjs[0].values[i];
         if (point != null) {
-          return chart.getX()(point);
+          return chart.getX()(point.data);
         } else {
           return null;
         }
@@ -928,8 +952,8 @@ Some operations can mutate the original chart data.
           var point;
           point = d.values[idx];
           return {
-            x: chart.getX()(point, idx),
-            y: chart.getY()(point, idx),
+            x: chart.getX()(point.data, idx),
+            y: chart.getY()(point.data, idx),
             key: d.key,
             label: d.label,
             color: chart.seriesColor(d)
@@ -973,9 +997,9 @@ Some operations can mutate the original chart data.
         }).map(function(s, i) {
           return s.values.map(function(d, i) {
             return {
-              x: chart.getXInternal()(d, i),
-              y: chart.getY()(d, i),
-              xValue: chart.getX()(d, i),
+              x: chart.getXInternal(d, i),
+              y: chart.getYInternal(d, i),
+              xValue: chart.getX()(d.data, i),
               series: s,
               data: d
             };
@@ -1343,17 +1367,12 @@ Handles the guideline that moves along the x-axis
           return d.color || _this.color()(_this.metadata(d).index);
         };
       })(this);
-      this.getXInternal = (function(_this) {
-        return function() {
-          if (_this.ordinal()) {
-            return function(d, i) {
-              return i;
-            };
-          } else {
-            return _this.getX();
-          }
-        };
-      })(this);
+      this.getXInternal = function(d) {
+        return d.x;
+      };
+      this.getYInternal = function(d) {
+        return d.y;
+      };
     }
 
     Chart.prototype.destroy = function() {
@@ -1370,7 +1389,11 @@ Handles the guideline that moves along the x-axis
       if (arguments.length === 0) {
         return ForestD3.DataAPI.call(this, this.chartData);
       } else {
-        this.chartData = ForestD3.Utils.clone(d);
+        this.chartData = ForestD3.Utils.normalize(d, {
+          getX: this.getX(),
+          getY: this.getY(),
+          ordinal: this.ordinal()
+        });
         ForestD3.Utils.indexify(this.chartData, this._metadata);
         if (this.tooltipType() === 'spatial') {
           this.quadtree = this.data().quadtree();
@@ -1585,7 +1608,7 @@ Handles the guideline that moves along the x-axis
 
     Chart.prototype.updateChartScale = function() {
       var extent;
-      extent = ForestD3.Utils.extent(this.data().visible(), this.getXInternal(), this.getY(), this.forceDomain());
+      extent = ForestD3.Utils.extent(this.data().visible(), this.getXInternal, this.getYInternal, this.forceDomain());
       extent = ForestD3.Utils.extentPadding(extent, {
         x: this.xPadding(),
         y: this.yPadding()

@@ -8,8 +8,8 @@ If you set area=true, turns it into an area graph
     selection.style 'stroke', chart.seriesColor
 
     interpolate = selectionData.interpolate or 'linear'
-    x = chart.getXInternal()
-    y = chart.getY()
+    x = chart.getXInternal
+    y = chart.getYInternal
 
     lineFn = d3.svg.line()
         .interpolate(interpolate)
