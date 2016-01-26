@@ -91,9 +91,9 @@ dataUpdate = [
 chartUpdate.data(dataUpdate).render()
 
 document.getElementById('update-data').addEventListener 'click', ->
+    dataUpdate[0].values = getStocks(206, 0.07, 200)
     chartUpdate
-        .data()
-        .updateValues('series1', getStocks(206, 0.07, 200))
+        .data(dataUpdate)
         .render()
 
 # ******************* Log Scale Chart Example *******************

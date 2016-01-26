@@ -93,7 +93,8 @@
   chartUpdate.data(dataUpdate).render();
 
   document.getElementById('update-data').addEventListener('click', function() {
-    return chartUpdate.data().updateValues('series1', getStocks(206, 0.07, 200)).render();
+    dataUpdate[0].values = getStocks(206, 0.07, 200);
+    return chartUpdate.data(dataUpdate).render();
   });
 
   chartLog = new ForestD3.Chart('#example-log-scale');

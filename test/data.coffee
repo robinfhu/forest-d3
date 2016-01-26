@@ -475,30 +475,3 @@ describe 'Data API', ->
 
             api.barIndex('s4').should.equal 0
             api.barIndex('s5').should.equal 1
-
-    describe 'Update data', ->
-        it 'can update the data values', ->
-            data = [
-                key: 's1'
-                values: [
-                    [1,1]
-                    [2,1]
-                ]
-            ,
-                key: 's2'
-                values: [
-                    [1,10]
-                    [2,11]
-                ]
-            ]
-
-            api = ForestD3.DataAPI data
-            api.updateValues 's2', [
-                [1, 13]
-                [2, 14]
-            ]
-
-            api.get()[1].values.should.deep.equal [
-                [1, 13]
-                [2, 14]
-            ]

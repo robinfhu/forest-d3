@@ -535,120 +535,6 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
       },
 
       /*
-      Calculates the minimum and maximum point across all series'.
-      Useful for setting the domain for a d3.scale()
-      
-      data: Array of series'
-      x: function to get X value
-      y: function to get Y value
-      force: values to force onto domains. Example: {y: [0]},
-          force 0 onto y domain.
-      
-      Returns:
-          {
-              x: [min, max]
-              y: [min, max]
-          }
-       */
-      extent_old: function(data, x, y, force) {
-        var defaultExtent, roundOff, xAllPoints, xExt, yAllPoints, yExt;
-        defaultExtent = [-1, 1];
-        if (!data || data.length === 0) {
-          return {
-            x: defaultExtent,
-            y: defaultExtent
-          };
-        }
-        if (x == null) {
-          x = function(d, i) {
-            return d[0];
-          };
-        }
-        if (y == null) {
-          y = function(d, i) {
-            return d[1];
-          };
-        }
-        if (force == null) {
-          force = {};
-        }
-        if (force.x == null) {
-          force.x = [];
-        }
-        if (force.y == null) {
-          force.y = [];
-        }
-        if (!(force.x instanceof Array)) {
-          force.x = [force.x];
-        }
-        if (!(force.y instanceof Array)) {
-          force.y = [force.y];
-        }
-        xAllPoints = data.map(function(series) {
-          if ((series.values != null) && series.type !== 'region') {
-            return d3.extent(series.values, x);
-          } else {
-            return [];
-          }
-        });
-        yAllPoints = data.map(function(series) {
-          if ((series.values != null) && series.type !== 'region') {
-            return d3.extent(series.values, y);
-          } else {
-            return [];
-          }
-        });
-        xExt = d3.extent(d3.merge(xAllPoints));
-        yExt = d3.extent(d3.merge(yAllPoints));
-        data.filter(function(d) {
-          return d.type === 'marker';
-        }).forEach(function(marker) {
-          if (marker.axis === 'x') {
-            return xExt.push(marker.value);
-          } else {
-            return yExt.push(marker.value);
-          }
-        });
-        data.filter(function(d) {
-          return d.type === 'region';
-        }).forEach(function(region) {
-          if (region.axis === 'x') {
-            return xExt = xExt.concat(region.values);
-          } else {
-            return yExt = yExt.concat(region.values);
-          }
-        });
-        xExt = xExt.concat(force.x);
-        yExt = yExt.concat(force.y);
-        xExt = d3.extent(xExt);
-        yExt = d3.extent(yExt);
-        roundOff = function(d, i) {
-          if (Math.abs(d) < 1) {
-            return d;
-          }
-          if (i === 0) {
-            if (isNaN(d)) {
-              return -1;
-            } else {
-              return Math.floor(d);
-            }
-          } else {
-            if (isNaN(d)) {
-              return 1;
-            } else {
-              return Math.ceil(d);
-            }
-          }
-        };
-        xExt = xExt.map(roundOff);
-        yExt = yExt.map(roundOff);
-        return {
-          x: xExt,
-          y: yExt
-        };
-      },
-
-      /*
       Increases an extent by a certain percentage. Useful for padding the
       edges of a chart so the points are not right against the axis.
       
@@ -868,6 +754,22 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
 
       /*
       Converts the input data into a normalized format.
+      Also clones the data so the chart operates on copy of the data.
+      It converts the 'values' array into a normal format, that looks like this:
+          {
+              x: (raw x value, or an index if ordinal=true)
+              y: (the raw y value)
+              data: (reference to the original data point)
+          }
+      
+      It also adds an 'extent' property to the series data.
+      
+      @param data - the chart data to normalize.
+      @param options - object with the following properties:
+          getX: function to get the raw x value
+          getY: function to get the raw y value
+          ordinal: boolean describing whether the data is uniformly distributed
+              on the x-axis or not.
        */
       normalize: function(data, options) {
         var findExtent, getX, getY, ordinal;
@@ -946,17 +848,6 @@ Some operations can mutate the original chart data.
             color: chart.seriesColor(d)
           };
         });
-      },
-      updateValues: function(key, values) {
-        var d, j, len;
-        for (j = 0, len = data.length; j < len; j++) {
-          d = data[j];
-          if (d.key === key) {
-            d.values = values;
-            break;
-          }
-        }
-        return this;
       },
       hide: function(keys, flag) {
         var d, j, len, metadata, ref;

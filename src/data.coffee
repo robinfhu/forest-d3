@@ -18,14 +18,6 @@ Some operations can mutate the original chart data.
             hidden: chart.metadata(d).hidden is true
             color: chart.seriesColor d
 
-    # Updates a data series with new values. Mutates data.
-    updateValues: (key, values)->
-        for d in data
-            if d.key is key
-                d.values = values
-                break
-        @
-
     # Mark a given data series as hidden.
     hide: (keys, flag = true)->
         metadata = chart.metadata()
