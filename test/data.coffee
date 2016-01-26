@@ -252,6 +252,35 @@ describe 'Data API', ->
         internalData[1].key.should.equal 'bar1'
         internalData[1].type.should.equal 'bar'
 
+    it 'converts data to consistent format internally', ->
+        data =
+            'line1':
+                type: 'line'
+                values: [
+                    [0,0]
+                    [1,1]
+                    [2,4]
+                ]
+            'bar1':
+                type: 'bar'
+                values: [
+                    [0,0]
+                    [1,1]
+                    [2,4]
+                ]
+
+        chart = new ForestD3.Chart()
+        chart.data(data)
+
+        internalData = chart.data().get()
+        internalData[0].values[0].x.should.equal 0
+        internalData[0].values[0].y.should.equal 0
+
+        internalData[1].values[2].x.should.equal 2
+        internalData[1].values[2].y.should.equal 4
+
+        internalData[1].values[2].data.should.deep.equal [2,4]
+
     describe 'Data Slice', ->
         it 'can get a slice of data at an index', ->
             data = [

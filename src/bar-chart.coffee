@@ -15,7 +15,8 @@ chartProperties = [
         d3.select(@container()).classed('auto-height bar-chart', true)
         @_setProperties chartProperties
 
-        @getXInternal = (d,i)-> i
+        @getXInternal = (d)-> d.x
+        @getYInternal = (d)-> d.y
 
     ###
     Set chart data.
@@ -24,7 +25,11 @@ chartProperties = [
         unless d?
             return ForestD3.DataAPI.call @, @chartData
         else
-            @chartData = d
+            @chartData = ForestD3.Utils.normalize d, {
+                getX: @getX()
+                getY: @getY()
+                ordinal: yes
+            }
             return @
 
     _barData: ->
@@ -43,10 +48,10 @@ chartProperties = [
         getVal = @sortBy()
         if @sortDirection() is 'asc'
             result.sort (a,b)->
-                d3.ascending getVal(a), getVal(b)
+                d3.ascending getVal(a.data), getVal(b.data)
         else
             result.sort (a,b)->
-                d3.descending getVal(a), getVal(b)
+                d3.descending getVal(a.data), getVal(b.data)
 
         result
     ###
@@ -59,7 +64,7 @@ chartProperties = [
     ###
     calcMaxTextWidth: ->
         labels = @_barData().map (d,i)=>
-            @getX()(d,i)
+            @getX()(d.data,i)
 
         maxL = 0
         maxLabel = ''
@@ -90,7 +95,7 @@ chartProperties = [
 
         labels = @labelGroup
             .selectAll('text')
-            .data(@_barDataSorted(), (d)-> d)
+            .data(@_barDataSorted(), @getXInternal)
 
         labels
             .enter()
@@ -105,12 +110,12 @@ chartProperties = [
             .remove()
 
         labels.each (d,i)->
-            isNegative = chart.getY()(d,i) < 0
+            isNegative = chart.getYInternal(d) < 0
 
             d3.select(@)
                 .classed('positive', not isNegative)
                 .classed('negative', isNegative)
-                .text(chart.getX()(d,i))
+                .text(chart.getX()(d.data,i))
                 .transition()
                 .duration(700)
                 .delay(i*20)
@@ -121,7 +126,7 @@ chartProperties = [
 
         bars = @barGroup
             .selectAll('rect')
-            .data(@_barDataSorted(), (d)-> d)
+            .data(@_barDataSorted(), @getXInternal)
 
         bars
             .enter()
@@ -137,10 +142,10 @@ chartProperties = [
 
         bars.each (d,i)->
             width = do->
-                yPos = chart.yScale chart.getY()(d,i)
+                yPos = chart.yScale chart.getYInternal(d)
                 Math.abs (yPos - zeroPosition)
 
-            isNegative = chart.getY()(d,i) < 0
+            isNegative = chart.getYInternal(d) < 0
 
             translate =
                 if isNegative
@@ -165,7 +170,7 @@ chartProperties = [
 
         valueLabels = @valueGroup
             .selectAll('text')
-            .data(@_barDataSorted(), (d)-> d)
+            .data(@_barDataSorted(), @getXInternal)
 
         valueLabels
             .enter()
@@ -177,7 +182,7 @@ chartProperties = [
             .remove()
 
         valueLabels.each (d,i)->
-            yVal = chart.getY()(d,i)
+            yVal = chart.getYInternal(d,i)
             isNegative = yVal < 0
 
             xPos =
@@ -230,7 +235,11 @@ chartProperties = [
                 @svg.attr('height', @canvasHeight)
 
     updateChartScale: ->
-        extent = ForestD3.Utils.extent @data().get(), @getXInternal(), @getY()
+        extent = ForestD3.Utils.extent(
+            @data().get(),
+            @getXInternal,
+            @getYInternal
+        )
         extent.y = d3.extent extent.y.concat([0])
 
         @yScale = d3.scale.linear()

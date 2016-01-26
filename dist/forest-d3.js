@@ -1756,8 +1756,11 @@ Handles the guideline that moves along the x-axis
       BarChart.__super__.constructor.call(this, domContainer);
       d3.select(this.container()).classed('auto-height bar-chart', true);
       this._setProperties(chartProperties);
-      this.getXInternal = function(d, i) {
-        return i;
+      this.getXInternal = function(d) {
+        return d.x;
+      };
+      this.getYInternal = function(d) {
+        return d.y;
       };
     }
 
@@ -1770,7 +1773,11 @@ Handles the guideline that moves along the x-axis
       if (d == null) {
         return ForestD3.DataAPI.call(this, this.chartData);
       } else {
-        this.chartData = d;
+        this.chartData = ForestD3.Utils.normalize(d, {
+          getX: this.getX(),
+          getY: this.getY(),
+          ordinal: true
+        });
         return this;
       }
     };
@@ -1793,11 +1800,11 @@ Handles the guideline that moves along the x-axis
       getVal = this.sortBy();
       if (this.sortDirection() === 'asc') {
         result.sort(function(a, b) {
-          return d3.ascending(getVal(a), getVal(b));
+          return d3.ascending(getVal(a.data), getVal(b.data));
         });
       } else {
         result.sort(function(a, b) {
-          return d3.descending(getVal(a), getVal(b));
+          return d3.descending(getVal(a.data), getVal(b.data));
         });
       }
       return result;
@@ -1817,7 +1824,7 @@ Handles the guideline that moves along the x-axis
       var j, label, labels, len, maxL, maxLabel, size, text;
       labels = this._barData().map((function(_this) {
         return function(d, i) {
-          return _this.getX()(d, i);
+          return _this.getX()(d.data, i);
         };
       })(this));
       maxL = 0;
@@ -1853,41 +1860,35 @@ Handles the guideline that moves along the x-axis
       })(this);
       chart = this;
       color = this.data().get()[0].color;
-      labels = this.labelGroup.selectAll('text').data(this._barDataSorted(), function(d) {
-        return d;
-      });
+      labels = this.labelGroup.selectAll('text').data(this._barDataSorted(), this.getXInternal);
       labels.enter().append('text').attr('text-anchor', 'end').attr('x', 0).attr('y', 0).style('fill-opacity', 0);
       labels.exit().remove();
       labels.each(function(d, i) {
         var isNegative;
-        isNegative = chart.getY()(d, i) < 0;
-        return d3.select(this).classed('positive', !isNegative).classed('negative', isNegative).text(chart.getX()(d, i)).transition().duration(700).delay(i * 20).attr('y', barY(i)).style('fill-opacity', 1);
+        isNegative = chart.getYInternal(d) < 0;
+        return d3.select(this).classed('positive', !isNegative).classed('negative', isNegative).text(chart.getX()(d.data, i)).transition().duration(700).delay(i * 20).attr('y', barY(i)).style('fill-opacity', 1);
       });
       zeroPosition = chart.yScale(0);
-      bars = this.barGroup.selectAll('rect').data(this._barDataSorted(), function(d) {
-        return d;
-      });
+      bars = this.barGroup.selectAll('rect').data(this._barDataSorted(), this.getXInternal);
       bars.enter().append('rect').attr('x', zeroPosition).attr('y', 0).style('fill-opacity', 0).style('stroke-opacity', 0);
       bars.exit().remove();
       bars.each(function(d, i) {
         var isNegative, translate, width;
         width = (function() {
           var yPos;
-          yPos = chart.yScale(chart.getY()(d, i));
+          yPos = chart.yScale(chart.getYInternal(d));
           return Math.abs(yPos - zeroPosition);
         })();
-        isNegative = chart.getY()(d, i) < 0;
+        isNegative = chart.getYInternal(d) < 0;
         translate = isNegative ? "translate(" + (-width) + ", 0)" : '';
         return d3.select(this).attr('height', chart.barHeight()).attr('transform', translate).classed('positive', !isNegative).classed('negative', isNegative).transition().attr('width', width).style('fill', color).duration(700).delay(i * 50).attr('x', zeroPosition).attr('y', barY(i)).style('fill-opacity', 1).style('stroke-opacity', 0.7);
       });
-      valueLabels = this.valueGroup.selectAll('text').data(this._barDataSorted(), function(d) {
-        return d;
-      });
+      valueLabels = this.valueGroup.selectAll('text').data(this._barDataSorted(), this.getXInternal);
       valueLabels.enter().append('text').attr('x', 0);
       valueLabels.exit().remove();
       valueLabels.each(function(d, i) {
         var isNegative, xPos, yVal;
-        yVal = chart.getY()(d, i);
+        yVal = chart.getYInternal(d, i);
         isNegative = yVal < 0;
         xPos = isNegative ? zeroPosition : chart.yScale(yVal);
         return d3.select(this).classed('positive', !isNegative).classed('negative', isNegative).transition().duration(700).attr('y', barY(i)).delay(i * 20).text(yVal).attr('x', xPos);
@@ -1924,7 +1925,7 @@ Handles the guideline that moves along the x-axis
 
     BarChart.prototype.updateChartScale = function() {
       var extent;
-      extent = ForestD3.Utils.extent(this.data().get(), this.getXInternal(), this.getY());
+      extent = ForestD3.Utils.extent(this.data().get(), this.getXInternal, this.getYInternal);
       extent.y = d3.extent(extent.y.concat([0]));
       return this.yScale = d3.scale.linear().domain(extent.y).range([0, this.canvasWidth]);
     };
