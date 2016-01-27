@@ -10,10 +10,6 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
 
     selection.style 'fill', chart.seriesColor
 
-    points = selection
-        .selectAll('path.point')
-        .data((d)-> d.values)
-
     x = chart.getXInternal
     y = chart.getYInternal
 
@@ -24,11 +20,17 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
 
     symbol = d3.svg.symbol().type shape
 
+    points = selection
+        .selectAll('path.point')
+        .data((d)-> d.values)
+
+    base = Math.min(chart.yScale(0), chart.canvasHeight)
+
     points.enter()
         .append('path')
         .classed('point', true)
-        .attr('transform',
-            "translate(#{chart.canvasWidth/2},#{chart.canvasHeight/2})"
+        .attr('transform', (d,i)->
+            "translate(#{chart.xScale(x(d,i))},#{base})"
         )
         .attr('d', symbol.size(0))
 

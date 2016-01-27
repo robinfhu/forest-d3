@@ -414,19 +414,22 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
 
 (function() {
   this.ForestD3.ChartItem.scatter = function(selection, selectionData) {
-    var all, chart, points, seriesIndex, shape, symbol, x, y;
+    var all, base, chart, points, seriesIndex, shape, symbol, x, y;
     chart = this;
     selection.style('fill', chart.seriesColor);
-    points = selection.selectAll('path.point').data(function(d) {
-      return d.values;
-    });
     x = chart.getXInternal;
     y = chart.getYInternal;
     all = d3.svg.symbolTypes;
     seriesIndex = chart.metadata(selectionData).index;
     shape = selectionData.shape || all[seriesIndex % all.length];
     symbol = d3.svg.symbol().type(shape);
-    points.enter().append('path').classed('point', true).attr('transform', "translate(" + (chart.canvasWidth / 2) + "," + (chart.canvasHeight / 2) + ")").attr('d', symbol.size(0));
+    points = selection.selectAll('path.point').data(function(d) {
+      return d.values;
+    });
+    base = Math.min(chart.yScale(0), chart.canvasHeight);
+    points.enter().append('path').classed('point', true).attr('transform', function(d, i) {
+      return "translate(" + (chart.xScale(x(d, i))) + "," + base + ")";
+    }).attr('d', symbol.size(0));
     points.exit().remove();
     return points.transition().duration(selectionData.duration || chart.duration()).delay(function(d, i) {
       return i * 10;
