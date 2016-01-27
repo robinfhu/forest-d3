@@ -39,7 +39,7 @@ describe 'Tooltip and Guideline', ->
         tooltip.length.should.equal 1, 'tooltip exists'
 
     it 'can render spatial tooltips', (done)->
-        chart.tooltipType('spatial').data(data).render()
+        chart.ordinal(false).tooltipType('spatial').data(data).render()
 
         chart.updateTooltip [40, 400], [10, 10]
 

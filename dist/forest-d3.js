@@ -1358,7 +1358,7 @@ Handles the guideline that moves along the x-axis
       'getY', function(d, i) {
         return d[1];
       }
-    ], ['forceDomain', null], ['ordinal', false], ['autoResize', true], ['color', ForestD3.Utils.defaultColor], ['duration', 250], ['pointSize', 4], ['xPadding', 0.1], ['yPadding', 0.1], ['xLabel', ''], ['yLabel', ''], ['chartLabel', ''], ['xScaleType', d3.scale.linear], ['yScaleType', d3.scale.linear], [
+    ], ['forceDomain', null], ['ordinal', true], ['autoResize', true], ['color', ForestD3.Utils.defaultColor], ['duration', 250], ['pointSize', 4], ['xPadding', 0.1], ['yPadding', 0.1], ['xLabel', ''], ['yLabel', ''], ['chartLabel', ''], ['xScaleType', d3.scale.linear], ['yScaleType', d3.scale.linear], [
       'xTickFormat', function(d) {
         return d;
       }

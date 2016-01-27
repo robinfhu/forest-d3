@@ -2,7 +2,7 @@ chartProperties = [
     ['getX', (d,i)-> d[0] ]
     ['getY', (d,i)-> d[1] ]
     ['forceDomain', null]
-    ['ordinal', false]
+    ['ordinal', true]
     ['autoResize', true]
     ['color', ForestD3.Utils.defaultColor]
     ['duration', 250]

@@ -140,7 +140,7 @@ describe 'Data API', ->
             ]
         ]
         chart = new ForestD3.Chart()
-        chart.data(data)
+        chart.ordinal(false).data(data)
 
         chart.data().xValues().should.deep.equal [2, 80, 90]
 
