@@ -5,7 +5,7 @@ If you set area=true, turns it into an area graph
 @ForestD3.ChartItem.line = (selection, selectionData)->
     chart = @
 
-    selection.style 'stroke', chart.seriesColor
+    selection.style 'stroke', selectionData.color
 
     interpolate = selectionData.interpolate or 'linear'
     x = chart.getXInternal
@@ -55,6 +55,6 @@ If you set area=true, turns it into an area graph
         area
             .transition()
             .duration(duration)
-            .style('fill', chart.seriesColor(selectionData))
+            .style('fill', selectionData.color)
             .attr('d', areaFn.y1((d,i)-> chart.yScale(y(d,i))))
 

@@ -4,7 +4,7 @@ chartProperties = [
     ['forceDomain', null]
     ['ordinal', true]
     ['autoResize', true]
-    ['color', ForestD3.Utils.defaultColor]
+    ['colorPalette', null]
     ['duration', 250]
     ['pointSize', 4]
     ['xPadding', 0.1]
@@ -35,7 +35,6 @@ chartProperties = [
         @crosshairs = new ForestD3.Crosshairs @
         @xAxis = d3.svg.axis()
         @yAxis = d3.svg.axis()
-        @seriesColor = (d)=> d.color or @color()(@metadata(d).index)
         @getXInternal = (d)-> d.x
         @getYInternal = (d)-> d.y
 
@@ -51,9 +50,10 @@ chartProperties = [
             return ForestD3.DataAPI.call @, @chartData
         else
             @chartData = ForestD3.Utils.normalize d, {
-                getX: @getX(),
-                getY: @getY(),
+                getX: @getX()
+                getY: @getY()
                 ordinal: @ordinal()
+                colorPalette: @colorPalette()
             }
 
             ForestD3.Utils.indexify @chartData, @_metadata

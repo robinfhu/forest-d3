@@ -221,7 +221,7 @@ Author:  Robin Hu
       }
     }).attr('height', function(d, i) {
       return Math.abs(chart.yScale(y(d, i)) - barBase);
-    }).attr('width', barWidth).style('fill', chart.seriesColor(selectionData));
+    }).attr('width', barWidth).style('fill', selectionData.color);
   };
 
 }).call(this);
@@ -236,7 +236,7 @@ If you set area=true, turns it into an area graph
   this.ForestD3.ChartItem.line = function(selection, selectionData) {
     var area, areaBase, areaFn, chart, duration, interpolate, lineFn, path, x, y;
     chart = this;
-    selection.style('stroke', chart.seriesColor);
+    selection.style('stroke', selectionData.color);
     interpolate = selectionData.interpolate || 'linear';
     x = chart.getXInternal;
     y = chart.getYInternal;
@@ -261,7 +261,7 @@ If you set area=true, turns it into an area graph
       }).y0(areaBase);
       area = selection.selectAll('path.area').data([selectionData.values]);
       area.enter().append('path').classed('area', true).attr('d', areaFn.y1(areaBase));
-      return area.transition().duration(duration).style('fill', chart.seriesColor(selectionData)).attr('d', areaFn.y1(function(d, i) {
+      return area.transition().duration(duration).style('fill', selectionData.color).attr('d', areaFn.y1(function(d, i) {
         return chart.yScale(y(d, i));
       }));
     }
@@ -416,7 +416,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
   this.ForestD3.ChartItem.scatter = function(selection, selectionData) {
     var all, base, chart, points, seriesIndex, shape, symbol, x, y;
     chart = this;
-    selection.style('fill', chart.seriesColor);
+    selection.style('fill', selectionData.color);
     x = chart.getXInternal;
     y = chart.getYInternal;
     all = d3.svg.symbolTypes;
@@ -775,7 +775,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
               on the x-axis or not.
        */
       normalize: function(data, options) {
-        var findExtent, getX, getY, ordinal;
+        var colorIndex, colorPalette, findExtent, getX, getY, ordinal;
         if (options == null) {
           options = {};
         }
@@ -783,11 +783,13 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         getX = options.getX;
         getY = options.getY;
         ordinal = options.ordinal;
+        colorPalette = options.colorPalette || colors20;
         findExtent = function(values, key) {
           return d3.extent(values.map(function(d) {
             return d[key];
           }));
         };
+        colorIndex = 0;
         data.forEach(function(series, i) {
           if (series.key == null) {
             series.key = "series" + i;
@@ -811,6 +813,10 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
               y: series.axis !== 'x' ? [series.value] : []
             };
             return;
+          }
+          if (series.color == null) {
+            series.color = colorPalette[colorIndex % colorPalette.length];
+            colorIndex++;
           }
           if (series.values instanceof Array) {
             series.values = series.values.map(function(d, i) {
@@ -853,12 +859,8 @@ Some operations can mutate the original chart data.
       },
       displayInfo: function() {
         return data.map(function(d) {
-          return {
-            key: d.key,
-            label: d.label || d.key,
-            hidden: chart.metadata(d).hidden === true,
-            color: chart.seriesColor(d)
-          };
+          d.hidden = chart.metadata(d).hidden === true;
+          return d;
         });
       },
       hide: function(keys, flag) {
@@ -970,7 +972,7 @@ Some operations can mutate the original chart data.
             y: chart.getY()(point.data, idx),
             key: d.key,
             label: d.label,
-            color: chart.seriesColor(d)
+            color: d.color
           };
         });
       },
@@ -1131,7 +1133,7 @@ Library of tooltip rendering utilities
     single: function(chart, point) {
       var bgColor, color, label, xValue;
       xValue = chart.xTickFormat()(point.xValue);
-      color = chart.seriesColor(point.series);
+      color = point.series.color;
       bgColor = "background-color: " + color + ";";
       label = point.series.label || point.series.key;
       return "<div class='header'>" + xValue + "</div>\n<table>\n    <tr>\n        <td><div class='series-color' style='" + bgColor + "'></div></td>\n        <td class='series-label'>" + label + "</td>\n        <td class='series-value'>\n            " + (chart.yTickFormat()(point.y)) + "\n        </td>\n    </tr>\n</table>";
@@ -1358,7 +1360,7 @@ Handles the guideline that moves along the x-axis
       'getY', function(d, i) {
         return d[1];
       }
-    ], ['forceDomain', null], ['ordinal', true], ['autoResize', true], ['color', ForestD3.Utils.defaultColor], ['duration', 250], ['pointSize', 4], ['xPadding', 0.1], ['yPadding', 0.1], ['xLabel', ''], ['yLabel', ''], ['chartLabel', ''], ['xScaleType', d3.scale.linear], ['yScaleType', d3.scale.linear], [
+    ], ['forceDomain', null], ['ordinal', true], ['autoResize', true], ['colorPalette', null], ['duration', 250], ['pointSize', 4], ['xPadding', 0.1], ['yPadding', 0.1], ['xLabel', ''], ['yLabel', ''], ['chartLabel', ''], ['xScaleType', d3.scale.linear], ['yScaleType', d3.scale.linear], [
       'xTickFormat', function(d) {
         return d;
       }
@@ -1376,11 +1378,6 @@ Handles the guideline that moves along the x-axis
       this.crosshairs = new ForestD3.Crosshairs(this);
       this.xAxis = d3.svg.axis();
       this.yAxis = d3.svg.axis();
-      this.seriesColor = (function(_this) {
-        return function(d) {
-          return d.color || _this.color()(_this.metadata(d).index);
-        };
-      })(this);
       this.getXInternal = function(d) {
         return d.x;
       };
@@ -1406,7 +1403,8 @@ Handles the guideline that moves along the x-axis
         this.chartData = ForestD3.Utils.normalize(d, {
           getX: this.getX(),
           getY: this.getY(),
-          ordinal: this.ordinal()
+          ordinal: this.ordinal(),
+          colorPalette: this.colorPalette()
         });
         ForestD3.Utils.indexify(this.chartData, this._metadata);
         if (this.tooltipType() === 'spatial') {

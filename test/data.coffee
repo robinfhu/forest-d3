@@ -366,6 +366,42 @@ describe 'Data API', ->
         internalData[2].label.should.equal 'Series #2'
         internalData[2].type.should.equal 'scatter'
 
+    it 'automatically adds color field to each series', ->
+        data = [
+            values: []
+        ,
+            color: '#00f'
+            values: []
+        ,
+            type: 'marker'
+            value: 30
+        ,
+            values: []
+        ,
+            values: []
+        ,
+            values: []
+        ]
+
+        colors = [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#ffbb78",
+            "#2ca02c",
+            "#98df8a"
+        ]
+
+        chart = new ForestD3.Chart()
+        chart.colorPalette(colors).data(data)
+        internalData = chart.data().get()
+        internalData[0].color.should.equal '#1f77b4'
+        internalData[1].color.should.equal '#00f'
+        should.not.exist internalData[2].color
+        internalData[3].color.should.equal '#aec7e8'
+        internalData[4].color.should.equal '#ff7f0e'
+        internalData[5].color.should.equal '#ffbb78'
+
     describe 'Data Slice', ->
         it 'can get a slice of data at an index', ->
             data = [

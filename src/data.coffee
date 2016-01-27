@@ -13,10 +13,8 @@ Some operations can mutate the original chart data.
     # Used for legends that need label and color information
     displayInfo: ->
         data.map (d)->
-            key: d.key
-            label: d.label or d.key
-            hidden: chart.metadata(d).hidden is true
-            color: chart.seriesColor d
+            d.hidden = chart.metadata(d).hidden is true
+            d
 
     # Mark a given data series as hidden.
     hide: (keys, flag = true)->
@@ -108,7 +106,7 @@ Some operations can mutate the original chart data.
             y: chart.getY()(point.data, idx)
             key: d.key
             label: d.label
-            color: chart.seriesColor d
+            color: d.color
 
     _barItems: -> @.visible().filter((d)-> d.type is 'bar')
     ###

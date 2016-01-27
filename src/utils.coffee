@@ -278,9 +278,12 @@
         getX = options.getX
         getY = options.getY
         ordinal = options.ordinal
+        colorPalette = options.colorPalette or colors20
 
         findExtent = (values, key)->
             d3.extent values.map (d)-> d[key]
+
+        colorIndex = 0
 
         data.forEach (series,i)->
             series.key ?= "series#{i}"
@@ -298,6 +301,10 @@
                     x: if series.axis is 'x' then [series.value] else []
                     y: if series.axis isnt 'x' then [series.value] else []
                 return
+
+            unless series.color?
+                series.color = colorPalette[colorIndex % colorPalette.length]
+                colorIndex++
 
             if series.values instanceof Array
                 series.values = series.values.map (d,i)->

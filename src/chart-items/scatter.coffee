@@ -8,7 +8,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
 @ForestD3.ChartItem.scatter = (selection, selectionData)->
     chart = @
 
-    selection.style 'fill', chart.seriesColor
+    selection.style 'fill', selectionData.color
 
     x = chart.getXInternal
     y = chart.getYInternal

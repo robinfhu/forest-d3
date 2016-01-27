@@ -78,4 +78,4 @@
             Math.abs(chart.yScale(y(d,i)) - barBase)
         )
         .attr('width', barWidth)
-        .style('fill', chart.seriesColor(selectionData))
+        .style('fill', selectionData.color)

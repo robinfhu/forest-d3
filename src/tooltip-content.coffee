@@ -28,7 +28,7 @@ Library of tooltip rendering utilities
         """
     single: (chart, point)->
         xValue = chart.xTickFormat()(point.xValue)
-        color = chart.seriesColor point.series
+        color = point.series.color
         bgColor = "background-color: #{color};"
         label = point.series.label or point.series.key
         """
