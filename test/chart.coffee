@@ -75,7 +75,7 @@ describe 'Chart', ->
                     ]
                 ]
 
-                chart.xTicks(1).data(sampleData).render()
+                chart.data(sampleData).render()
 
                 xTicks = $(container).find('.x-axis .tick')
                 xTicks.length.should.be.greaterThan 0
@@ -362,6 +362,24 @@ describe 'Chart', ->
                     bar = $(container).find('g.item-s1 rect').get(0)
                     width = parseFloat(bar.getAttribute('width'))
                     width.should.be.lessThan 300
+                    done()
+                , 300
+
+            it 'can use reduceXTicks=false to show all x-labels', (done)->
+                data =
+                    series1:
+                        type: 'bar'
+                        values: [
+                            'January','February','March','April','May',
+                            'June','July','August','September','October'
+                        ].map (m)-> [m, Math.random()]
+
+                chart = new ForestD3.Chart container
+                chart.ordinal(true).reduceXTicks(false).data(data).render()
+
+                setTimeout ->
+                    xTicks = $(container).find('g.x-axis .tick')
+                    xTicks.length.should.equal 10
                     done()
                 , 300
 

@@ -42,3 +42,5 @@ var data = {
 var chart = new ForestD3.Chart('#my-chart');
 chart.data(data).render();
 ```
+
+This will render a scatter chart by default.

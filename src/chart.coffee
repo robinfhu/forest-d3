@@ -16,7 +16,7 @@ chartProperties = [
     ['yScaleType', d3.scale.linear]
     ['xTickFormat', (d)-> d]
     ['yTickFormat', d3.format(',.2f')]
-    ['xTicks', null]
+    ['reduceXTicks', true]
     ['yTicks', null]
     ['showXAxis', true]
     ['showYAxis', true]
@@ -203,23 +203,29 @@ chartProperties = [
                 space in between.
                 ###
 
-                # Gets the width of each x-tick label
-                xTickWidth = ForestD3.Utils.textWidthApprox(
-                    xValuesRaw,
-                    @xTickFormat()
-                )
-
                 xValues = @data().xValues()
-                # Figures out how many ticks can be shown on x-axis
-                xTicks = @canvasWidth / xTickWidth
 
-                # Figures out optimal tick layout.
-                widthThreshold = Math.ceil @xScale.invert xTickWidth
-                tickValues = ForestD3.Utils.tickValues(
-                    xValues,
-                    xTicks,
-                    widthThreshold
-                )
+                tickValues = do =>
+                    if @reduceXTicks()
+                        # Gets the width of each x-tick label
+                        xTickWidth = ForestD3.Utils.textWidthApprox(
+                            xValuesRaw,
+                            @xTickFormat()
+                        )
+
+                        # Figures out how many ticks can be shown on x-axis
+                        xTicks = @canvasWidth / xTickWidth
+
+                        # Figures out optimal tick layout.
+                        widthThreshold = Math.ceil @xScale.invert xTickWidth
+
+                        return ForestD3.Utils.tickValues(
+                            xValues,
+                            xTicks,
+                            widthThreshold
+                        )
+                    else
+                        return xValues
 
             @xAxis
                 .scale(@xScale)

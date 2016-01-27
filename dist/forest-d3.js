@@ -1362,7 +1362,7 @@ Handles the guideline that moves along the x-axis
       'xTickFormat', function(d) {
         return d;
       }
-    ], ['yTickFormat', d3.format(',.2f')], ['xTicks', null], ['yTicks', null], ['showXAxis', true], ['showYAxis', true], ['showTooltip', true], ['showGuideline', true], ['tooltipType', 'bisect']
+    ], ['yTickFormat', d3.format(',.2f')], ['reduceXTicks', true], ['yTicks', null], ['showXAxis', true], ['showYAxis', true], ['showTooltip', true], ['showGuideline', true], ['tooltipType', 'bisect']
   ];
 
   this.ForestD3.Chart = Chart = (function(superClass) {
@@ -1553,7 +1553,7 @@ Handles the guideline that moves along the x-axis
      */
 
     Chart.prototype.updateChartFrame = function() {
-      var axesLabels, backdrop, canvasEnter, chart, chartLabel, margin, tickValues, widthThreshold, xAxisGroup, xAxisLabel, xTickWidth, xTicks, xValues, xValuesRaw, yAxisGroup, yAxisLabel;
+      var axesLabels, backdrop, canvasEnter, chart, chartLabel, margin, tickValues, xAxisGroup, xAxisLabel, xValues, xValuesRaw, yAxisGroup, yAxisLabel;
       backdrop = this.svg.selectAll('rect.backdrop').data([0]);
       backdrop.enter().append('rect').classed('backdrop', true);
       backdrop.attr('width', this.width).attr('height', this.height);
@@ -1568,11 +1568,20 @@ Handles the guideline that moves along the x-axis
           Will always show the first and last ticks, and fill in the
           space in between.
            */
-          xTickWidth = ForestD3.Utils.textWidthApprox(xValuesRaw, this.xTickFormat());
           xValues = this.data().xValues();
-          xTicks = this.canvasWidth / xTickWidth;
-          widthThreshold = Math.ceil(this.xScale.invert(xTickWidth));
-          tickValues = ForestD3.Utils.tickValues(xValues, xTicks, widthThreshold);
+          tickValues = (function(_this) {
+            return function() {
+              var widthThreshold, xTickWidth, xTicks;
+              if (_this.reduceXTicks()) {
+                xTickWidth = ForestD3.Utils.textWidthApprox(xValuesRaw, _this.xTickFormat());
+                xTicks = _this.canvasWidth / xTickWidth;
+                widthThreshold = Math.ceil(_this.xScale.invert(xTickWidth));
+                return ForestD3.Utils.tickValues(xValues, xTicks, widthThreshold);
+              } else {
+                return xValues;
+              }
+            };
+          })(this)();
         }
         this.xAxis.scale(this.xScale).tickSize(10, 10).tickValues(tickValues).tickPadding(5).tickFormat((function(_this) {
           return function(d) {

@@ -121,3 +121,56 @@ dataTwoGroups = [
 ]
 
 chartTwoGroups.data(dataTwoGroups).render()
+
+# ************************* Just a regular single series
+dataSingleSeries =
+    monthlyData:
+        color: '#aaa'
+        type: 'bar'
+        values: [
+            month: 'Jan'
+            calc: 5.5
+        ,
+            month: 'Feb'
+            calc: 6.7
+        ,
+            month: 'Mar'
+            calc: 8.0
+        ,
+            month: 'Apr'
+            calc: 13.5
+        ,
+            month: 'May'
+            calc: 20.4
+        ,
+            month: 'Jun'
+            calc: 22.8
+        ,
+            month: 'Jul'
+            calc: 19.8
+        ,
+            month: 'Aug'
+            calc: 16.8
+        ,
+            month: 'Sep'
+            calc: 10.4
+        ,
+            month: 'Oct'
+            calc: 4.5
+        ,
+            month: 'Nov'
+            calc: 3.2
+        ,
+            month: 'Dec'
+            calc: 1.1
+        ]
+
+chartSingleSeries = new ForestD3.Chart '#example-single-series'
+chartSingleSeries
+    .ordinal(true)
+    .getX((d)-> d.month)
+    .getY((d)-> d.calc)
+    .reduceXTicks(false)
+    .chartLabel('Monthly Calculations')
+    .data(dataSingleSeries)
+    .render()

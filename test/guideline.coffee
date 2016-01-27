@@ -66,4 +66,4 @@ describe 'Chart', ->
                 line = $(container).find('line.guideline')
                 line.css('opacity').should.equal '0'
                 done()
-            , 800
+            , 1000
