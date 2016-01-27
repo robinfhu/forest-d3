@@ -128,54 +128,6 @@ describe 'Utilities', ->
                 x: [-4, 1]
                 y: [0, 3]
 
-    describe 'Indexify', ->
-        it 'adds _index to each series', ->
-            data = [
-                key: 's1'
-                values: []
-            ,
-                key: 's2'
-                values: []
-            ,
-                key: 's3'
-                values: []
-            ]
-
-            meta = {}
-            result = ForestD3.Utils.indexify data, meta
-
-            meta['s1'].index.should.equal 0
-            meta['s2'].index.should.equal 1
-            meta['s3'].index.should.equal 2
-
-        it 'skips markers and regions', ->
-            data = [
-                key: 'm1'
-                type: 'marker'
-                value: 1
-            ,
-                key: 'm2'
-                type: 'line'
-                values: []
-            ,
-                key: 's1'
-                type: 'scatter'
-                values: []
-            ,
-                key: 's2'
-                type: 'region'
-                values: []
-            ]
-
-            meta = {}
-
-            result = ForestD3.Utils.indexify data, meta
-
-            should.not.exist meta['m1'].index
-            meta['m2'].index.should.equal 0
-            meta['s1'].index.should.equal 1
-            should.not.exist meta['s2'].index
-
     describe 'extentPadding', ->
         extPadding = null
         beforeEach ->

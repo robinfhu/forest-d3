@@ -366,7 +366,7 @@ describe 'Data API', ->
         internalData[2].label.should.equal 'Series #2'
         internalData[2].type.should.equal 'scatter'
 
-    it 'automatically adds color field to each series', ->
+    it 'automatically adds color and index field to each series', ->
         data = [
             values: []
         ,
@@ -401,6 +401,13 @@ describe 'Data API', ->
         internalData[3].color.should.equal '#aec7e8'
         internalData[4].color.should.equal '#ff7f0e'
         internalData[5].color.should.equal '#ffbb78'
+
+        internalData[0].index.should.equal 0
+        internalData[1].index.should.equal 1
+        should.not.exist internalData[2].index
+        internalData[3].index.should.equal 2
+        internalData[4].index.should.equal 3
+        internalData[5].index.should.equal 4
 
     describe 'Data Slice', ->
         it 'can get a slice of data at an index', ->

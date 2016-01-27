@@ -117,11 +117,6 @@
         )
 
         data
-        .filter((d)-> (not d.type?) or (d.type not in ['region', 'marker']))
-        .forEach (d, i)->
-            metadata[d.key].index = i
-
-        data
 
     ###
     Utility class that uses d3.bisect to find the index in a given array,
@@ -284,6 +279,7 @@
             d3.extent values.map (d)-> d[key]
 
         colorIndex = 0
+        seriesIndex = 0
 
         data.forEach (series,i)->
             series.key ?= "series#{i}"
@@ -305,6 +301,9 @@
             unless series.color?
                 series.color = colorPalette[colorIndex % colorPalette.length]
                 colorIndex++
+
+            series.index = seriesIndex
+            seriesIndex++
 
             if series.values instanceof Array
                 series.values = series.values.map (d,i)->

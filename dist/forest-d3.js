@@ -420,7 +420,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
     x = chart.getXInternal;
     y = chart.getYInternal;
     all = d3.svg.symbolTypes;
-    seriesIndex = chart.metadata(selectionData).index;
+    seriesIndex = selectionData.index;
     shape = selectionData.shape || all[seriesIndex % all.length];
     symbol = d3.svg.symbol().type(shape);
     points = selection.selectAll('path.point').data(function(d) {
@@ -582,12 +582,6 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
           if (metadata[d.key] == null) {
             return metadata[d.key] = {};
           }
-        });
-        data.filter(function(d) {
-          var ref;
-          return (d.type == null) || ((ref = d.type) !== 'region' && ref !== 'marker');
-        }).forEach(function(d, i) {
-          return metadata[d.key].index = i;
         });
         return data;
       },
@@ -775,7 +769,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
               on the x-axis or not.
        */
       normalize: function(data, options) {
-        var colorIndex, colorPalette, findExtent, getX, getY, ordinal;
+        var colorIndex, colorPalette, findExtent, getX, getY, ordinal, seriesIndex;
         if (options == null) {
           options = {};
         }
@@ -790,6 +784,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
           }));
         };
         colorIndex = 0;
+        seriesIndex = 0;
         data.forEach(function(series, i) {
           if (series.key == null) {
             series.key = "series" + i;
@@ -818,6 +813,8 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
             series.color = colorPalette[colorIndex % colorPalette.length];
             colorIndex++;
           }
+          series.index = seriesIndex;
+          seriesIndex++;
           if (series.values instanceof Array) {
             series.values = series.values.map(function(d, i) {
               return {
