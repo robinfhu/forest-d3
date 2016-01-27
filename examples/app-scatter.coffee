@@ -9,10 +9,6 @@ getValues = (factor=40)->
     values = [0...20].map (_)->
         [Math.random() * 10, Math.random() * factor]
 
-    values.sort (a,b)-> d3.ascending(a[0], b[0])
-
-    values
-
 data = [
     shape: 'square'
     color: 'orange'
