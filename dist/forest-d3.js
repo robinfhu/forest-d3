@@ -57,16 +57,6 @@ Author:  Robin Hu
       return window.removeEventListener('resize', this.resize);
     };
 
-    BaseChart.prototype.metadata = function(d) {
-      if (typeof d === 'string') {
-        return this._metadata[d];
-      } else if (typeof d === 'object' && (d.key != null)) {
-        return this._metadata[d.key];
-      } else {
-        return this._metadata;
-      }
-    };
-
     BaseChart.prototype.on = function(type, listener) {
       return this._dispatch.on(type, listener);
     };
@@ -75,32 +65,7 @@ Author:  Robin Hu
       return this._dispatch[type].apply(this, Array.prototype.slice.call(arguments, 1));
     };
 
-    BaseChart.prototype._attachStateHandlers = function() {
-      return this.on('stateUpdate', (function(_this) {
-        return function(state) {
-          var attr, config, key, meta, results, val;
-          results = [];
-          for (key in state) {
-            config = state[key];
-            meta = _this.metadata()[key];
-            if (meta != null) {
-              results.push((function() {
-                var results1;
-                results1 = [];
-                for (attr in config) {
-                  val = config[attr];
-                  results1.push(meta[attr] = val);
-                }
-                return results1;
-              })());
-            } else {
-              results.push(void 0);
-            }
-          }
-          return results;
-        };
-      })(this));
-    };
+    BaseChart.prototype._attachStateHandlers = function() {};
 
     BaseChart.prototype.container = function(d) {
       if (d == null) {
@@ -574,19 +539,6 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
       },
 
       /*
-      Assigns a numeric 'index' to each series, which is used to uniquely
-      identify it. Stores this index in chart.metadata
-       */
-      indexify: function(data, metadata) {
-        data.forEach(function(d) {
-          if (metadata[d.key] == null) {
-            return metadata[d.key] = {};
-          }
-        });
-        return data;
-      },
-
-      /*
       Utility class that uses d3.bisect to find the index in a given array,
       where a search value can be inserted.
       This is different from normal bisectLeft; this function finds the nearest
@@ -854,25 +806,18 @@ Some operations can mutate the original chart data.
       get: function() {
         return data;
       },
-      displayInfo: function() {
-        return data.map(function(d) {
-          d.hidden = chart.metadata(d).hidden === true;
-          return d;
-        });
-      },
       hide: function(keys, flag) {
-        var d, j, len, metadata, ref;
+        var d, j, len, ref;
         if (flag == null) {
           flag = true;
         }
-        metadata = chart.metadata();
         if (!(keys instanceof Array)) {
           keys = [keys];
         }
         for (j = 0, len = data.length; j < len; j++) {
           d = data[j];
           if (ref = d.key, indexOf.call(keys, ref) >= 0) {
-            metadata[d.key].hidden = flag;
+            d.hidden = flag;
           }
         }
         return this;
@@ -881,40 +826,37 @@ Some operations can mutate the original chart data.
         return this.hide(keys, false);
       },
       toggle: function(keys) {
-        var d, j, len, metadata, ref;
-        metadata = chart.metadata();
+        var d, j, len, ref;
         if (!(keys instanceof Array)) {
           keys = [keys];
         }
         for (j = 0, len = data.length; j < len; j++) {
           d = data[j];
           if (ref = d.key, indexOf.call(keys, ref) >= 0) {
-            metadata[d.key].hidden = !metadata[d.key].hidden;
+            d.hidden = !d.hidden;
           }
         }
         return this;
       },
       showOnly: function(key) {
-        var d, j, len, metadata;
-        metadata = chart.metadata();
+        var d, j, len;
         for (j = 0, len = data.length; j < len; j++) {
           d = data[j];
-          metadata[d.key].hidden = !(d.key === key);
+          d.hidden = !(d.key === key);
         }
         return this;
       },
       showAll: function() {
-        var d, j, len, metadata;
-        metadata = chart.metadata();
+        var d, j, len;
         for (j = 0, len = data.length; j < len; j++) {
           d = data[j];
-          metadata[d.key].hidden = false;
+          d.hidden = false;
         }
         return this;
       },
       visible: function() {
         return data.filter(function(d) {
-          return !chart.metadata(d).hidden;
+          return !d.hidden;
         });
       },
       _getSliceable: function() {
@@ -960,7 +902,7 @@ Some operations can mutate the original chart data.
        */
       sliced: function(idx) {
         return this._getSliceable().filter(function(d) {
-          return !chart.metadata(d).hidden;
+          return !d.hidden;
         }).map(function(d) {
           var point;
           point = d.values[idx];
@@ -1006,7 +948,7 @@ Some operations can mutate the original chart data.
       quadtree: function() {
         var allPoints;
         allPoints = this._getSliceable().filter(function(d) {
-          return !chart.metadata(d).hidden;
+          return !d.hidden;
         }).map(function(s, i) {
           return s.values.map(function(d, i) {
             return {
@@ -1074,7 +1016,7 @@ It acts as a plugin to a main chart instance.
           return _this.chartInstance.data().showAll().render();
         };
       })(this));
-      data = this.chartInstance.data().displayInfo();
+      data = this.chartInstance.data().get();
       items = this.container.selectAll('div.item').data(data, function(d) {
         return d.key;
       });
@@ -1403,7 +1345,6 @@ Handles the guideline that moves along the x-axis
           ordinal: this.ordinal(),
           colorPalette: this.colorPalette()
         });
-        ForestD3.Utils.indexify(this.chartData, this._metadata);
         if (this.tooltipType() === 'spatial') {
           this.quadtree = this.data().quadtree();
         }
@@ -1474,7 +1415,7 @@ Handles the guideline that moves along the x-axis
        */
       chartItems.order();
       this.renderPlugins();
-      this.trigger('rendered', this.metadata());
+      this.trigger('rendered');
       return this;
     };
 
@@ -1708,7 +1649,7 @@ Handles the guideline that moves along the x-axis
           There is an additional check to make sure tooltips are not
           rendered for hidden chart series'.
            */
-          isHidden = this.metadata(point.series).hidden;
+          isHidden = point.series.hidden;
           if (dist < threshold && !isHidden) {
             content = ForestD3.TooltipContent.single(this, point);
             this.crosshairs.render(xActual, yActual);

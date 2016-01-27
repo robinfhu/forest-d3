@@ -40,12 +40,3 @@ describe 'Chart', ->
             chart.render()
 
             spy.should.have.been.calledOnce
-            should.exist spy.args[0][0]
-
-            state = spy.args[0][0]
-            state['s2'].hidden.should.be.true
-
-        it 'can alter state via `stateUpdate` event', ->
-            chart.trigger 'stateUpdate', {'s2': {hidden: true}}
-
-            chart.metadata()['s2'].hidden.should.be.true

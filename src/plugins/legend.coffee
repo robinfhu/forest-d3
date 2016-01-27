@@ -29,7 +29,7 @@ It acts as a plugin to a main chart instance.
             .text('show all')
             .on('click', (d)=> @chartInstance.data().showAll().render())
 
-        data = @chartInstance.data().displayInfo()
+        data = @chartInstance.data().get()
 
         items = @container.selectAll('div.item').data(data, (d)-> d.key)
         itemsEnter = items

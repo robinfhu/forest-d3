@@ -107,16 +107,6 @@
 
 
         result
-    ###
-    Assigns a numeric 'index' to each series, which is used to uniquely
-    identify it. Stores this index in chart.metadata
-    ###
-    indexify: (data, metadata)->
-        data.forEach((d)->
-            metadata[d.key] = {} unless metadata[d.key]?
-        )
-
-        data
 
     ###
     Utility class that uses d3.bisect to find the index in a given array,

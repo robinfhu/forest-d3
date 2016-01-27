@@ -10,21 +10,14 @@ Some operations can mutate the original chart data.
     # Returns the entire raw data object.
     get: -> data
 
-    # Used for legends that need label and color information
-    displayInfo: ->
-        data.map (d)->
-            d.hidden = chart.metadata(d).hidden is true
-            d
-
     # Mark a given data series as hidden.
     hide: (keys, flag = true)->
-        metadata = chart.metadata()
         if not (keys instanceof Array)
             keys = [keys]
 
         for d in data
             if d.key in keys
-                metadata[d.key].hidden = flag
+                d.hidden = flag
 
         @
 
@@ -34,35 +27,32 @@ Some operations can mutate the original chart data.
 
     # Flip data series on/off.
     toggle: (keys)->
-        metadata = chart.metadata()
         if not (keys instanceof Array)
             keys = [keys]
 
         for d in data
             if d.key in keys
-                metadata[d.key].hidden = not metadata[d.key].hidden
+                d.hidden = not d.hidden
 
         @
 
     # Turn everything off except for the given data series.
     showOnly: (key)->
-        metadata = chart.metadata()
         for d in data
-            metadata[d.key].hidden = not (d.key is key)
+            d.hidden = not (d.key is key)
 
         @
 
     # Turn everything on.
     showAll: ->
-        metadata = chart.metadata()
         for d in data
-            metadata[d.key].hidden = false
+            d.hidden = false
 
         @
 
     # Get list of data series' that are not hidden
     visible: ->
-        data.filter (d)-> not chart.metadata(d).hidden
+        data.filter (d)-> not d.hidden
 
     _getSliceable: ->
         data.filter (d)-> d.values? and d.type isnt 'region'
@@ -99,7 +89,7 @@ Some operations can mutate the original chart data.
     Useful for making the tooltip.
     ###
     sliced: (idx)->
-        @._getSliceable().filter((d)-> not chart.metadata(d).hidden).map (d)->
+        @._getSliceable().filter((d)-> not d.hidden).map (d)->
             point = d.values[idx]
 
             x: chart.getX()(point.data, idx)
@@ -130,7 +120,7 @@ Some operations can mutate the original chart data.
 
     quadtree: ->
         allPoints = @._getSliceable()
-        .filter((d)-> not chart.metadata(d).hidden)
+        .filter((d)-> not d.hidden)
         .map (s, i)->
             s.values.map (d,i)->
                 x: chart.getXInternal(d,i)

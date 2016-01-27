@@ -56,8 +56,6 @@ chartProperties = [
                 colorPalette: @colorPalette()
             }
 
-            ForestD3.Utils.indexify @chartData, @_metadata
-
             if @tooltipType() is 'spatial'
                 @quadtree = @data().quadtree()
 
@@ -123,7 +121,7 @@ chartProperties = [
         @renderPlugins()
 
         # Trigger the 'rendered' event
-        @trigger 'rendered', @metadata()
+        @trigger 'rendered'
 
         @
 
@@ -436,7 +434,7 @@ chartProperties = [
                 There is an additional check to make sure tooltips are not
                 rendered for hidden chart series'.
                 ###
-                isHidden = @metadata(point.series).hidden
+                isHidden = point.series.hidden
                 if dist < threshold and not isHidden
                     content = ForestD3.TooltipContent.single @, point
 

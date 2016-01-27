@@ -29,14 +29,6 @@
 
         window.removeEventListener 'resize', @resize
 
-    metadata: (d)->
-        if typeof d is 'string'
-            @_metadata[d]
-        else if typeof d is 'object' and d.key?
-            @_metadata[d.key]
-        else
-            @_metadata
-
     on: (type, listener)->
         @_dispatch.on type, listener
 
@@ -44,12 +36,6 @@
         @_dispatch[type].apply @, Array.prototype.slice.call(arguments, 1)
 
     _attachStateHandlers: ->
-        @on 'stateUpdate', (state)=>
-            for key, config of state
-                meta = @metadata()[key]
-                if meta?
-                    for attr, val of config
-                        meta[attr] = val
 
     container: (d)->
         unless d?
