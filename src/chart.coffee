@@ -94,21 +94,22 @@ chartProperties = [
         'type' attribute, renders a different kind of chart element.
         ###
         chartItems.each (d,i)->
-            renderFn = -> 0
-
             chartItem = d3.select @
-            if (d.type is 'scatter') or (not d.type? and d.values?)
-                renderFn = ForestD3.ChartItem.scatter
-            else if d.type is 'line'
-                renderFn = ForestD3.ChartItem.line
-            else if d.type is 'bar'
-                renderFn = ForestD3.ChartItem.bar
-            else if d.type is 'ohlc'
-                renderFn = ForestD3.ChartItem.ohlc
-            else if (d.type is 'marker') or (not d.type? and d.value?)
-                renderFn = ForestD3.ChartItem.markerLine
-            else if d.type is 'region'
-                renderFn = ForestD3.ChartItem.region
+            renderFn = switch d.type
+                when 'scatter'
+                    ForestD3.ChartItem.scatter
+                when 'line'
+                    ForestD3.ChartItem.line
+                when 'bar'
+                    ForestD3.ChartItem.bar
+                when 'ohlc'
+                    ForestD3.ChartItem.ohlc
+                when 'marker'
+                    ForestD3.ChartItem.markerLine
+                when 'region'
+                    ForestD3.ChartItem.region
+                else
+                    (-> 0)
 
             renderFn.call chart, chartItem, d
 

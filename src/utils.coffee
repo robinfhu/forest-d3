@@ -282,7 +282,11 @@
         findExtent = (values, key)->
             d3.extent values.map (d)-> d[key]
 
-        data.forEach (series)->
+        data.forEach (series,i)->
+            series.key ?= "series#{i}"
+            series.label ?= "Series ##{i}"
+            series.type ?= if series.value? then 'marker' else 'scatter'
+
             if series.type is 'region'
                 series.extent =
                     x: if series.axis is 'x' then series.values else []

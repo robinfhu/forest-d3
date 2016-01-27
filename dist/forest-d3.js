@@ -788,7 +788,16 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
             return d[key];
           }));
         };
-        data.forEach(function(series) {
+        data.forEach(function(series, i) {
+          if (series.key == null) {
+            series.key = "series" + i;
+          }
+          if (series.label == null) {
+            series.label = "Series #" + i;
+          }
+          if (series.type == null) {
+            series.type = series.value != null ? 'marker' : 'scatter';
+          }
           if (series.type === 'region') {
             series.extent = {
               x: series.axis === 'x' ? series.values : [],
@@ -1439,23 +1448,27 @@ Handles the guideline that moves along the x-axis
        */
       chartItems.each(function(d, i) {
         var chartItem, renderFn;
-        renderFn = function() {
-          return 0;
-        };
         chartItem = d3.select(this);
-        if ((d.type === 'scatter') || ((d.type == null) && (d.values != null))) {
-          renderFn = ForestD3.ChartItem.scatter;
-        } else if (d.type === 'line') {
-          renderFn = ForestD3.ChartItem.line;
-        } else if (d.type === 'bar') {
-          renderFn = ForestD3.ChartItem.bar;
-        } else if (d.type === 'ohlc') {
-          renderFn = ForestD3.ChartItem.ohlc;
-        } else if ((d.type === 'marker') || ((d.type == null) && (d.value != null))) {
-          renderFn = ForestD3.ChartItem.markerLine;
-        } else if (d.type === 'region') {
-          renderFn = ForestD3.ChartItem.region;
-        }
+        renderFn = (function() {
+          switch (d.type) {
+            case 'scatter':
+              return ForestD3.ChartItem.scatter;
+            case 'line':
+              return ForestD3.ChartItem.line;
+            case 'bar':
+              return ForestD3.ChartItem.bar;
+            case 'ohlc':
+              return ForestD3.ChartItem.ohlc;
+            case 'marker':
+              return ForestD3.ChartItem.markerLine;
+            case 'region':
+              return ForestD3.ChartItem.region;
+            default:
+              return function() {
+                return 0;
+              };
+          }
+        })();
         return renderFn.call(chart, chartItem, d);
       });
 

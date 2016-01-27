@@ -37,7 +37,7 @@ describe 'Data API', ->
         display[2].color.should.equal '#00f'
         display[1].hidden.should.be.true
         display[0].label.should.equal 'Hello'
-        display[2].label.should.equal 'series3'
+        display[2].label.should.equal 'Series #2'
 
     it 'has methods to show/hide data series`', ->
         data = [
@@ -342,6 +342,29 @@ describe 'Data API', ->
             x: []
             y: [-10,11]
 
+    it 'fills in key and label if not defined', ->
+        data = [
+            values: []
+        ,
+            values: []
+        ,
+            values: []
+        ]
+
+        chart = new ForestD3.Chart()
+        chart.data(data)
+        internalData = chart.data().get()
+
+        internalData[0].key.should.equal 'series0'
+        internalData[0].label.should.equal 'Series #0'
+
+        internalData[1].key.should.equal 'series1'
+        internalData[1].label.should.equal 'Series #1'
+
+
+        internalData[2].key.should.equal 'series2'
+        internalData[2].label.should.equal 'Series #2'
+        internalData[2].type.should.equal 'scatter'
 
     describe 'Data Slice', ->
         it 'can get a slice of data at an index', ->

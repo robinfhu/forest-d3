@@ -23,16 +23,10 @@
 
   data = [
     {
-      key: 'series1',
-      type: 'scatter',
-      label: 'Sample A',
       shape: 'square',
       color: 'orange',
       values: getValues()
     }, {
-      key: 'series2',
-      type: 'scatter',
-      label: 'Sample B',
       values: getValues(20)
     }
   ];
