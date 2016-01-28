@@ -1483,8 +1483,15 @@ Handles the guideline that moves along the x-axis
         this.height = bounds.height;
         this.width = bounds.width;
         margin = this.margin();
+
+        /*
+        Calculates the chart canvas dimensions. Uses the parent
+        container's dimensions, and subtracts off any margins.
+         */
         this.canvasHeight = this.height - margin.bottom - margin.top;
-        return this.canvasWidth = this.width - margin.left - margin.right;
+        this.canvasWidth = this.width - margin.left - margin.right;
+        this.canvasWidth = d3.max([this.canvasWidth, 50]);
+        return this.canvasHeight = d3.max([this.canvasHeight, 50]);
       }
     };
 

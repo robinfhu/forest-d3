@@ -173,8 +173,16 @@ chartProperties = [
 
             margin = @margin()
 
+            ###
+            Calculates the chart canvas dimensions. Uses the parent
+            container's dimensions, and subtracts off any margins.
+            ###
             @canvasHeight = @height - margin.bottom - margin.top
             @canvasWidth = @width - margin.left - margin.right
+
+            # Ensures that charts cannot get smaller than 50x50 pixels.
+            @canvasWidth = d3.max [@canvasWidth, 50]
+            @canvasHeight = d3.max [@canvasHeight, 50]
 
     ###
     Draws the chart frame. Things like backdrop and canvas.

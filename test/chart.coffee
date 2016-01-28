@@ -408,7 +408,7 @@ describe 'Chart', ->
                     done()
                 , 300
 
-        describe 'Chart Options', ->
+        describe 'Chart Margins', ->
             it 'can set chart margins', ->
                 data = [
                     key: 'line1'
@@ -459,3 +459,28 @@ describe 'Chart', ->
                     right: 11
                     bottom: 33
                     left: 23
+
+            it 'cannot set margins so small it creates negative width', ->
+                container.style.width = '30px'
+
+                data = [
+                    key: 'line1'
+                    type: 'line'
+                    values: [
+                        [0,0]
+                        [1,1]
+                        [2,4]
+                    ]
+                ]
+
+                chart = new ForestD3.Chart container
+                chart.margin
+                    left: 130
+                    top: 80
+                    bottom: 40
+                    right: 60
+                chart.data(data).render()
+
+                chart.canvasWidth.should.be.greaterThan 30
+
+                container.style.width = '500px'
