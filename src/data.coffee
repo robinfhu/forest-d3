@@ -55,7 +55,7 @@ Some operations can mutate the original chart data.
         data.filter (d)-> not d.hidden
 
     _getSliceable: ->
-        data.filter (d)-> d.values? and d.type isnt 'region'
+        data.filter (d)-> d.isDataSeries
 
     _xValues: (getX)->
         dataObjs = @._getSliceable()

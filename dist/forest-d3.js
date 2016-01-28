@@ -772,6 +772,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
           series.index = seriesIndex;
           seriesIndex++;
           if (series.values instanceof Array) {
+            series.isDataSeries = true;
             series.values = series.values.map(function(d, i) {
               return {
                 x: ordinal ? i : getX(d, i),
@@ -865,7 +866,7 @@ Some operations can mutate the original chart data.
       },
       _getSliceable: function() {
         return data.filter(function(d) {
-          return (d.values != null) && d.type !== 'region';
+          return d.isDataSeries;
         });
       },
       _xValues: function(getX) {
@@ -1093,6 +1094,12 @@ Library of tooltip rendering utilities
       this.chart = chart;
       this.container = null;
     }
+
+
+    /*
+    Lets you define a DOM id for the tooltip. Makes it so that
+    you can perform DOM manipulation on it later on.
+     */
 
     Tooltip.prototype.id = function(s) {
       if (arguments.length === 0) {

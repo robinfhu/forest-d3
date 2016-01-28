@@ -296,6 +296,7 @@
             seriesIndex++
 
             if series.values instanceof Array
+                series.isDataSeries = true
                 series.values = series.values.map (d,i)->
                     x: if ordinal then i else getX(d,i)
                     y: getY(d,i)
