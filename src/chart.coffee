@@ -23,6 +23,7 @@ chartProperties = [
     ['showTooltip', true]
     ['showGuideline', true]
     ['tooltipType', 'bisect']  # Can be 'bisect' or 'spatial'
+    ['stackable', false]
 ]
 
 @ForestD3.Chart = class Chart extends ForestD3.BaseChart
@@ -56,6 +57,7 @@ chartProperties = [
                 getY: @getY()
                 ordinal: @ordinal()
                 colorPalette: @colorPalette()
+                stackable: @stackable()
             }
 
             if @tooltipType() is 'spatial'

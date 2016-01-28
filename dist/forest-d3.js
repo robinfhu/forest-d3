@@ -725,7 +725,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
               on the x-axis or not.
        */
       normalize: function(data, options) {
-        var colorIndex, colorPalette, findExtent, getX, getY, ordinal, seriesIndex;
+        var colorIndex, colorPalette, findExtent, getX, getY, ordinal, seriesIndex, stackable;
         if (options == null) {
           options = {};
         }
@@ -734,10 +734,9 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         getY = options.getY;
         ordinal = options.ordinal;
         colorPalette = options.colorPalette || colors20;
-        findExtent = function(values, key) {
-          return d3.extent(values.map(function(d) {
-            return d[key];
-          }));
+        stackable = options.stackable || false;
+        findExtent = function(values, valFn) {
+          return d3.extent(values.map(valFn));
         };
         colorIndex = 0;
         seriesIndex = 0;
@@ -773,16 +772,50 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
           seriesIndex++;
           if (series.values instanceof Array) {
             series.isDataSeries = true;
-            series.values = series.values.map(function(d, i) {
+            return series.values = series.values.map(function(d, i) {
               return {
                 x: ordinal ? i : getX(d, i),
                 y: getY(d, i),
                 data: d
               };
             });
-            series.extent = {
-              x: findExtent(series.values, 'x'),
-              y: findExtent(series.values, 'y')
+          }
+        });
+
+        /*
+        If 'stackable' is set to true, then process the data through
+        d3.layout.stack(), which will add a 'y0' attribute to each data point.
+        
+        'y0' represents the starting point on the Y-axis for the bar's location.
+         */
+        if (stackable) {
+          d3.layout.stack().offset('zero').values(function(d) {
+            return d.values;
+          })(data);
+        }
+
+        /*
+        Calculates the extent (in x and y directions) of the data in each
+        series. The 'extent' is basically the highest and lowest values, used
+        to figure out the chart's scale.
+        
+        Special attention is given when 'stackable' is true. In that case,
+        we need to add y0 to y, because the data is stacked, therefore the
+        extent must be bigger.
+         */
+        data.forEach(function(series) {
+          var yExtentVal;
+          if (series.isDataSeries) {
+            yExtentVal = stackable ? function(d) {
+              return d.y0 + d.y;
+            } : function(d) {
+              return d.y;
+            };
+            return series.extent = {
+              x: findExtent(series.values, function(d) {
+                return d.x;
+              }),
+              y: findExtent(series.values, yExtentVal)
             };
           }
         });
@@ -1323,7 +1356,7 @@ Handles the guideline that moves along the x-axis
       'xTickFormat', function(d) {
         return d;
       }
-    ], ['yTickFormat', d3.format(',.2f')], ['reduceXTicks', true], ['yTicks', null], ['showXAxis', true], ['showYAxis', true], ['showTooltip', true], ['showGuideline', true], ['tooltipType', 'bisect']
+    ], ['yTickFormat', d3.format(',.2f')], ['reduceXTicks', true], ['yTicks', null], ['showXAxis', true], ['showYAxis', true], ['showTooltip', true], ['showGuideline', true], ['tooltipType', 'bisect'], ['stackable', false]
   ];
 
   this.ForestD3.Chart = Chart = (function(superClass) {
@@ -1364,7 +1397,8 @@ Handles the guideline that moves along the x-axis
           getX: this.getX(),
           getY: this.getY(),
           ordinal: this.ordinal(),
-          colorPalette: this.colorPalette()
+          colorPalette: this.colorPalette(),
+          stackable: this.stackable()
         });
         if (this.tooltipType() === 'spatial') {
           this.quadtree = this.data().quadtree();
