@@ -131,6 +131,63 @@ Author:  Robin Hu
 }).call(this);
 
 (function() {
+  this.ForestD3.ChartItem.barStacked = function(selection, selectionData) {
+    var barBase, barWidth, bars, chart, fullSpace, maxFullSpace, maxPadding, x, xCentered, y;
+    chart = this;
+    bars = selection.selectAll('rect.bar').data(selectionData.values);
+    x = chart.getXInternal;
+    y = chart.getYInternal;
+
+    /*
+    Ensure the bars are based at the zero line, but does not extend past
+    canvas boundaries.
+     */
+    barBase = chart.yScale(0);
+    if (barBase > chart.canvasHeight) {
+      barBase = chart.canvasHeight;
+    } else if (barBase < 0) {
+      barBase = 0;
+    }
+    fullSpace = chart.canvasWidth / selectionData.values.length;
+    maxFullSpace = chart.xScale(1) / 2;
+    fullSpace = d3.min([maxFullSpace, fullSpace]);
+    maxPadding = 15;
+    fullSpace -= d3.min([fullSpace * 0.1, maxPadding]);
+    fullSpace = d3.max([1, fullSpace]);
+
+    /*
+    This is used to ensure that the bar group is centered around the x-axis
+    tick mark.
+     */
+    xCentered = fullSpace / 2;
+    bars.enter().append('rect').classed('bar', true).attr('x', function(d, i) {
+      return chart.xScale(x(d, i)) - xCentered;
+    }).attr('y', barBase).attr('height', 0);
+    bars.exit().remove();
+    barWidth = fullSpace;
+    return bars.transition().duration(selectionData.duration || chart.duration()).delay(function(d, i) {
+      return i * 20;
+    }).attr('x', function(d, i) {
+
+      /*
+      Calculates the x position of each bar. Shifts the bar along x-axis
+      depending on which series index the bar belongs to.
+       */
+      return chart.xScale(x(d, i)) - xCentered;
+    }).attr('y', function(d, i) {
+      return chart.yScale(d.y0 + d.y);
+    }).attr('height', function(d, i) {
+      return Math.abs(chart.yScale(d.y - d.y0));
+    }).attr('width', barWidth).style('fill', selectionData.color).attr('class', function(d, i) {
+      var additionalClass;
+      additionalClass = (typeof selectionData.classed) === 'function' ? selectionData.classed(d.data, i, selectionData) : '';
+      return "bar " + additionalClass;
+    });
+  };
+
+}).call(this);
+
+(function() {
   this.ForestD3.ChartItem.bar = function(selection, selectionData) {
     var barBase, barCount, barIndex, barWidth, bars, chart, fullSpace, maxFullSpace, maxPadding, x, xCentered, y;
     chart = this;
@@ -1356,7 +1413,7 @@ Handles the guideline that moves along the x-axis
       'xTickFormat', function(d) {
         return d;
       }
-    ], ['yTickFormat', d3.format(',.2f')], ['reduceXTicks', true], ['yTicks', null], ['showXAxis', true], ['showYAxis', true], ['showTooltip', true], ['showGuideline', true], ['tooltipType', 'bisect'], ['stackable', false]
+    ], ['yTickFormat', d3.format(',.2f')], ['reduceXTicks', true], ['yTicks', null], ['showXAxis', true], ['showYAxis', true], ['showTooltip', true], ['showGuideline', true], ['tooltipType', 'bisect'], ['stackable', false], ['stacked', false], ['stackType', 'bar']
   ];
 
   this.ForestD3.Chart = Chart = (function(superClass) {
@@ -1441,23 +1498,33 @@ Handles the guideline that moves along the x-axis
         var chartItem, renderFn;
         chartItem = d3.select(this);
         renderFn = (function() {
-          switch (d.type) {
-            case 'scatter':
-              return ForestD3.ChartItem.scatter;
-            case 'line':
-              return ForestD3.ChartItem.line;
-            case 'bar':
-              return ForestD3.ChartItem.bar;
-            case 'ohlc':
-              return ForestD3.ChartItem.ohlc;
-            case 'marker':
-              return ForestD3.ChartItem.markerLine;
-            case 'region':
-              return ForestD3.ChartItem.region;
-            default:
-              return function() {
-                return 0;
-              };
+          if (chart.stackable()) {
+            if (chart.stackType() === 'bar') {
+              if (chart.stacked()) {
+                return ForestD3.ChartItem.barStacked;
+              } else {
+                return ForestD3.ChartItem.bar;
+              }
+            }
+          } else {
+            switch (d.type) {
+              case 'scatter':
+                return ForestD3.ChartItem.scatter;
+              case 'line':
+                return ForestD3.ChartItem.line;
+              case 'bar':
+                return ForestD3.ChartItem.bar;
+              case 'ohlc':
+                return ForestD3.ChartItem.ohlc;
+              case 'marker':
+                return ForestD3.ChartItem.markerLine;
+              case 'region':
+                return ForestD3.ChartItem.region;
+              default:
+                return function() {
+                  return 0;
+                };
+            }
           }
         })();
         return renderFn.call(chart, chartItem, d);

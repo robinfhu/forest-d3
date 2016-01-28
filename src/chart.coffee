@@ -24,6 +24,8 @@ chartProperties = [
     ['showGuideline', true]
     ['tooltipType', 'bisect']  # Can be 'bisect' or 'spatial'
     ['stackable', false]
+    ['stacked', false]
+    ['stackType', 'bar']
 ]
 
 @ForestD3.Chart = class Chart extends ForestD3.BaseChart
@@ -97,21 +99,30 @@ chartProperties = [
         ###
         chartItems.each (d,i)->
             chartItem = d3.select @
-            renderFn = switch d.type
-                when 'scatter'
-                    ForestD3.ChartItem.scatter
-                when 'line'
-                    ForestD3.ChartItem.line
-                when 'bar'
-                    ForestD3.ChartItem.bar
-                when 'ohlc'
-                    ForestD3.ChartItem.ohlc
-                when 'marker'
-                    ForestD3.ChartItem.markerLine
-                when 'region'
-                    ForestD3.ChartItem.region
+
+            renderFn = do ->
+                if chart.stackable()
+                    if chart.stackType() is 'bar'
+                        if chart.stacked()
+                            return ForestD3.ChartItem.barStacked
+                        else
+                            return ForestD3.ChartItem.bar
                 else
-                    (-> 0)
+                    switch d.type
+                        when 'scatter'
+                            ForestD3.ChartItem.scatter
+                        when 'line'
+                            ForestD3.ChartItem.line
+                        when 'bar'
+                            ForestD3.ChartItem.bar
+                        when 'ohlc'
+                            ForestD3.ChartItem.ohlc
+                        when 'marker'
+                            ForestD3.ChartItem.markerLine
+                        when 'region'
+                            ForestD3.ChartItem.region
+                        else
+                            (-> 0)
 
             renderFn.call chart, chartItem, d
 

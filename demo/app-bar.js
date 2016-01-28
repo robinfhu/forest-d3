@@ -1,5 +1,5 @@
 (function() {
-  var chart, chartOneGroup, chartSingle, chartSingleSeries, chartTwoGroups, data, dataOneGroup, dataSingle, dataSingleSeries, dataTwoGroups, getStocks, legend;
+  var chart, chartOneGroup, chartSingle, chartSingleSeries, chartStackedBar, chartTwoGroups, data, dataOneGroup, dataSingle, dataSingleSeries, dataStacked, dataTwoGroups, getStocks, legend, legendStacked;
 
   chart = new ForestD3.Chart('#example');
 
@@ -173,5 +173,79 @@
   }).getY(function(d) {
     return d.calc;
   }).reduceXTicks(false).chartLabel('Monthly Calculations').data(dataSingleSeries).render();
+
+  dataStacked = [
+    {
+      label: 'Apples',
+      values: [
+        {
+          month: 'Jan',
+          val: 1
+        }, {
+          month: 'Feb',
+          val: 3
+        }, {
+          month: 'Mar',
+          val: 4.6
+        }, {
+          month: 'Apr',
+          val: 8.81
+        }, {
+          month: 'May',
+          val: 7.5
+        }
+      ]
+    }, {
+      label: 'Pears',
+      values: [
+        {
+          month: 'Jan',
+          val: 5
+        }, {
+          month: 'Feb',
+          val: 1.2
+        }, {
+          month: 'Mar',
+          val: 1.4
+        }, {
+          month: 'Apr',
+          val: 3.4
+        }, {
+          month: 'May',
+          val: 0.4
+        }
+      ]
+    }, {
+      label: 'Bananas',
+      values: [
+        {
+          month: 'Jan',
+          val: 10.2
+        }, {
+          month: 'Feb',
+          val: 2
+        }, {
+          month: 'Mar',
+          val: 1.4
+        }, {
+          month: 'Apr',
+          val: 7.4
+        }, {
+          month: 'May',
+          val: 2.3
+        }
+      ]
+    }
+  ];
+
+  chartStackedBar = new ForestD3.Chart('#example-stacked');
+
+  legendStacked = new ForestD3.Legend('#legend-stacked');
+
+  chartStackedBar.getX(function(d) {
+    return d.month;
+  }).getY(function(d) {
+    return d.val;
+  }).xPadding(0.4).stackable(true).stacked(true).stackType('bar').addPlugin(legendStacked).data(dataStacked).render();
 
 }).call(this);
