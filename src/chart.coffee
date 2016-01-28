@@ -38,6 +38,8 @@ chartProperties = [
         @getXInternal = (d)-> d.x
         @getYInternal = (d)-> d.y
 
+        @_tooltipFrozen = false
+
     destroy: ->
         super()
         @tooltip.destroy()
@@ -295,6 +297,7 @@ chartProperties = [
                 )
             )
             .on('mouseout', -> chart.updateTooltip null)
+            .on('click', -> chart._tooltipFrozen = not chart._tooltipFrozen)
 
         # Add a guideline
         @guideline.create @canvas
@@ -365,6 +368,8 @@ chartProperties = [
     ###
     updateTooltip: (mouse, clientMouse)->
         return unless @showTooltip()
+
+        return if @_tooltipFrozen
 
         unless mouse?
             # Hide guideline from view if 'null' passed in

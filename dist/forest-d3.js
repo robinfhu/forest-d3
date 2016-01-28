@@ -1323,6 +1323,7 @@ Handles the guideline that moves along the x-axis
       this.getYInternal = function(d) {
         return d.y;
       };
+      this._tooltipFrozen = false;
     }
 
     Chart.prototype.destroy = function() {
@@ -1547,6 +1548,8 @@ Handles the guideline that moves along the x-axis
         return chart.updateTooltip(d3.mouse(this), [d3.event.clientX, d3.event.clientY]);
       }).on('mouseout', function() {
         return chart.updateTooltip(null);
+      }).on('click', function() {
+        return chart._tooltipFrozen = !chart._tooltipFrozen;
       });
       this.guideline.create(this.canvas);
       this.crosshairs.create(this.canvas);
@@ -1591,6 +1594,9 @@ Handles the guideline that moves along the x-axis
     Chart.prototype.updateTooltip = function(mouse, clientMouse) {
       var content, dist, idx, isHidden, point, threshold, x, xActual, xDiff, xPos, xValues, y, yActual, yDiff, yPos;
       if (!this.showTooltip()) {
+        return;
+      }
+      if (this._tooltipFrozen) {
         return;
       }
       if (mouse == null) {
