@@ -33,10 +33,13 @@ describe 'Tooltip and Guideline', ->
 
     it 'renders tooltip onto document.body', ->
         chart.data(data).render()
+        chart.tooltip.id 'my-tooltip'
         chart.updateTooltip [0,0], [10,10]
 
         tooltip = $('.forest-d3.tooltip-box')
         tooltip.length.should.equal 1, 'tooltip exists'
+
+        $('#my-tooltip').length.should.equal 1, 'select by id'
 
     it 'can render spatial tooltips', (done)->
         chart.ordinal(false).tooltipType('spatial').data(data).render()

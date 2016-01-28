@@ -3,6 +3,17 @@
         @container = null
 
     ###
+    Lets you define a DOM id for the tooltip. Makes it so that
+    you can perform DOM manipulation on it later on.
+    ###
+    id: (s)->
+        if arguments.length is 0
+            return @_id
+        else
+            @_id = s
+            return @
+
+    ###
     content: string or DOM object or d3 object representing tooltip content.
     clientMouse: Array of [mouse screen x, mouse screen y] positions
     ###
@@ -50,6 +61,7 @@
             xPos -= dimensions.width + edgeThreshold
 
         d3.select(@container)
+            .attr('id', @id())
             .style('left', "#{xPos}px")
             .style('top', "#{yPos}px")
             .transition()

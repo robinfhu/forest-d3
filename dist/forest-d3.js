@@ -1094,6 +1094,15 @@ Library of tooltip rendering utilities
       this.container = null;
     }
 
+    Tooltip.prototype.id = function(s) {
+      if (arguments.length === 0) {
+        return this._id;
+      } else {
+        this._id = s;
+        return this;
+      }
+    };
+
 
     /*
     content: string or DOM object or d3 object representing tooltip content.
@@ -1142,7 +1151,7 @@ Library of tooltip rendering utilities
       if ((xPos + dimensions.width + edgeThreshold) > window.innerWidth) {
         xPos -= dimensions.width + edgeThreshold;
       }
-      return d3.select(this.container).style('left', xPos + "px").style('top', yPos + "px").transition().style('opacity', 0.9);
+      return d3.select(this.container).attr('id', this.id()).style('left', xPos + "px").style('top', yPos + "px").transition().style('opacity', 0.9);
     };
 
     Tooltip.prototype.hide = function() {
