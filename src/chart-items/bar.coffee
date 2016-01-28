@@ -79,3 +79,12 @@
         )
         .attr('width', barWidth)
         .style('fill', selectionData.color)
+        .attr('class', (d,i)->
+            additionalClass =
+                if (typeof selectionData.classed) is 'function'
+                    selectionData.classed d.data, i, selectionData
+                else
+                    ''
+
+            "bar #{additionalClass}"
+        )

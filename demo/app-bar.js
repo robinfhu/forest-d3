@@ -117,6 +117,13 @@
     monthlyData: {
       color: '#aaa',
       type: 'bar',
+      classed: function(d) {
+        if (d.calc > 22) {
+          return '-highlight-bar';
+        } else {
+          return '';
+        }
+      },
       values: [
         {
           month: 'Jan',

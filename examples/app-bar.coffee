@@ -125,6 +125,8 @@ dataSingleSeries =
     monthlyData:
         color: '#aaa'
         type: 'bar'
+        classed: (d)->
+            if d.calc > 22 then '-highlight-bar' else ''
         values: [
             month: 'Jan'
             calc: 5.5

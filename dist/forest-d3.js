@@ -186,7 +186,11 @@ Author:  Robin Hu
       }
     }).attr('height', function(d, i) {
       return Math.abs(chart.yScale(y(d, i)) - barBase);
-    }).attr('width', barWidth).style('fill', selectionData.color);
+    }).attr('width', barWidth).style('fill', selectionData.color).attr('class', function(d, i) {
+      var additionalClass;
+      additionalClass = (typeof selectionData.classed) === 'function' ? selectionData.classed(d.data, i, selectionData) : '';
+      return "bar " + additionalClass;
+    });
   };
 
 }).call(this);

@@ -375,11 +375,36 @@ describe 'Chart', ->
                         ].map (m)-> [m, Math.random()]
 
                 chart = new ForestD3.Chart container
-                chart.ordinal(true).reduceXTicks(false).data(data).render()
+                chart.reduceXTicks(false).data(data).render()
 
                 setTimeout ->
                     xTicks = $(container).find('g.x-axis .tick')
                     xTicks.length.should.equal 10
+                    done()
+                , 300
+
+            it 'can class bars differently based on a function', (done)->
+                data =
+                    series1:
+                        type: 'bar'
+                        classed: (d)->
+                            if d[1] > 1.0
+                                '-highlight-bar'
+                            else
+                                ''
+                        values: [
+                            'January','February','March','April','May',
+                            'June','July','August','September','October'
+                        ].map (m)-> [m, Math.random()]
+
+                data.series1.values.push ['November', 1.3]
+
+                chart = new ForestD3.Chart container
+                chart.data(data).render()
+
+                setTimeout ->
+                    bar = $(container).find('rect.bar.-highlight-bar')
+                    bar.length.should.equal 1
                     done()
                 , 300
 
