@@ -10,7 +10,7 @@ chartProperties = [
 
     # Overrides parent class
     preprocessData: ->
-        internalData = @data().get()
+        internalData = @data().visible()
         d3.layout.stack()
             .offset('zero')
             .values((d)-> d.values)(internalData)

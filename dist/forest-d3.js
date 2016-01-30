@@ -2073,7 +2073,7 @@ Library of tooltip rendering utilities
 
     StackedChart.prototype.preprocessData = function() {
       var internalData, yOffsetVal;
-      internalData = this.data().get();
+      internalData = this.data().visible();
       d3.layout.stack().offset('zero').values(function(d) {
         return d.values;
       })(internalData);

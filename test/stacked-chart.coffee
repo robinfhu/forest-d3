@@ -1,5 +1,5 @@
 describe 'Chart', ->
-    describe.only 'Stackable Charts', ->
+    describe 'Stackable Charts', ->
         chart = null
         container = null
 
@@ -68,3 +68,13 @@ describe 'Chart', ->
                 done()
             , 500
 
+        it 'calculates offset only for visible bars', ->
+            chart = new ForestD3.StackedChart container
+
+            chart.stacked(true).stackType('bar').data(data)
+
+            chart.data().hide('series1').render()
+
+            internal = chart.data().visible()
+
+            internal[1].values[0].y0.should.equal 3
