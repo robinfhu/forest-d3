@@ -368,11 +368,11 @@ chartProperties = [
             .attr('y', 0)
             .attr('x', @canvasWidth)
 
+    calculateExtent: ->
+        ForestD3.Utils.extent @data().visible(), @forceDomain()
+
     updateChartScale: ->
-        extent = ForestD3.Utils.extent(
-            @data().visible(),
-            @forceDomain()
-        )
+        extent = @calculateExtent()
         extent = ForestD3.Utils.extentPadding extent, {
             x: @xPadding()
             y: @yPadding()

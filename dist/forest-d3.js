@@ -1700,9 +1700,13 @@ Handles the guideline that moves along the x-axis
       }).attr('y', 0).attr('x', this.canvasWidth);
     };
 
+    Chart.prototype.calculateExtent = function() {
+      return ForestD3.Utils.extent(this.data().visible(), this.forceDomain());
+    };
+
     Chart.prototype.updateChartScale = function() {
       var extent;
-      extent = ForestD3.Utils.extent(this.data().visible(), this.forceDomain());
+      extent = this.calculateExtent();
       extent = ForestD3.Utils.extentPadding(extent, {
         x: this.xPadding(),
         y: this.yPadding()
