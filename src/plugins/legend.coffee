@@ -3,9 +3,16 @@ Draws a chart legend using HTML.
 It acts as a plugin to a main chart instance.
 ###
 
+legendProperties = [
+    ['onlyDataSeries', true] # if false, will show markers and regions in legend
+]
+
 @ForestD3.Legend = class Legend
     constructor: (domContainer)->
         @name = 'legend'
+
+        @properties = {}
+        ForestD3.Utils.setProperties @, @properties, legendProperties
 
         if domContainer.select?
             @container = domContainer
@@ -32,6 +39,11 @@ It acts as a plugin to a main chart instance.
         @chartInstance = chart
 
         @
+
+    destroy: ->
+        if @container?
+            @container.remove()
+
     render: ->
         return unless @chartInstance?
 
@@ -44,6 +56,8 @@ It acts as a plugin to a main chart instance.
             .on('click', (d)=> @chartInstance.data().showAll().render())
 
         data = @chartInstance.data().get()
+        if @onlyDataSeries()
+            data = data.filter (d)-> d.isDataSeries
 
         items = @container.selectAll('div.item').data(data, (d)-> d.key)
         itemsEnter = items

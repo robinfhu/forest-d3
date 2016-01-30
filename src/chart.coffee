@@ -49,6 +49,7 @@ chartProperties = [
     destroy: ->
         super()
         @tooltip.destroy()
+        @destroyPlugins()
 
     ###
     Set chart data.
@@ -537,3 +538,7 @@ chartProperties = [
             if plugin.render?
                 plugin.render()
 
+    destroyPlugins: ->
+        for key, plugin of @plugins
+            if plugin.destroy?
+                plugin.destroy()

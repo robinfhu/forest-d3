@@ -55,6 +55,8 @@
     }
   };
 
+  legend.onlyDataSeries(false);
+
   lineChart.ordinal(true).xTickFormat(function(d) {
     if (d != null) {
       return d3.time.format('%Y-%m-%d')(new Date(d));

@@ -69,15 +69,4 @@
         return null
 
     _setProperties: (chartProperties)->
-        for propPair in chartProperties
-            [prop, defaultVal] = propPair
-            @properties[prop] = defaultVal
-
-            @[prop] = do (prop)=>
-                (d)=>
-                    if typeof(d) is 'undefined'
-                        return @properties[prop]
-
-                    else
-                        @properties[prop] = d
-                        return @
+        ForestD3.Utils.setProperties @, @properties, chartProperties

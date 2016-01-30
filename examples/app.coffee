@@ -44,6 +44,8 @@ lineData =
         axis: 'y'
         value: 404
 
+legend.onlyDataSeries false
+
 lineChart
     .ordinal(true)
     .xTickFormat((d)->

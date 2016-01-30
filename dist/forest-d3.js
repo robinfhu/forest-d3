@@ -106,26 +106,7 @@ Author:  Robin Hu
     };
 
     BaseChart.prototype._setProperties = function(chartProperties) {
-      var defaultVal, i, len, prop, propPair, results;
-      results = [];
-      for (i = 0, len = chartProperties.length; i < len; i++) {
-        propPair = chartProperties[i];
-        prop = propPair[0], defaultVal = propPair[1];
-        this.properties[prop] = defaultVal;
-        results.push(this[prop] = (function(_this) {
-          return function(prop) {
-            return function(d) {
-              if (typeof d === 'undefined') {
-                return _this.properties[prop];
-              } else {
-                _this.properties[prop] = d;
-                return _this;
-              }
-            };
-          };
-        })(this)(prop));
-      }
-      return results;
+      return ForestD3.Utils.setProperties(this, this.properties, chartProperties);
     };
 
     return BaseChart;
@@ -496,6 +477,26 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
     var colors20;
     colors20 = d3.scale.category20().range();
     return {
+      setProperties: function(chart, target, chartProperties) {
+        var defaultVal, j, len, prop, propPair, results;
+        results = [];
+        for (j = 0, len = chartProperties.length; j < len; j++) {
+          propPair = chartProperties[j];
+          prop = propPair[0], defaultVal = propPair[1];
+          target[prop] = defaultVal;
+          results.push(chart[prop] = (function(prop) {
+            return function(d) {
+              if (typeof d === 'undefined') {
+                return target[prop];
+              } else {
+                target[prop] = d;
+                return chart;
+              }
+            };
+          })(prop));
+        }
+        return results;
+      },
 
       /*
       Calculates the minimum and maximum point across all series'.
@@ -1079,12 +1080,16 @@ It acts as a plugin to a main chart instance.
  */
 
 (function() {
-  var Legend;
+  var Legend, legendProperties;
+
+  legendProperties = [['onlyDataSeries', true]];
 
   this.ForestD3.Legend = Legend = (function() {
     function Legend(domContainer) {
       var processClickEvent;
       this.name = 'legend';
+      this.properties = {};
+      ForestD3.Utils.setProperties(this, this.properties, legendProperties);
       if (domContainer.select != null) {
         this.container = domContainer;
       } else {
@@ -1114,6 +1119,12 @@ It acts as a plugin to a main chart instance.
       return this;
     };
 
+    Legend.prototype.destroy = function() {
+      if (this.container != null) {
+        return this.container.remove();
+      }
+    };
+
     Legend.prototype.render = function() {
       var data, items, itemsEnter, showAll;
       if (this.chartInstance == null) {
@@ -1126,6 +1137,11 @@ It acts as a plugin to a main chart instance.
         };
       })(this));
       data = this.chartInstance.data().get();
+      if (this.onlyDataSeries()) {
+        data = data.filter(function(d) {
+          return d.isDataSeries;
+        });
+      }
       items = this.container.selectAll('div.item').data(data, function(d) {
         return d.key;
       });
@@ -1491,7 +1507,8 @@ You can combine lines, bars, areas and scatter points into one chart.
 
     Chart.prototype.destroy = function() {
       Chart.__super__.destroy.call(this);
-      return this.tooltip.destroy();
+      this.tooltip.destroy();
+      return this.destroyPlugins();
     };
 
 
@@ -1935,6 +1952,21 @@ You can combine lines, bars, areas and scatter points into one chart.
         }
         if (plugin.render != null) {
           results.push(plugin.render());
+        } else {
+          results.push(void 0);
+        }
+      }
+      return results;
+    };
+
+    Chart.prototype.destroyPlugins = function() {
+      var key, plugin, ref, results;
+      ref = this.plugins;
+      results = [];
+      for (key in ref) {
+        plugin = ref[key];
+        if (plugin.destroy != null) {
+          results.push(plugin.destroy());
         } else {
           results.push(void 0);
         }

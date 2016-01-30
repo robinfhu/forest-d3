@@ -1,6 +1,19 @@
 @ForestD3.Utils = do ->
     colors20 = d3.scale.category20().range()
 
+    setProperties:  (chart, target, chartProperties)->
+        for propPair in chartProperties
+            [prop, defaultVal] = propPair
+            target[prop] = defaultVal
+
+            chart[prop] = do (prop)->
+                (d)->
+                    if typeof(d) is 'undefined'
+                        return target[prop]
+
+                    else
+                        target[prop] = d
+                        return chart
     ###
     Calculates the minimum and maximum point across all series'.
     Useful for setting the domain for a d3.scale()

@@ -25,6 +25,12 @@ describe 'Plugin: Legend', ->
 
         chart = new ForestD3.Chart chartContainer
 
+        document.body.appendChild chartContainer
+        document.body.appendChild legendContainer
+
+        afterEach ->
+            chart.destroy()
+
     it 'sets forest-d3 class on parent div', ->
         legend = new ForestD3.Legend legendContainer
 
@@ -49,7 +55,7 @@ describe 'Plugin: Legend', ->
         items.eq(2).find('.color-square')
         .css('background-color').should.equal 'rgb(0, 0, 0)'
 
-    it 'renders via chart plugin API', ->
+    it 'renders via chart plugin API', (done)->
         chart.data sampleData
         legend = new ForestD3.Legend legendContainer
 
@@ -58,10 +64,13 @@ describe 'Plugin: Legend', ->
 
         chart.render()
 
-        items = $(legendContainer).find('.item')
-        items.length.should.equal 3, 'three legend items'
+        setTimeout ->
+            items = $(legendContainer).find('.item')
+            items.length.should.equal 3, 'three legend items'
+            done()
+        , 300
 
-    it 'renders via chart plugin API', ->
+    it 'marks legend item as disabled', ->
         chart.data sampleData
         legend = new ForestD3.Legend legendContainer
         chart.addPlugin legend
@@ -71,3 +80,21 @@ describe 'Plugin: Legend', ->
 
         items = $(legendContainer).find('.item')
         items.eq(0).hasClass('disabled').should.be.true
+
+    it 'marks legend item as disabled', ->
+        data2 = sampleData.concat [
+            type: 'region'
+            values: [3,4]
+        ,
+            type: 'marker'
+            value: 1
+        ]
+
+        chart.data data2
+        legend = new ForestD3.Legend legendContainer
+        legend.onlyDataSeries(true)
+        chart.addPlugin legend
+
+        chart.render()
+        items = $(legendContainer).find '.item'
+        items.length.should.equal 3, '3 items only'
