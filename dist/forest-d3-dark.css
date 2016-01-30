@@ -89,12 +89,12 @@
 
 .forest-d3.legend .item {
   min-width: 200px;
-  padding-bottom: 10px;
+  padding: 5px;
   cursor: pointer;
-  border-bottom: solid 1px transparent;
+  transition: all 0.25s;
 }
 .forest-d3.legend .item:hover {
-  border-bottom: solid 1px #ccc;
+  background-color: rgba(124,124,244,0.23);
 }
 .forest-d3.legend .item:hover .show-only {
   display: inline-block;
@@ -106,7 +106,7 @@
 }
 .forest-d3.legend .item .color-square {
   position: relative;
-  top: 4px;
+  top: 3px;
   display: inline-block;
   width: 18px;
   height: 18px;

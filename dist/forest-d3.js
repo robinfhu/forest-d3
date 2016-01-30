@@ -939,10 +939,19 @@ Some operations can mutate the original chart data.
         }
         return this;
       },
-      showOnly: function(key) {
+      showOnly: function(key, options) {
         var d, j, len;
+        if (options == null) {
+          options = {};
+        }
+        if (options.onlyDataSeries == null) {
+          options.onlyDataSeries = false;
+        }
         for (j = 0, len = data.length; j < len; j++) {
           d = data[j];
+          if (options.onlyDataSeries && !d.isDataSeries) {
+            continue;
+          }
           d.hidden = !(d.key === key);
         }
         return this;
@@ -1156,7 +1165,9 @@ It acts as a plugin to a main chart instance.
       })(this)).on('dblclick.legend', (function(_this) {
         return function(d) {
           _this.lastClickEvent = function() {
-            return _this.chartInstance.data().showOnly(d.key).render();
+            return _this.chartInstance.data().showOnly(d.key, {
+              onlyDataSeries: _this.onlyDataSeries()
+            }).render();
           };
           return _this.legendClickHandler();
         };
@@ -1181,7 +1192,9 @@ It acts as a plugin to a main chart instance.
       return itemsEnter.append('span').classed('show-only button', true).text('only').on('click.showOnly', (function(_this) {
         return function(d) {
           d3.event.stopPropagation();
-          return _this.chartInstance.data().showOnly(d.key).render();
+          return _this.chartInstance.data().showOnly(d.key, {
+            onlyDataSeries: _this.onlyDataSeries()
+          }).render();
         };
       })(this));
     };

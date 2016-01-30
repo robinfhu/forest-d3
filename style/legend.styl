@@ -2,12 +2,12 @@
     &.legend
         .item
             min-width 200px
-            padding-bottom 10px
+            padding 5px
             cursor pointer
-            border-bottom solid 1px transparent
+            transition all 0.25s
 
             &:hover
-                border-bottom solid 1px #ccc
+                background-color $legendHoverColor
 
                 .show-only
                     display inline-block
@@ -19,7 +19,7 @@
 
             .color-square
                 position relative
-                top 4px
+                top 3px
                 display inline-block
                 width 18px
                 height 18px

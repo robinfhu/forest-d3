@@ -70,6 +70,42 @@ describe 'Data API', ->
         visible = api.visible()
         visible.length.should.equal 3
 
+    it 'showOnly accepts "onlyDataSeries" option', ->
+        data = [
+            key: 'series1'
+            label: 'Hello'
+            values: []
+        ,
+            key: 'series2'
+            label: 'World'
+            values: []
+        ,
+            key: 'seriesMarker'
+            type: 'marker'
+            value: 0
+        ,
+            key: 'seriesRegion'
+            type: 'region'
+            values: [0,1]
+        ,
+            key: 'series3'
+            color: '#00f'
+            label: 'Foo'
+            values: []
+        ]
+
+        chart = new ForestD3.Chart()
+        chart.data(data)
+
+        api = chart.data()
+
+        api.showOnly 'series2', {onlyDataSeries: true}
+        visible = api.visible()
+
+        visible.length.should.equal 3, '3 visible'
+        visible[0].key.should.equal 'series2'
+        visible[1].key.should.equal 'seriesMarker'
+        visible[2].key.should.equal 'seriesRegion'
 
     it 'has method to get visible data only', ->
         data = [

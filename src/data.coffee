@@ -37,8 +37,14 @@ Some operations can mutate the original chart data.
         @
 
     # Turn everything off except for the given data series.
-    showOnly: (key)->
+    # if 'onlyDataSeries' option is true, then markers and regions are ignored.
+    showOnly: (key, options={})->
+        options.onlyDataSeries ?= false
+
         for d in data
+            if options.onlyDataSeries and not d.isDataSeries
+                continue
+
             d.hidden = not (d.key is key)
 
         @

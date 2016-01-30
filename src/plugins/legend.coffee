@@ -73,7 +73,10 @@ legendProperties = [
             )
             .on('dblclick.legend', (d)=>
                 @lastClickEvent = =>
-                    @chartInstance.data().showOnly(d.key).render()
+                    @chartInstance
+                        .data()
+                        .showOnly(d.key, {onlyDataSeries: @onlyDataSeries()})
+                        .render()
                 @legendClickHandler()
             )
             .on('mouseover.legend', (d)=>
@@ -101,5 +104,8 @@ legendProperties = [
             .text('only')
             .on('click.showOnly', (d)=>
                 d3.event.stopPropagation()
-                @chartInstance.data().showOnly(d.key).render()
+                @chartInstance
+                    .data()
+                    .showOnly(d.key, {onlyDataSeries: @onlyDataSeries()})
+                    .render()
             )
