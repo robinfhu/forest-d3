@@ -6,6 +6,11 @@ Author:  Robin Hu
 
 ********************************************************
 ###
+unless d3?
+    throw new Error """
+    d3.js has not been included. See http://d3js.org/ for how to include it.
+    """
+
 @ForestD3 =
     version: '0.3.0-beta'
 

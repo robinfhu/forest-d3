@@ -80,15 +80,15 @@ chartProperties = [
         @updateChartScale()
         @updateChartFrame()
 
-        chartItems = @canvas
+        chartSeries = @canvas
             .selectAll('g.series')
             .data(@data().visible(), (series)-> series.key)
 
-        chartItems.enter()
+        chartSeries.enter()
             .append('g')
             .attr('class', (series, i)-> "series series-#{series.key}")
 
-        chartItems.exit()
+        chartSeries.exit()
             .transition()
             .duration(@duration())
             .style('opacity', 0)
@@ -99,19 +99,19 @@ chartProperties = [
         Main render loop. Loops through the data array, and depending on the
         'type' attribute, renders a different kind of chart element.
         ###
-        chartItems.each (series,i)->
-            chartItem = d3.select @
+        chartSeries.each (series,i)->
+            seriesContainer = d3.select @
 
             visualization = chart.getVisualization series
 
-            visualization.call chart, chartItem, series
+            visualization.call chart, seriesContainer, series
 
         ###
         This line keeps chart-items in order on the canvas. Items that appear
         lower in the list thus overlap items that are near the beginning of the
         list.
         ###
-        chartItems.order()
+        chartSeries.order()
 
         @renderPlugins()
 
@@ -141,6 +141,17 @@ chartProperties = [
                 visualizations.region
             else
                 (-> 0)
+
+    ###
+    Applies the CSS class 'highlight' to a specific series <g> element.
+    key - string representing the series key
+    ###
+    highlightSeries: (key)->
+        @canvas
+            .selectAll('g.series')
+            .classed('highlight', (series)->
+                series.key is key
+            )
 
     ###
     Get or set the chart's margins.

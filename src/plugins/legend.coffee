@@ -62,6 +62,9 @@ It acts as a plugin to a main chart instance.
                     @chartInstance.data().showOnly(d.key).render()
                 @legendClickHandler()
             )
+            .on('mouseover.legend', (d)=>
+                @chartInstance.highlightSeries d.key
+            )
 
         items.classed('disabled', (d)-> d.hidden)
 

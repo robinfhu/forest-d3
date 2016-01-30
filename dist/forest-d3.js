@@ -9,6 +9,10 @@ Author:  Robin Hu
  */
 
 (function() {
+  if (typeof d3 === "undefined" || d3 === null) {
+    throw new Error("d3.js has not been included. See http://d3js.org/ for how to include it.");
+  }
+
   this.ForestD3 = {
     version: '0.3.0-beta'
   };
@@ -1140,6 +1144,10 @@ It acts as a plugin to a main chart instance.
           };
           return _this.legendClickHandler();
         };
+      })(this)).on('mouseover.legend', (function(_this) {
+        return function(d) {
+          return _this.chartInstance.highlightSeries(d.key);
+        };
       })(this));
       items.classed('disabled', function(d) {
         return d.hidden;
@@ -1511,7 +1519,7 @@ You can combine lines, bars, areas and scatter points into one chart.
      */
 
     Chart.prototype.render = function() {
-      var chart, chartItems;
+      var chart, chartSeries;
       if (this.svg == null) {
         return this;
       }
@@ -1521,24 +1529,24 @@ You can combine lines, bars, areas and scatter points into one chart.
       this.updateDimensions();
       this.updateChartScale();
       this.updateChartFrame();
-      chartItems = this.canvas.selectAll('g.series').data(this.data().visible(), function(series) {
+      chartSeries = this.canvas.selectAll('g.series').data(this.data().visible(), function(series) {
         return series.key;
       });
-      chartItems.enter().append('g').attr('class', function(series, i) {
+      chartSeries.enter().append('g').attr('class', function(series, i) {
         return "series series-" + series.key;
       });
-      chartItems.exit().transition().duration(this.duration()).style('opacity', 0).remove();
+      chartSeries.exit().transition().duration(this.duration()).style('opacity', 0).remove();
       chart = this;
 
       /*
       Main render loop. Loops through the data array, and depending on the
       'type' attribute, renders a different kind of chart element.
        */
-      chartItems.each(function(series, i) {
-        var chartItem, visualization;
-        chartItem = d3.select(this);
+      chartSeries.each(function(series, i) {
+        var seriesContainer, visualization;
+        seriesContainer = d3.select(this);
         visualization = chart.getVisualization(series);
-        return visualization.call(chart, chartItem, series);
+        return visualization.call(chart, seriesContainer, series);
       });
 
       /*
@@ -1546,7 +1554,7 @@ You can combine lines, bars, areas and scatter points into one chart.
       lower in the list thus overlap items that are near the beginning of the
       list.
        */
-      chartItems.order();
+      chartSeries.order();
       this.renderPlugins();
       this.trigger('rendered');
       return this;
@@ -1579,6 +1587,18 @@ You can combine lines, bars, areas and scatter points into one chart.
             return 0;
           };
       }
+    };
+
+
+    /*
+    Applies the CSS class 'highlight' to a specific series <g> element.
+    key - string representing the series key
+     */
+
+    Chart.prototype.highlightSeries = function(key) {
+      return this.canvas.selectAll('g.series').classed('highlight', function(series) {
+        return series.key === key;
+      });
     };
 
 

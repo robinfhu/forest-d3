@@ -489,3 +489,33 @@ describe 'Chart', ->
                 chart.canvasWidth.should.be.greaterThan 30
 
                 container.style.width = '500px'
+
+        describe 'Highlighting a Series', ->
+            it 'can highlight a series', (done)->
+                data = [
+                    key: 'apples'
+                    type: 'line'
+                    values: [
+                        [0,0]
+                        [1,1]
+                        [2,4]
+                    ]
+                ,
+                    key: 'oranges'
+                    type: 'line'
+                    values: [
+                        [0,1]
+                        [1,3]
+                        [2,4]
+                    ]
+                ]
+
+                chart = new ForestD3.Chart container
+                chart.data(data).render()
+
+                setTimeout ->
+                    chart.highlightSeries('apples')
+                    $(container).find('g.series-apples.highlight')
+                    .length.should.equal 1, 'series-apples highlighted'
+                    done()
+                , 200

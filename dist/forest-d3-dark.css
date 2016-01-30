@@ -117,9 +117,18 @@
   stroke-opacity: 0.8;
   stroke-width: 2;
   pointer-events: none;
+  transition: all 0.25s;
 }
 .forest-d3 path.area {
   fill-opacity: 0.3;
+  transition: all 0.25s;
+}
+.forest-d3 .highlight path.line {
+  stroke-opacity: 1;
+  stroke-width: 3;
+}
+.forest-d3 .highlight path.area {
+  fill-opacity: 0.5;
 }
 
 .forest-d3 line.marker {
