@@ -27,12 +27,13 @@ Library of tooltip rendering utilities
         </table>
         """
     single: (chart, point, options={})->
-        getXValue = options.getXValue or ((d)-> d.xValue)
+        getXValue = options.getXValue or chart.getXInternal
+        series = options.series or {}
 
         xValue = chart.xTickFormat()(getXValue(point))
-        color = point.series.color
+        color = series.color
         bgColor = "background-color: #{color};"
-        label = point.series.label or point.series.key
+        label = series.label or series.key
         """
         <div class='header'>#{xValue}</div>
         <table>

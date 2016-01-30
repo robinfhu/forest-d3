@@ -479,7 +479,11 @@ chartProperties = [
                 ###
                 isHidden = point.series.hidden
                 if dist < threshold and not isHidden
-                    content = ForestD3.TooltipContent.single @, point
+                    content = ForestD3.TooltipContent.single @, point, {
+                        getXValue: (d)-> d.xValue
+                        series: point.series
+                    }
+
                     @renderSpatialTooltip {
                         content
                         clientMouse

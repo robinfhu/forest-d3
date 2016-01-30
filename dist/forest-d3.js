@@ -458,11 +458,31 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
       return "translate(" + (chart.xScale(x(d, i))) + "," + base + ")";
     }).attr('d', symbol.size(0));
     points.exit().remove();
-    return points.transition().duration(selectionData.duration || chart.duration()).delay(function(d, i) {
+    points.transition().duration(selectionData.duration || chart.duration()).delay(function(d, i) {
       return i * 10;
     }).ease('quad').attr('transform', function(d, i) {
       return "translate(" + (chart.xScale(x(d, i))) + "," + (chart.yScale(y(d, i))) + ")";
     }).attr('d', symbol.size(selectionData.size || 96));
+    if (chart.tooltipType() === 'hover') {
+      selection.classed('interactive', true);
+      return points.on('mouseover.tooltipHover', function(d, i) {
+        var canvasMouse, clientMouse, content;
+        clientMouse = [d3.event.clientX, d3.event.clientY];
+        canvasMouse = [chart.xScale(x(d, i)), chart.yScale(y(d, i))];
+        content = ForestD3.TooltipContent.single(chart, d, {
+          series: selectionData
+        });
+        return chart.renderSpatialTooltip({
+          content: content,
+          clientMouse: clientMouse,
+          canvasMouse: canvasMouse
+        });
+      }).on('mouseout.tooltipHover', function(d, i) {
+        return chart.renderSpatialTooltip({
+          hide: true
+        });
+      });
+    }
   };
 
 }).call(this);
@@ -1269,17 +1289,16 @@ Library of tooltip rendering utilities
       return "<div class='header'>" + xValue + "</div>\n<table>\n    " + rows + "\n</table>";
     },
     single: function(chart, point, options) {
-      var bgColor, color, getXValue, label, xValue;
+      var bgColor, color, getXValue, label, series, xValue;
       if (options == null) {
         options = {};
       }
-      getXValue = options.getXValue || (function(d) {
-        return d.xValue;
-      });
+      getXValue = options.getXValue || chart.getXInternal;
+      series = options.series || {};
       xValue = chart.xTickFormat()(getXValue(point));
-      color = point.series.color;
+      color = series.color;
       bgColor = "background-color: " + color + ";";
-      label = point.series.label || point.series.key;
+      label = series.label || series.key;
       return "<div class='header'>" + xValue + "</div>\n<table>\n    <tr>\n        <td><div class='series-color' style='" + bgColor + "'></div></td>\n        <td class='series-label'>" + label + "</td>\n        <td class='series-value'>\n            " + (chart.yTickFormat()(chart.getYInternal(point))) + "\n        </td>\n    </tr>\n</table>";
     }
   };
@@ -1801,7 +1820,12 @@ You can combine lines, bars, areas and scatter points into one chart.
            */
           isHidden = point.series.hidden;
           if (dist < threshold && !isHidden) {
-            content = ForestD3.TooltipContent.single(this, point);
+            content = ForestD3.TooltipContent.single(this, point, {
+              getXValue: function(d) {
+                return d.xValue;
+              },
+              series: point.series
+            });
             return this.renderSpatialTooltip({
               content: content,
               clientMouse: clientMouse,

@@ -56,3 +56,12 @@ describe 'Tooltip and Guideline', ->
             crosshair.css('stroke-opacity').should.equal '0.5'
             done()
         , 200
+
+    it 'adds "interactive" class to series when tooltipType=="hover"', (done)->
+        chart.ordinal(false).tooltipType('hover').data(data).render()
+
+        setTimeout ->
+            series = $(container).find('g.series.interactive')
+            series.length.should.equal 2, 'two interactive series'
+            done()
+        , 200

@@ -9,7 +9,7 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
 @ForestD3.Visualizations.scatter = (selection, selectionData)->
     chart = @
 
-    selection.style 'fill', selectionData.color
+    selection.style('fill', selectionData.color)
 
     x = chart.getXInternal
     y = chart.getYInternal
@@ -46,3 +46,24 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
             "translate(#{chart.xScale(x(d,i))},#{chart.yScale(y(d,i))})"
         )
         .attr('d', symbol.size(selectionData.size or 96))
+
+    # Add hover events, but only if tooltipType is 'hover'
+    if chart.tooltipType() is 'hover'
+        selection.classed 'interactive', true
+        points
+            .on('mouseover.tooltipHover', (d,i)->
+                clientMouse = [d3.event.clientX, d3.event.clientY]
+                canvasMouse = [chart.xScale(x(d,i)), chart.yScale(y(d,i))]
+                content = ForestD3.TooltipContent.single chart, d, {
+                    series: selectionData
+                }
+
+                chart.renderSpatialTooltip {
+                    content
+                    clientMouse
+                    canvasMouse
+                }
+            )
+            .on('mouseout.tooltipHover', (d,i)->
+                chart.renderSpatialTooltip {hide: true}
+            )

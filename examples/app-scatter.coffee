@@ -31,6 +31,7 @@ chartHover
     .ordinal(false)
     .chartLabel('Hover Tooltips')
     .tooltipType('hover')
+    .xTickFormat(d3.format('.2f'))
     .addPlugin(new ForestD3.Legend '#legend-hover')
 
 dataHover = [
