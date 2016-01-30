@@ -264,7 +264,6 @@
         getY = options.getY
         ordinal = options.ordinal
         colorPalette = options.colorPalette or colors20
-        stackable = options.stackable or false
 
         findExtent = (values, valFn)->
             d3.extent values.map valFn
@@ -304,17 +303,6 @@
                     data: d
 
         ###
-        If 'stackable' is set to true, then process the data through
-        d3.layout.stack(), which will add a 'y0' attribute to each data point.
-
-        'y0' represents the starting point on the Y-axis for the bar's location.
-        ###
-        if stackable
-            d3.layout.stack()
-            .offset('zero')
-            .values((d)-> d.values)(data)
-
-        ###
         Calculates the extent (in x and y directions) of the data in each
         series. The 'extent' is basically the highest and lowest values, used
         to figure out the chart's scale.
@@ -325,15 +313,8 @@
         ###
         data.forEach (series)->
             if series.isDataSeries
-
-                yExtentVal =
-                    if stackable
-                        (d)-> d.y0 + d.y
-                    else
-                        (d)-> d.y
-
                 series.extent =
                     x: findExtent(series.values, (d)-> d.x)
-                    y: findExtent(series.values, yExtentVal)
+                    y: findExtent(series.values, (d)-> d.y)
 
         data

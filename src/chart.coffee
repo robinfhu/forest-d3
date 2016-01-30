@@ -23,9 +23,6 @@ chartProperties = [
     ['showTooltip', true]
     ['showGuideline', true]
     ['tooltipType', 'bisect']  # Can be 'bisect' or 'spatial'
-    ['stackable', false]
-    ['stacked', false]
-    ['stackType', 'bar']
 ]
 
 @ForestD3.Chart = class Chart extends ForestD3.BaseChart
@@ -59,7 +56,6 @@ chartProperties = [
                 getY: @getY()
                 ordinal: @ordinal()
                 colorPalette: @colorPalette()
-                stackable: @stackable()
             }
 
             if @tooltipType() is 'spatial'
@@ -97,34 +93,12 @@ chartProperties = [
         Main render loop. Loops through the data array, and depending on the
         'type' attribute, renders a different kind of chart element.
         ###
-        chartItems.each (d,i)->
+        chartItems.each (series,i)->
             chartItem = d3.select @
 
-            renderFn = do ->
-                if chart.stackable()
-                    if chart.stackType() is 'bar'
-                        if chart.stacked()
-                            return ForestD3.ChartItem.barStacked
-                        else
-                            return ForestD3.ChartItem.bar
-                else
-                    switch d.type
-                        when 'scatter'
-                            ForestD3.ChartItem.scatter
-                        when 'line'
-                            ForestD3.ChartItem.line
-                        when 'bar'
-                            ForestD3.ChartItem.bar
-                        when 'ohlc'
-                            ForestD3.ChartItem.ohlc
-                        when 'marker'
-                            ForestD3.ChartItem.markerLine
-                        when 'region'
-                            ForestD3.ChartItem.region
-                        else
-                            (-> 0)
+            renderFn = chart.getRenderMethod series
 
-            renderFn.call chart, chartItem, d
+            renderFn.call chart, chartItem, series
 
         ###
         This line keeps chart-items in order on the canvas. Items that appear
@@ -139,6 +113,27 @@ chartProperties = [
         @trigger 'rendered'
 
         @
+
+    ###
+    Given a chart series object, determines what type of visualization
+    to render.
+    ###
+    getRenderMethod: (series)->
+        switch series.type
+            when 'scatter'
+                ForestD3.ChartItem.scatter
+            when 'line'
+                ForestD3.ChartItem.line
+            when 'bar'
+                ForestD3.ChartItem.bar
+            when 'ohlc'
+                ForestD3.ChartItem.ohlc
+            when 'marker'
+                ForestD3.ChartItem.markerLine
+            when 'region'
+                ForestD3.ChartItem.region
+            else
+                (-> 0)
 
     ###
     Get or set the chart's margins.
@@ -198,7 +193,11 @@ chartProperties = [
             @canvasHeight = d3.max [@canvasHeight, 50]
 
     ###
-    Draws the chart frame. Things like backdrop and canvas.
+    Draws the chart frame:
+    * Canvas <rect>
+    * X and Y Axes
+    * Guidelines
+    * Labels
     ###
     updateChartFrame: ->
         # Put a rectangle in background to serve as a backdrop.
@@ -368,9 +367,15 @@ chartProperties = [
             .attr('y', 0)
             .attr('x', @canvasWidth)
 
+    ###
+    Figures out the range of data.
+    ###
     calculateExtent: ->
         ForestD3.Utils.extent @data().visible(), @forceDomain()
 
+    ###
+    Creates an x and y scale, setting the domain and ranges.
+    ###
     updateChartScale: ->
         extent = @calculateExtent()
         extent = ForestD3.Utils.extentPadding extent, {

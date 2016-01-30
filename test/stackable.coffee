@@ -1,5 +1,5 @@
 describe 'Chart', ->
-    describe 'Stackable Charts', ->
+    describe.skip 'Stackable Charts', ->
         chart = null
         container = null
 
