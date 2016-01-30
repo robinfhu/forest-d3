@@ -27,7 +27,7 @@ chartProperties = [
     ['showYAxis', true]
     ['showTooltip', true]
     ['showGuideline', true]
-    ['tooltipType', 'bisect']  # Can be 'bisect' or 'spatial'
+    ['tooltipType', 'bisect']  # Can be 'bisect', 'spatial' or 'hover'
     ['barPaddingPercent', 0.1]
 ]
 
