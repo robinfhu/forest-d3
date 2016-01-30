@@ -3,7 +3,7 @@
   stroke-width: 1;
   stroke: #000;
   stroke-opacity: 0.1;
-  transition: all 0.25s;
+  transition: fill-opacity 0.25s, stroke-opacity 0.25s;
 }
 .forest-d3 .highlight rect.bar {
   fill-opacity: 0.9;
