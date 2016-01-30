@@ -1146,6 +1146,129 @@ It acts as a plugin to a main chart instance.
 
 
 /*
+Handles the guideline that moves along the x-axis
+ */
+
+(function() {
+  var Crosshairs;
+
+  this.ForestD3.Crosshairs = Crosshairs = (function() {
+    function Crosshairs(chart) {
+      this.chart = chart;
+    }
+
+    Crosshairs.prototype.create = function(canvas) {
+      if (!this.chart.showGuideline()) {
+        return;
+      }
+      this.xLine = canvas.selectAll('line.crosshair-x').data([this.chart.canvasHeight]);
+      this.yLine = canvas.selectAll('line.crosshair-y').data([this.chart.canvasWidth]);
+      this.xLine.enter().append('line').classed('crosshair-x', true).style('stroke-opacity', 0);
+      this.xLine.attr('y1', 0).attr('y2', function(d) {
+        return d;
+      });
+      this.yLine.enter().append('line').classed('crosshair-y', true).style('stroke-opacity', 0);
+      return this.yLine.attr('x1', 0).attr('x2', function(d) {
+        return d;
+      });
+    };
+
+    Crosshairs.prototype.render = function(x, y) {
+      if (!this.chart.showGuideline()) {
+        return;
+      }
+      if (this.xLine == null) {
+        return;
+      }
+      this.xLine.transition().duration(50).attr('x1', x).attr('x2', x).style('stroke-opacity', 0.5);
+      return this.yLine.transition().duration(50).attr('y1', y).attr('y2', y).style('stroke-opacity', 0.5);
+    };
+
+    Crosshairs.prototype.hide = function() {
+      if (!this.chart.showGuideline()) {
+        return;
+      }
+      if (this.xLine == null) {
+        return;
+      }
+      this.xLine.transition().delay(250).style('stroke-opacity', 0);
+      return this.yLine.transition().delay(250).style('stroke-opacity', 0);
+    };
+
+    return Crosshairs;
+
+  })();
+
+}).call(this);
+
+
+/*
+Handles the guideline that moves along the x-axis
+ */
+
+(function() {
+  var Guideline;
+
+  this.ForestD3.Guideline = Guideline = (function() {
+    function Guideline(chart) {
+      this.chart = chart;
+    }
+
+    Guideline.prototype.create = function(canvas) {
+      if (!this.chart.showGuideline()) {
+        return;
+      }
+      this.line = canvas.selectAll('line.guideline').data([this.chart.canvasHeight]);
+      this.line.enter().append('line').classed('guideline', true).style('opacity', 0);
+      this.line.attr('y1', 0).attr('y2', function(d) {
+        return d;
+      });
+      this.markerContainer = canvas.selectAll('g.guideline-markers').data([0]);
+      return this.markerContainer.enter().append('g').classed('guideline-markers', true);
+    };
+
+    Guideline.prototype.render = function(xPosition, xIndex) {
+      var markers, slice;
+      if (!this.chart.showGuideline()) {
+        return;
+      }
+      if (this.line == null) {
+        return;
+      }
+      this.line.attr('x1', xPosition).attr('x2', xPosition).transition().style('opacity', 0.5);
+      slice = this.chart.data().sliced(xIndex);
+      this.markerContainer.transition().style('opacity', 1);
+      markers = this.markerContainer.selectAll('circle.marker').data(slice);
+      markers.enter().append('circle').classed('marker', true).attr('r', 3);
+      markers.exit().remove();
+      return markers.attr('cx', xPosition).attr('cy', (function(_this) {
+        return function(d) {
+          return _this.chart.yScale(d.y);
+        };
+      })(this)).style('fill', function(d) {
+        return d.color;
+      });
+    };
+
+    Guideline.prototype.hide = function() {
+      if (!this.chart.showGuideline()) {
+        return;
+      }
+      if (this.line == null) {
+        return;
+      }
+      this.line.transition().delay(250).style('opacity', 0);
+      return this.markerContainer.transition().delay(250).style('opacity', 0);
+    };
+
+    return Guideline;
+
+  })();
+
+}).call(this);
+
+
+/*
 Library of tooltip rendering utilities
  */
 
@@ -1267,129 +1390,6 @@ Library of tooltip rendering utilities
     };
 
     return Tooltip;
-
-  })();
-
-}).call(this);
-
-
-/*
-Handles the guideline that moves along the x-axis
- */
-
-(function() {
-  var Guideline;
-
-  this.ForestD3.Guideline = Guideline = (function() {
-    function Guideline(chart) {
-      this.chart = chart;
-    }
-
-    Guideline.prototype.create = function(canvas) {
-      if (!this.chart.showGuideline()) {
-        return;
-      }
-      this.line = canvas.selectAll('line.guideline').data([this.chart.canvasHeight]);
-      this.line.enter().append('line').classed('guideline', true).style('opacity', 0);
-      this.line.attr('y1', 0).attr('y2', function(d) {
-        return d;
-      });
-      this.markerContainer = canvas.selectAll('g.guideline-markers').data([0]);
-      return this.markerContainer.enter().append('g').classed('guideline-markers', true);
-    };
-
-    Guideline.prototype.render = function(xPosition, xIndex) {
-      var markers, slice;
-      if (!this.chart.showGuideline()) {
-        return;
-      }
-      if (this.line == null) {
-        return;
-      }
-      this.line.attr('x1', xPosition).attr('x2', xPosition).transition().style('opacity', 0.5);
-      slice = this.chart.data().sliced(xIndex);
-      this.markerContainer.transition().style('opacity', 1);
-      markers = this.markerContainer.selectAll('circle.marker').data(slice);
-      markers.enter().append('circle').classed('marker', true).attr('r', 3);
-      markers.exit().remove();
-      return markers.attr('cx', xPosition).attr('cy', (function(_this) {
-        return function(d) {
-          return _this.chart.yScale(d.y);
-        };
-      })(this)).style('fill', function(d) {
-        return d.color;
-      });
-    };
-
-    Guideline.prototype.hide = function() {
-      if (!this.chart.showGuideline()) {
-        return;
-      }
-      if (this.line == null) {
-        return;
-      }
-      this.line.transition().delay(250).style('opacity', 0);
-      return this.markerContainer.transition().delay(250).style('opacity', 0);
-    };
-
-    return Guideline;
-
-  })();
-
-}).call(this);
-
-
-/*
-Handles the guideline that moves along the x-axis
- */
-
-(function() {
-  var Crosshairs;
-
-  this.ForestD3.Crosshairs = Crosshairs = (function() {
-    function Crosshairs(chart) {
-      this.chart = chart;
-    }
-
-    Crosshairs.prototype.create = function(canvas) {
-      if (!this.chart.showGuideline()) {
-        return;
-      }
-      this.xLine = canvas.selectAll('line.crosshair-x').data([this.chart.canvasHeight]);
-      this.yLine = canvas.selectAll('line.crosshair-y').data([this.chart.canvasWidth]);
-      this.xLine.enter().append('line').classed('crosshair-x', true).style('stroke-opacity', 0);
-      this.xLine.attr('y1', 0).attr('y2', function(d) {
-        return d;
-      });
-      this.yLine.enter().append('line').classed('crosshair-y', true).style('stroke-opacity', 0);
-      return this.yLine.attr('x1', 0).attr('x2', function(d) {
-        return d;
-      });
-    };
-
-    Crosshairs.prototype.render = function(x, y) {
-      if (!this.chart.showGuideline()) {
-        return;
-      }
-      if (this.xLine == null) {
-        return;
-      }
-      this.xLine.transition().duration(50).attr('x1', x).attr('x2', x).style('stroke-opacity', 0.5);
-      return this.yLine.transition().duration(50).attr('y1', y).attr('y2', y).style('stroke-opacity', 0.5);
-    };
-
-    Crosshairs.prototype.hide = function() {
-      if (!this.chart.showGuideline()) {
-        return;
-      }
-      if (this.xLine == null) {
-        return;
-      }
-      this.xLine.transition().delay(250).style('stroke-opacity', 0);
-      return this.yLine.transition().delay(250).style('stroke-opacity', 0);
-    };
-
-    return Crosshairs;
 
   })();
 
