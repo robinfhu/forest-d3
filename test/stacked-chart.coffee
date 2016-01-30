@@ -1,7 +1,27 @@
 describe 'Chart', ->
-    describe.skip 'Stackable Charts', ->
+    describe 'Stackable Charts', ->
         chart = null
         container = null
+
+        data = [
+            values: [
+                [1, 3]
+                [2, 2]
+                [3, 6]
+            ]
+        ,
+            values: [
+                [1, 1]
+                [2, 3]
+                [3, 1]
+            ]
+        ,
+            values: [
+                [1, 1]
+                [2, 1]
+                [3, 1]
+            ]
+        ]
 
         beforeEach ->
             container = document.createElement 'div'
@@ -13,30 +33,12 @@ describe 'Chart', ->
             chart.destroy()
 
         it 'computes the stacked offsets and extents', ->
-            chart = new ForestD3.Chart()
-            data = [
-                values: [
-                    [1, 3]
-                    [2, 2]
-                    [3, 6]
-                ]
-            ,
-                values: [
-                    [1, 1]
-                    [2, 3]
-                    [3, 1]
-                ]
-            ,
-                values: [
-                    [1, 1]
-                    [2, 1]
-                    [3, 1]
-                ]
-            ]
+            chart = new ForestD3.StackedChart container
 
-            chart.stackable(true).data(data)
+            chart.data(data).render()
 
-            internal = chart.data().get()
+            internal = chart.stacked(true).stackType('bar').data().get()
+
             internal[0].values[0].y0.should.equal 0
             internal[0].values[1].y0.should.equal 0
             internal[0].values[2].y0.should.equal 0

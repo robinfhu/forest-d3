@@ -368,16 +368,21 @@ chartProperties = [
             .attr('x', @canvasWidth)
 
     ###
-    Figures out the range of data.
+    Gives sub-charts a chance to pre-process the data.
+
+    For example, stacked charts will want to call d3.layout.stack() before
+    calculating the extent.
+
+    Defaults to no-op.
     ###
-    calculateExtent: ->
-        ForestD3.Utils.extent @data().visible(), @forceDomain()
+    preprocessData: ->
 
     ###
     Creates an x and y scale, setting the domain and ranges.
     ###
     updateChartScale: ->
-        extent = @calculateExtent()
+        @preprocessData()
+        extent = ForestD3.Utils.extent @data().visible(), @forceDomain()
         extent = ForestD3.Utils.extentPadding extent, {
             x: @xPadding()
             y: @yPadding()

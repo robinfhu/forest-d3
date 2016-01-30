@@ -782,7 +782,7 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
               on the x-axis or not.
        */
       normalize: function(data, options) {
-        var colorIndex, colorPalette, findExtent, getX, getY, ordinal, seriesIndex;
+        var colorIndex, colorPalette, getX, getY, ordinal, seriesIndex;
         if (options == null) {
           options = {};
         }
@@ -791,9 +791,6 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         getY = options.getY;
         ordinal = options.ordinal;
         colorPalette = options.colorPalette || colors20;
-        findExtent = function(values, valFn) {
-          return d3.extent(values.map(valFn));
-        };
         colorIndex = 0;
         seriesIndex = 0;
         data.forEach(function(series, i) {
@@ -850,10 +847,10 @@ Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
         data.forEach(function(series) {
           if (series.isDataSeries) {
             return series.extent = {
-              x: findExtent(series.values, function(d) {
+              x: d3.extent(series.values, function(d) {
                 return d.x;
               }),
-              y: findExtent(series.values, function(d) {
+              y: d3.extent(series.values, function(d) {
                 return d.y;
               })
             };
@@ -1686,12 +1683,15 @@ Library of tooltip rendering utilities
 
 
     /*
-    Figures out the range of data.
+    Gives sub-charts a chance to pre-process the data.
+    
+    For example, stacked charts will want to call d3.layout.stack() before
+    calculating the extent.
+    
+    Defaults to no-op.
      */
 
-    Chart.prototype.calculateExtent = function() {
-      return ForestD3.Utils.extent(this.data().visible(), this.forceDomain());
-    };
+    Chart.prototype.preprocessData = function() {};
 
 
     /*
@@ -1700,7 +1700,8 @@ Library of tooltip rendering utilities
 
     Chart.prototype.updateChartScale = function() {
       var extent;
-      extent = this.calculateExtent();
+      this.preprocessData();
+      extent = ForestD3.Utils.extent(this.data().visible(), this.forceDomain());
       extent = ForestD3.Utils.extentPadding(extent, {
         x: this.xPadding(),
         y: this.yPadding()
@@ -2049,5 +2050,42 @@ Library of tooltip rendering utilities
     return BarChart;
 
   })(ForestD3.BaseChart);
+
+}).call(this);
+
+(function() {
+  var StackedChart, chartProperties,
+    extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    hasProp = {}.hasOwnProperty;
+
+  chartProperties = [['stackType', 'bar'], ['stacked', true]];
+
+  this.ForestD3.StackedChart = StackedChart = (function(superClass) {
+    extend(StackedChart, superClass);
+
+    function StackedChart(domContainer) {
+      StackedChart.__super__.constructor.call(this, domContainer);
+      this._setProperties(chartProperties);
+    }
+
+    StackedChart.prototype.preprocessData = function() {
+      var internalData, yOffsetVal;
+      internalData = this.data().get();
+      d3.layout.stack().offset('zero').values(function(d) {
+        return d.values;
+      })(internalData);
+      yOffsetVal = function(d) {
+        return d.y + d.y0;
+      };
+      return internalData.forEach(function(series) {
+        if (series.isDataSeries) {
+          return series.extent.y = d3.extent(series.values, yOffsetVal);
+        }
+      });
+    };
+
+    return StackedChart;
+
+  })(ForestD3.Chart);
 
 }).call(this);

@@ -265,9 +265,6 @@
         ordinal = options.ordinal
         colorPalette = options.colorPalette or colors20
 
-        findExtent = (values, valFn)->
-            d3.extent values.map valFn
-
         colorIndex = 0
         seriesIndex = 0
 
@@ -314,7 +311,7 @@
         data.forEach (series)->
             if series.isDataSeries
                 series.extent =
-                    x: findExtent(series.values, (d)-> d.x)
-                    y: findExtent(series.values, (d)-> d.y)
+                    x: d3.extent(series.values, (d)-> d.x)
+                    y: d3.extent(series.values, (d)-> d.y)
 
         data
