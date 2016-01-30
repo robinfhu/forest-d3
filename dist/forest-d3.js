@@ -1461,11 +1461,11 @@ Library of tooltip rendering utilities
       this.updateDimensions();
       this.updateChartScale();
       this.updateChartFrame();
-      chartItems = this.canvas.selectAll('g.chart-item').data(this.data().visible(), function(d) {
+      chartItems = this.canvas.selectAll('g.series').data(this.data().visible(), function(d) {
         return d.key;
       });
       chartItems.enter().append('g').attr('class', function(d, i) {
-        return "chart-item item-" + (d.key || i);
+        return "series series-" + (d.key || i);
       });
       chartItems.exit().transition().duration(this.duration()).style('opacity', 0).remove();
       chart = this;

@@ -75,12 +75,12 @@ chartProperties = [
         @updateChartFrame()
 
         chartItems = @canvas
-            .selectAll('g.chart-item')
+            .selectAll('g.series')
             .data(@data().visible(), (d)-> d.key)
 
         chartItems.enter()
             .append('g')
-            .attr('class', (d, i)-> "chart-item item-#{d.key or i}")
+            .attr('class', (d, i)-> "series series-#{d.key or i}")
 
         chartItems.exit()
             .transition()

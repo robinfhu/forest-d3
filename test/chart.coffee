@@ -51,7 +51,7 @@ describe 'Chart', ->
 
                 chart.data(sampleData).render()
 
-                circle = $(container).find('svg g.chart-item path.point')
+                circle = $(container).find('svg g.series path.point')
                 circle.length.should.equal 1, 'one <path> point'
 
             it 'renders the chart frame once', ->
@@ -124,12 +124,15 @@ describe 'Chart', ->
 
                 chart.data(sampleData).render()
 
-                series = $(container).find('g.chart-item')
+                series = $(container).find('g.series')
                 series.length.should.equal 3, 'three groups'
 
-                series.eq(0)[0].getAttribute('class').should.contain 'item-foo'
-                series.eq(1)[0].getAttribute('class').should.contain 'item-bar'
-                series.eq(2)[0].getAttribute('class').should.contain 'item-maz'
+                series.eq(0)[0]
+                .getAttribute('class').should.contain 'series-foo'
+                series.eq(1)[0]
+                .getAttribute('class').should.contain 'series-bar'
+                series.eq(2)[0]
+                .getAttribute('class').should.contain 'series-maz'
 
             it 'does not render hidden series', (done)->
                 chart = new ForestD3.Chart container
@@ -155,20 +158,20 @@ describe 'Chart', ->
                 chart.data().hide(['bar'])
                 chart.render()
 
-                series = $(container).find('g.chart-item')
+                series = $(container).find('g.series')
                 series.length.should.equal 2, 'two series only'
                 series.find('.series-bar').length.should.equal 0
 
                 chart.data().show('bar')
                 chart.render()
 
-                series = $(container).find('g.chart-item')
+                series = $(container).find('g.series')
                 series.length.should.equal 3, 'three now'
 
                 chart.data().hide('maz')
                 chart.render()
                 setTimeout ->
-                    series = $(container).find('g.chart-item')
+                    series = $(container).find('g.series')
                     series.length.should.equal 2, 'back to two series only'
                     done()
                 , 400
@@ -198,10 +201,10 @@ describe 'Chart', ->
 
                 chart.data().show('bar').render()
 
-                items = $(container).find('g.chart-item')
-                items.get(0).getAttribute('class').should.contain 'item-foo'
-                items.get(1).getAttribute('class').should.contain 'item-bar'
-                items.get(2).getAttribute('class').should.contain 'item-maz'
+                items = $(container).find('g.series')
+                items.get(0).getAttribute('class').should.contain 'series-foo'
+                items.get(1).getAttribute('class').should.contain 'series-bar'
+                items.get(2).getAttribute('class').should.contain 'series-maz'
                 done()
 
         describe 'Marker Lines', ->
@@ -217,7 +220,7 @@ describe 'Chart', ->
                 chart = new ForestD3.Chart container
                 chart.data(data).render()
 
-                chartItems = $(container).find('g.chart-item')
+                chartItems = $(container).find('g.series')
                 chartItems.length.should.equal 1
 
                 line = chartItems.eq(0).find('line')
@@ -245,8 +248,8 @@ describe 'Chart', ->
                 chart = new ForestD3.Chart container
                 chart.data(data).render()
 
-                line = $(container).find('g.chart-item line')
-                text = $(container).find('g.chart-item text')
+                line = $(container).find('g.series line')
+                text = $(container).find('g.series text')
                 text.text().should.contain 'Threshold'
 
                 setTimeout ->
@@ -274,7 +277,7 @@ describe 'Chart', ->
                 chart = new ForestD3.Chart container
                 chart.data(data).render()
 
-                rect = $(container).find('g.chart-item rect')
+                rect = $(container).find('g.series rect')
                 rect.length.should.equal 2, 'two rectangles'
 
         describe 'Line Chart', ->
@@ -292,7 +295,7 @@ describe 'Chart', ->
                 chart = new ForestD3.Chart container
                 chart.data(data).render()
 
-                line = $(container).find('g.chart-item path.line')
+                line = $(container).find('g.series path.line')
                 line.length.should.equal 1, 'line path exists'
 
             it 'can render an SVG line and path if area=true', ->
@@ -310,10 +313,10 @@ describe 'Chart', ->
                 chart = new ForestD3.Chart container
                 chart.data(data).render()
 
-                line = $(container).find('g.chart-item path.line')
+                line = $(container).find('g.series path.line')
                 line.length.should.equal 1, 'line path exists'
 
-                area = $(container).find('g.chart-item path.area')
+                area = $(container).find('g.series path.area')
                 area.length.should.equal 1, 'area path exists'
 
         describe 'Bar Chart', ->
@@ -340,10 +343,10 @@ describe 'Chart', ->
                 chart = new ForestD3.Chart container
                 chart.data(data).render()
 
-                bars1 = $(container).find('g.item-s1 rect')
+                bars1 = $(container).find('g.series-s1 rect')
                 bars1.length.should.equal 3, 'three bars s1'
 
-                bars2 = $(container).find('g.item-s2 rect')
+                bars2 = $(container).find('g.series-s2 rect')
                 bars2.length.should.equal 3, 'three bars s2'
 
             it 'should set max width for each bar', (done)->
@@ -359,7 +362,7 @@ describe 'Chart', ->
                 chart.ordinal(true).data(data).render()
 
                 setTimeout ->
-                    bar = $(container).find('g.item-s1 rect').get(0)
+                    bar = $(container).find('g.series-s1 rect').get(0)
                     width = parseFloat(bar.getAttribute('width'))
                     width.should.be.lessThan 300
                     done()
