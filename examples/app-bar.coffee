@@ -175,60 +175,20 @@ chartSingleSeries
     .render()
 
 # ******************** Stacked Bar Example ****************
+months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug']
+getVals = (list)-> list.map (d,i)-> {month: months[i], val: d}
 dataStacked = [
     label: 'Apples'
-    values: [
-        month: 'Jan'
-        val: 1
-    ,
-        month: 'Feb'
-        val: 3
-    ,
-        month: 'Mar'
-        val: 4.6
-    ,
-        month: 'Apr'
-        val: 8.81
-    ,
-        month: 'May'
-        val: 7.5
-    ]
+    values: getVals([1,3,4.6,8.81,7.6,4,1.3])
 ,
     label: 'Pears'
-    values: [
-        month: 'Jan'
-        val: 5
-    ,
-        month: 'Feb'
-        val: 1.2
-    ,
-        month: 'Mar'
-        val: 1.4
-    ,
-        month: 'Apr'
-        val: 3.4
-    ,
-        month: 'May'
-        val: 0.4
-    ]
+    values: getVals([1,1.3,2.4,5.6,7.6,4.5,1.4])
 ,
-    label: 'Bananas'
-    values: [
-        month: 'Jan'
-        val: 10.2
-    ,
-        month: 'Feb'
-        val: 2
-    ,
-        month: 'Mar'
-        val: 1.4
-    ,
-        month: 'Apr'
-        val: 7.4
-    ,
-        month: 'May'
-        val: 2.3
-    ]
+    label: 'Grapes'
+    values: getVals([0.4,0.9,1.2,3.4,2.4,0.6,0.3])
+,
+    label: 'Strawberries'
+    values: getVals([1.9,3,4.6,7.3,5.5,4.3,0.6])
 ]
 
 chartStackedBar = new ForestD3.StackedChart '#example-stacked'
@@ -237,7 +197,8 @@ legendStacked = new ForestD3.Legend '#legend-stacked'
 chartStackedBar
     .getX((d)-> d.month)
     .getY((d)-> d.val)
-    .xPadding(0.4)
+    .xPadding(0.2)
+    .barPaddingPercent(0.0)
     .stacked(true)
     .stackType('bar')
     .addPlugin(legendStacked)

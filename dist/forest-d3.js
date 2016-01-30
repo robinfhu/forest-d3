@@ -151,8 +151,8 @@ Author:  Robin Hu
     fullSpace = chart.canvasWidth / selectionData.values.length;
     maxFullSpace = chart.xScale(1) / 2;
     fullSpace = d3.min([maxFullSpace, fullSpace]);
-    maxPadding = 15;
-    fullSpace -= d3.min([fullSpace * 0.1, maxPadding]);
+    maxPadding = 35;
+    fullSpace -= d3.min([fullSpace * chart.barPaddingPercent(), maxPadding]);
     fullSpace = d3.max([1, fullSpace]);
 
     /*
@@ -209,8 +209,8 @@ Author:  Robin Hu
     barCount = chart.data().barCount();
     maxFullSpace = chart.xScale(1) / 2;
     fullSpace = d3.min([maxFullSpace, fullSpace]);
-    maxPadding = 15;
-    fullSpace -= d3.min([fullSpace * 0.1, maxPadding]);
+    maxPadding = 35;
+    fullSpace -= d3.min([fullSpace * chart.barPaddingPercent(), maxPadding]);
     fullSpace = d3.max([barCount, fullSpace]);
 
     /*
@@ -1394,7 +1394,7 @@ Library of tooltip rendering utilities
       'xTickFormat', function(d) {
         return d;
       }
-    ], ['yTickFormat', d3.format(',.2f')], ['reduceXTicks', true], ['yTicks', null], ['showXAxis', true], ['showYAxis', true], ['showTooltip', true], ['showGuideline', true], ['tooltipType', 'bisect']
+    ], ['yTickFormat', d3.format(',.2f')], ['reduceXTicks', true], ['yTicks', null], ['showXAxis', true], ['showYAxis', true], ['showTooltip', true], ['showGuideline', true], ['tooltipType', 'bisect'], ['barPaddingPercent', 0.1]
   ];
 
   this.ForestD3.Chart = Chart = (function(superClass) {

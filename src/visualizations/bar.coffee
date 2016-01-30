@@ -28,10 +28,10 @@
 
     fullSpace = d3.min [maxFullSpace, fullSpace]
 
-    maxPadding = 15
+    maxPadding = 35
     #add some padding between groups of bars (default to 10% of the full space)
     #Padding is maxed out after a certain threshold
-    fullSpace -= d3.min [(fullSpace * 0.1), maxPadding]
+    fullSpace -= d3.min [(fullSpace * chart.barPaddingPercent()), maxPadding]
 
     # Ensure we don't get negative bar widths
     fullSpace = d3.max [barCount, fullSpace]

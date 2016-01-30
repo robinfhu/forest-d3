@@ -23,6 +23,7 @@ chartProperties = [
     ['showTooltip', true]
     ['showGuideline', true]
     ['tooltipType', 'bisect']  # Can be 'bisect' or 'spatial'
+    ['barPaddingPercent', 0.1]
 ]
 
 @ForestD3.Chart = class Chart extends ForestD3.BaseChart
