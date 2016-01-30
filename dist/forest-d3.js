@@ -1376,6 +1376,13 @@ Library of tooltip rendering utilities
 
 }).call(this);
 
+
+/*
+A Chart object renders time series data, or scatter plot data.
+
+You can combine lines, bars, areas and scatter points into one chart.
+ */
+
 (function() {
   var Chart, chartProperties,
     extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -2056,6 +2063,15 @@ Library of tooltip rendering utilities
 
 }).call(this);
 
+
+/*
+A StackedChart is responsible for rendering a chart with 'layers'.
+Examples include stacked bar and stacked area charts.
+
+Due to the unique nature of the stacked visualization, you are not
+allowed to combine it with lines and scatters.
+ */
+
 (function() {
   var StackedChart, chartProperties,
     extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -2088,11 +2104,21 @@ Library of tooltip rendering utilities
         if (series.isDataSeries) {
           series.type = seriesType;
           yVals = series.values.map(yOffsetVal);
+
+          /*
+          Add 0 to the extent always, because stacked bar charts
+          should be based on the zero axis
+           */
           yVals = yVals.concat([0]);
           return series.extent.y = d3.extent(yVals);
         }
       });
     };
+
+
+    /*
+    Override the parent class' method.
+     */
 
     StackedChart.prototype.getVisualization = function(series) {
       if (this.stacked()) {

@@ -1,3 +1,10 @@
+###
+A StackedChart is responsible for rendering a chart with 'layers'.
+Examples include stacked bar and stacked area charts.
+
+Due to the unique nature of the stacked visualization, you are not
+allowed to combine it with lines and scatters.
+###
 chartProperties = [
     ['stackType','bar']
     ['stacked', true]
@@ -29,9 +36,17 @@ chartProperties = [
                 series.type = seriesType
 
                 yVals = series.values.map yOffsetVal
+
+                ###
+                Add 0 to the extent always, because stacked bar charts
+                should be based on the zero axis
+                ###
                 yVals = yVals.concat([0])
                 series.extent.y = d3.extent yVals
 
+    ###
+    Override the parent class' method.
+    ###
     getVisualization: (series)->
         if @stacked()
             ForestD3.Visualizations.barStacked

@@ -1,3 +1,8 @@
+###
+A Chart object renders time series data, or scatter plot data.
+
+You can combine lines, bars, areas and scatter points into one chart.
+###
 chartProperties = [
     ['getX', (d,i)-> d[0] ]
     ['getY', (d,i)-> d[1] ]
