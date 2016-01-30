@@ -121,62 +121,33 @@ dataTwoGroups = [
 chartTwoGroups.data(dataTwoGroups).render()
 
 # ************************* Just a regular single series
+months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+getVals = (list)-> list.map (d,i)-> {month: months[i], val: d}
+
 dataSingleSeries =
     monthlyData:
         color: '#aaa'
         type: 'bar'
         classed: (d)->
-            if d.calc > 22 then '-highlight-bar' else ''
-        values: [
-            month: 'Jan'
-            calc: 5.5
-        ,
-            month: 'Feb'
-            calc: 6.7
-        ,
-            month: 'Mar'
-            calc: 8.0
-        ,
-            month: 'Apr'
-            calc: 13.5
-        ,
-            month: 'May'
-            calc: 20.4
-        ,
-            month: 'Jun'
-            calc: 22.8
-        ,
-            month: 'Jul'
-            calc: 19.8
-        ,
-            month: 'Aug'
-            calc: 16.8
-        ,
-            month: 'Sep'
-            calc: 10.4
-        ,
-            month: 'Oct'
-            calc: 4.5
-        ,
-            month: 'Nov'
-            calc: 3.2
-        ,
-            month: 'Dec'
-            calc: 1.1
-        ]
+            if d.val > 22 then '-highlight-bar' else ''
+        values: getVals([3.4,4.5,6.7,8.0,13.5,22.4,19.8,15.4,11.3,8.3,6.5,2.4])
+    average:
+        color: '#aaf'
+        type: 'line'
+        interpolate: 'cardinal'
+        values: getVals([3.9,5.5,2.7,8.9,30.5,36.4,23.8,14.4,11.3,7.3,8.5,5.4])
+
 
 chartSingleSeries = new ForestD3.Chart '#example-single-series'
 chartSingleSeries
     .getX((d)-> d.month)
-    .getY((d)-> d.calc)
+    .getY((d)-> d.val)
     .reduceXTicks(false)
     .chartLabel('Monthly Calculations')
     .data(dataSingleSeries)
     .render()
 
 # ******************** Stacked Bar Example ****************
-months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug']
-getVals = (list)-> list.map (d,i)-> {month: months[i], val: d}
 dataStacked = [
     label: 'Apples'
     values: getVals([1,3,4.6,8.81,7.6,4,1.3])
