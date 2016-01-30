@@ -55,6 +55,48 @@ describe 'Chart', ->
             internal[1].extent.y.should.deep.equal [0, 7]
             internal[2].extent.y.should.deep.equal [0, 8]
 
+        it 'negative stacked values', (done)->
+            chart = new ForestD3.StackedChart container
+
+            dataNeg = [
+                values: [[0, -1]]
+            ,
+                values: [[0, -2]]
+            ,
+                values: [[0, -3]]
+            ,
+                values: [[0, -2]]
+            ]
+
+            chart.stacked(true).stackType('bar').data(dataNeg).render()
+
+            internal = chart.data().get()
+
+            internal[0].values[0].y0.should.equal 0
+            internal[1].values[0].y0.should.equal -1
+            internal[2].values[0].y0.should.equal -3
+            internal[3].values[0].y0.should.equal -6
+
+            setTimeout ->
+                series = $(container).find('g.series').eq(0)
+                bar = series.find('rect')
+                parseInt(bar.attr('y')).should.equal(parseInt(chart.yScale(0)))
+
+                series = $(container).find('g.series').eq(1)
+                bar = series.find('rect')
+                parseInt(bar.attr('y')).should.equal(parseInt(chart.yScale(-1)))
+
+                series = $(container).find('g.series').eq(2)
+                bar = series.find('rect')
+                parseInt(bar.attr('y')).should.equal(parseInt(chart.yScale(-3)))
+
+                series = $(container).find('g.series').eq(3)
+                bar = series.find('rect')
+                parseInt(bar.attr('y')).should.equal(parseInt(chart.yScale(-6)))
+
+                done()
+            , 300
+
         it 'renders stacked bars and markers', (done)->
             chart = new ForestD3.StackedChart container
 

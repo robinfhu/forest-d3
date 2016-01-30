@@ -156,16 +156,16 @@
   dataStacked = [
     {
       label: 'Apples',
-      values: getVals([1, 3, 4.6, 8.81, 7.6, 4, 1.3])
+      values: getVals([-1.3, 1, 3, 4.6, 8.81, 7.6, 4, 1.3])
     }, {
       label: 'Pears',
-      values: getVals([1, 1.3, 2.4, 5.6, 7.6, 4.5, 1.4])
+      values: getVals([-1.7, 1, 1.3, 2.4, 5.6, 7.6, 4.5, 1.4])
     }, {
       label: 'Grapes',
-      values: getVals([0.4, 0.9, 1.2, 3.4, 2.4, 0.6, 0.3])
+      values: getVals([-2.3, 0.4, 0.9, 1.2, 3.4, 2.4, 0.6, 0.3])
     }, {
       label: 'Strawberries',
-      values: getVals([1.9, 3, 4.6, 7.3, 5.5, 4.3, 0.6])
+      values: getVals([-6.7, 1.9, 3, 4.6, 7.3, 5.5, 4.3, 0.6])
     }, {
       type: 'marker',
       axis: 'y',

@@ -65,7 +65,15 @@
             chart.xScale(x(d,i)) - xCentered
         )
         .attr('y', (d,i)->
-            chart.yScale(d.y0 + d.y)
+            ###
+            For negative stacked bars, place the top of the <rect> at y0.
+
+            For positive bars, place the top of the <rect> at y0 + y
+            ###
+            if d.y0 <= 0 and d.y < 0
+                chart.yScale d.y0
+            else
+                chart.yScale(d.y0 + d.y)
         )
         .attr('height', (d,i)->
             Math.abs(chart.yScale(d.y) - barBase)

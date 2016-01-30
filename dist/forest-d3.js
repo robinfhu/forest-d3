@@ -160,7 +160,17 @@ Author:  Robin Hu
        */
       return chart.xScale(x(d, i)) - xCentered;
     }).attr('y', function(d, i) {
-      return chart.yScale(d.y0 + d.y);
+
+      /*
+      For negative stacked bars, place the top of the <rect> at y0.
+      
+      For positive bars, place the top of the <rect> at y0 + y
+       */
+      if (d.y0 <= 0 && d.y < 0) {
+        return chart.yScale(d.y0);
+      } else {
+        return chart.yScale(d.y0 + d.y);
+      }
     }).attr('height', function(d, i) {
       return Math.abs(chart.yScale(d.y) - barBase);
     }).attr('width', barWidth).style('fill', selectionData.color).attr('class', function(d, i) {
