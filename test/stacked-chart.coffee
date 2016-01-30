@@ -1,5 +1,5 @@
 describe 'Chart', ->
-    describe 'Stackable Charts', ->
+    describe.only 'Stackable Charts', ->
         chart = null
         container = null
 
@@ -61,6 +61,10 @@ describe 'Chart', ->
             chart.stacked(true).stackType('bar').data(data).render()
 
             setTimeout ->
+                series = $(container).find('g.series')
+                series.length.should.equal 3, 'three series'
+
+                series.eq(0).find('rect.bar').length.should.equal 3, '3 bars'
                 done()
             , 500
 

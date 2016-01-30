@@ -20,3 +20,6 @@ chartProperties = [
         internalData.forEach (series)->
             if series.isDataSeries
                 series.extent.y = d3.extent series.values, yOffsetVal
+
+    getVisualization: (series)->
+        ForestD3.Visualizations.barStacked

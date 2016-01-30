@@ -2087,6 +2087,10 @@ Library of tooltip rendering utilities
       });
     };
 
+    StackedChart.prototype.getVisualization = function(series) {
+      return ForestD3.Visualizations.barStacked;
+    };
+
     return StackedChart;
 
   })(ForestD3.Chart);

@@ -238,7 +238,7 @@
     }
   ];
 
-  chartStackedBar = new ForestD3.Chart('#example-stacked');
+  chartStackedBar = new ForestD3.StackedChart('#example-stacked');
 
   legendStacked = new ForestD3.Legend('#legend-stacked');
 
@@ -246,6 +246,6 @@
     return d.month;
   }).getY(function(d) {
     return d.val;
-  }).xPadding(0.4).stackable(true).stacked(true).stackType('bar').addPlugin(legendStacked).data(dataStacked).render();
+  }).xPadding(0.4).stacked(true).stackType('bar').addPlugin(legendStacked).data(dataStacked).render();
 
 }).call(this);
