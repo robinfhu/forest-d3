@@ -3,6 +3,8 @@ describe 'Chart', ->
         it 'should exist', ->
             expect(ForestD3).to.exist
             expect(ForestD3.Chart).to.exist
+            expect(ForestD3.StackedChart).to.exist
+            expect(ForestD3.version).to.exist
 
     describe 'chart API', ->
         chart = null
