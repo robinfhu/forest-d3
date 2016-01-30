@@ -2,7 +2,7 @@
 Draws a simple line graph.
 If you set area=true, turns it into an area graph
 ###
-@ForestD3.ChartItem.line = (selection, selectionData)->
+@ForestD3.Visualizations.line = (selection, selectionData)->
     chart = @
 
     selection.style 'stroke', selectionData.color

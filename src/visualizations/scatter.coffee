@@ -2,10 +2,11 @@
 Function responsible for rendering a scatter plot inside a d3 selection.
 Must have reference to a chart instance.
 
-Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
+Example call:
+ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
 
 ###
-@ForestD3.ChartItem.scatter = (selection, selectionData)->
+@ForestD3.Visualizations.scatter = (selection, selectionData)->
     chart = @
 
     selection.style 'fill', selectionData.color

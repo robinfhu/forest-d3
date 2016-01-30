@@ -2,7 +2,7 @@
 Draws a transparent rectangle across the canvas signifying an important
 region.
 ###
-@ForestD3.ChartItem.region = (selection, selectionData)->
+@ForestD3.Visualizations.region = (selection, selectionData)->
     chart = @
 
     region = selection.selectAll('rect.region').data([selectionData])

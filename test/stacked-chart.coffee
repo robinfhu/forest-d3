@@ -35,9 +35,9 @@ describe 'Chart', ->
         it 'computes the stacked offsets and extents', ->
             chart = new ForestD3.StackedChart container
 
-            chart.data(data).render()
+            chart.stacked(true).stackType('bar').data(data).render()
 
-            internal = chart.stacked(true).stackType('bar').data().get()
+            internal = chart.data().get()
 
             internal[0].values[0].y0.should.equal 0
             internal[0].values[1].y0.should.equal 0
@@ -54,3 +54,13 @@ describe 'Chart', ->
             internal[0].extent.y.should.deep.equal [2, 6]
             internal[1].extent.y.should.deep.equal [4, 7]
             internal[2].extent.y.should.deep.equal [5, 8]
+
+        it 'renders stacked bars', (done)->
+            chart = new ForestD3.StackedChart container
+
+            chart.stacked(true).stackType('bar').data(data).render()
+
+            setTimeout ->
+                done()
+            , 500
+

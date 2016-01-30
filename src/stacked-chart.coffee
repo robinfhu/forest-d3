@@ -8,6 +8,7 @@ chartProperties = [
         super domContainer
         @_setProperties chartProperties
 
+    # Overrides parent class
     preprocessData: ->
         internalData = @data().get()
         d3.layout.stack()

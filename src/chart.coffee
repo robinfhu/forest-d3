@@ -96,9 +96,9 @@ chartProperties = [
         chartItems.each (series,i)->
             chartItem = d3.select @
 
-            renderFn = chart.getRenderMethod series
+            visualization = chart.getVisualization series
 
-            renderFn.call chart, chartItem, series
+            visualization.call chart, chartItem, series
 
         ###
         This line keeps chart-items in order on the canvas. Items that appear
@@ -118,20 +118,21 @@ chartProperties = [
     Given a chart series object, determines what type of visualization
     to render.
     ###
-    getRenderMethod: (series)->
+    getVisualization: (series)->
+        visualizations = ForestD3.Visualizations
         switch series.type
             when 'scatter'
-                ForestD3.ChartItem.scatter
+                visualizations.scatter
             when 'line'
-                ForestD3.ChartItem.line
+                visualizations.line
             when 'bar'
-                ForestD3.ChartItem.bar
+                visualizations.bar
             when 'ohlc'
-                ForestD3.ChartItem.ohlc
+                visualizations.ohlc
             when 'marker'
-                ForestD3.ChartItem.markerLine
+                visualizations.markerLine
             when 'region'
-                ForestD3.ChartItem.region
+                visualizations.region
             else
                 (-> 0)
 

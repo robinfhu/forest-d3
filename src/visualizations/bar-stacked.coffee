@@ -1,4 +1,4 @@
-@ForestD3.ChartItem.barStacked = (selection, selectionData)->
+@ForestD3.Visualizations.barStacked = (selection, selectionData)->
     chart = @
     bars = selection.selectAll('rect.bar').data(selectionData.values)
 

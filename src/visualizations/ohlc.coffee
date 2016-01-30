@@ -1,4 +1,4 @@
-@ForestD3.ChartItem.ohlc = (selection, selectionData)->
+@ForestD3.Visualizations.ohlc = (selection, selectionData)->
     chart = @
 
     selection.classed('ohlc', true)

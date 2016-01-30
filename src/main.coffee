@@ -9,4 +9,4 @@ Author:  Robin Hu
 @ForestD3 =
     version: '0.2.0-beta'
 
-@ForestD3.ChartItem = {}
+@ForestD3.Visualizations = {}

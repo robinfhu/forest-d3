@@ -1,7 +1,7 @@
 ###
 Draws a horizontal or vertical line at the specified x or y location.
 ###
-@ForestD3.ChartItem.markerLine = (selection, selectionData)->
+@ForestD3.Visualizations.markerLine = (selection, selectionData)->
     chart = @
 
     line = selection.selectAll('line.marker').data((d)-> [d.value])

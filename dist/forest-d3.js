@@ -13,7 +13,7 @@ Author:  Robin Hu
     version: '0.2.0-beta'
   };
 
-  this.ForestD3.ChartItem = {};
+  this.ForestD3.Visualizations = {};
 
 }).call(this);
 
@@ -131,7 +131,7 @@ Author:  Robin Hu
 }).call(this);
 
 (function() {
-  this.ForestD3.ChartItem.barStacked = function(selection, selectionData) {
+  this.ForestD3.Visualizations.barStacked = function(selection, selectionData) {
     var barBase, barWidth, bars, chart, fullSpace, maxFullSpace, maxPadding, x, xCentered, y;
     chart = this;
     bars = selection.selectAll('rect.bar').data(selectionData.values);
@@ -188,7 +188,7 @@ Author:  Robin Hu
 }).call(this);
 
 (function() {
-  this.ForestD3.ChartItem.bar = function(selection, selectionData) {
+  this.ForestD3.Visualizations.bar = function(selection, selectionData) {
     var barBase, barCount, barIndex, barWidth, bars, chart, fullSpace, maxFullSpace, maxPadding, x, xCentered, y;
     chart = this;
     bars = selection.selectAll('rect.bar').data(selectionData.values);
@@ -259,7 +259,7 @@ If you set area=true, turns it into an area graph
  */
 
 (function() {
-  this.ForestD3.ChartItem.line = function(selection, selectionData) {
+  this.ForestD3.Visualizations.line = function(selection, selectionData) {
     var area, areaBase, areaFn, chart, duration, interpolate, lineFn, path, x, y;
     chart = this;
     selection.style('stroke', selectionData.color);
@@ -301,7 +301,7 @@ Draws a horizontal or vertical line at the specified x or y location.
  */
 
 (function() {
-  this.ForestD3.ChartItem.markerLine = function(selection, selectionData) {
+  this.ForestD3.Visualizations.markerLine = function(selection, selectionData) {
     var chart, duration, label, labelEnter, labelOffset, labelPadding, labelRotate, line, x, y;
     chart = this;
     line = selection.selectAll('line.marker').data(function(d) {
@@ -332,7 +332,7 @@ Draws a horizontal or vertical line at the specified x or y location.
 }).call(this);
 
 (function() {
-  this.ForestD3.ChartItem.ohlc = function(selection, selectionData) {
+  this.ForestD3.Visualizations.ohlc = function(selection, selectionData) {
     var chart, close, closeMarks, duration, hi, lo, open, openMarks, rangeLines, x;
     chart = this;
     selection.classed('ohlc', true);
@@ -407,7 +407,7 @@ region.
  */
 
 (function() {
-  this.ForestD3.ChartItem.region = function(selection, selectionData) {
+  this.ForestD3.Visualizations.region = function(selection, selectionData) {
     var chart, duration, end, height, region, regionEnter, start, width, x, y;
     chart = this;
     region = selection.selectAll('rect.region').data([selectionData]);
@@ -435,11 +435,12 @@ region.
 Function responsible for rendering a scatter plot inside a d3 selection.
 Must have reference to a chart instance.
 
-Example call: ForestD3.ChartItem.scatter.call chartInstance, d3.select(this)
+Example call:
+ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
  */
 
 (function() {
-  this.ForestD3.ChartItem.scatter = function(selection, selectionData) {
+  this.ForestD3.Visualizations.scatter = function(selection, selectionData) {
     var all, base, chart, points, seriesIndex, shape, symbol, x, y;
     chart = this;
     selection.style('fill', selectionData.color);
@@ -1474,10 +1475,10 @@ Library of tooltip rendering utilities
       'type' attribute, renders a different kind of chart element.
        */
       chartItems.each(function(series, i) {
-        var chartItem, renderFn;
+        var chartItem, visualization;
         chartItem = d3.select(this);
-        renderFn = chart.getRenderMethod(series);
-        return renderFn.call(chart, chartItem, series);
+        visualization = chart.getVisualization(series);
+        return visualization.call(chart, chartItem, series);
       });
 
       /*
@@ -1497,20 +1498,22 @@ Library of tooltip rendering utilities
     to render.
      */
 
-    Chart.prototype.getRenderMethod = function(series) {
+    Chart.prototype.getVisualization = function(series) {
+      var visualizations;
+      visualizations = ForestD3.Visualizations;
       switch (series.type) {
         case 'scatter':
-          return ForestD3.ChartItem.scatter;
+          return visualizations.scatter;
         case 'line':
-          return ForestD3.ChartItem.line;
+          return visualizations.line;
         case 'bar':
-          return ForestD3.ChartItem.bar;
+          return visualizations.bar;
         case 'ohlc':
-          return ForestD3.ChartItem.ohlc;
+          return visualizations.ohlc;
         case 'marker':
-          return ForestD3.ChartItem.markerLine;
+          return visualizations.markerLine;
         case 'region':
-          return ForestD3.ChartItem.region;
+          return visualizations.region;
         default:
           return function() {
             return 0;

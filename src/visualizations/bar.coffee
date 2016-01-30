@@ -1,4 +1,4 @@
-@ForestD3.ChartItem.bar = (selection, selectionData)->
+@ForestD3.Visualizations.bar = (selection, selectionData)->
     chart = @
     bars = selection.selectAll('rect.bar').data(selectionData.values)
 
