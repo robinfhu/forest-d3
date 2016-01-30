@@ -51,9 +51,9 @@ describe 'Chart', ->
             internal[2].values[1].y0.should.equal 5
             internal[2].values[2].y0.should.equal 7
 
-            internal[0].extent.y.should.deep.equal [2, 6]
-            internal[1].extent.y.should.deep.equal [4, 7]
-            internal[2].extent.y.should.deep.equal [5, 8]
+            internal[0].extent.y.should.deep.equal [0, 6]
+            internal[1].extent.y.should.deep.equal [0, 7]
+            internal[2].extent.y.should.deep.equal [0, 8]
 
         it 'renders stacked bars', (done)->
             chart = new ForestD3.StackedChart container
