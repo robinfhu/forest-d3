@@ -1079,6 +1079,7 @@ It acts as a plugin to a main chart instance.
 
   this.ForestD3.Legend = Legend = (function() {
     function Legend(domContainer) {
+      var processClickEvent;
       this.name = 'legend';
       if (domContainer.select != null) {
         this.container = domContainer;
@@ -1086,6 +1087,22 @@ It acts as a plugin to a main chart instance.
         this.container = d3.select(domContainer);
       }
       this.container.classed('forest-d3 legend', true);
+
+      /*
+      This is a technique to distinguish between single and double clicks.
+      
+      When any kind of click happens, the last event handler gets stored in
+      @lastClickEvent.
+      
+      After a brief delay of about 200 ms, the lastClickEvent is executed.
+       */
+      this.lastClickEvent = function() {};
+      processClickEvent = (function(_this) {
+        return function() {
+          return _this.lastClickEvent.call(_this);
+        };
+      })(this);
+      this.legendClickHandler = ForestD3.Utils.debounce(processClickEvent, 200);
     }
 
     Legend.prototype.chart = function(chart) {
@@ -1109,9 +1126,19 @@ It acts as a plugin to a main chart instance.
         return d.key;
       });
       itemsEnter = items.enter().append('div').classed('item', true);
-      items.on('click', (function(_this) {
+      items.on('click.legend', (function(_this) {
         return function(d) {
-          return _this.chartInstance.data().toggle(d.key).render();
+          _this.lastClickEvent = function() {
+            return _this.chartInstance.data().toggle(d.key).render();
+          };
+          return _this.legendClickHandler();
+        };
+      })(this)).on('dblclick.legend', (function(_this) {
+        return function(d) {
+          _this.lastClickEvent = function() {
+            return _this.chartInstance.data().showOnly(d.key).render();
+          };
+          return _this.legendClickHandler();
         };
       })(this));
       items.classed('disabled', function(d) {
@@ -1123,7 +1150,7 @@ It acts as a plugin to a main chart instance.
       itemsEnter.append('span').classed('description', true).text(function(d) {
         return d.label;
       });
-      return itemsEnter.append('span').classed('show-only button', true).text('only').on('click', (function(_this) {
+      return itemsEnter.append('span').classed('show-only button', true).text('only').on('click.showOnly', (function(_this) {
         return function(d) {
           d3.event.stopPropagation();
           return _this.chartInstance.data().showOnly(d.key).render();
@@ -1494,11 +1521,11 @@ You can combine lines, bars, areas and scatter points into one chart.
       this.updateDimensions();
       this.updateChartScale();
       this.updateChartFrame();
-      chartItems = this.canvas.selectAll('g.series').data(this.data().visible(), function(d) {
-        return d.key;
+      chartItems = this.canvas.selectAll('g.series').data(this.data().visible(), function(series) {
+        return series.key;
       });
-      chartItems.enter().append('g').attr('class', function(d, i) {
-        return "series series-" + (d.key || i);
+      chartItems.enter().append('g').attr('class', function(series, i) {
+        return "series series-" + series.key;
       });
       chartItems.exit().transition().duration(this.duration()).style('opacity', 0).remove();
       chart = this;

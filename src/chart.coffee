@@ -82,11 +82,11 @@ chartProperties = [
 
         chartItems = @canvas
             .selectAll('g.series')
-            .data(@data().visible(), (d)-> d.key)
+            .data(@data().visible(), (series)-> series.key)
 
         chartItems.enter()
             .append('g')
-            .attr('class', (d, i)-> "series series-#{d.key or i}")
+            .attr('class', (series, i)-> "series series-#{series.key}")
 
         chartItems.exit()
             .transition()

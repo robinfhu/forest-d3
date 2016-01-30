@@ -3,10 +3,11 @@ legend = new ForestD3.Legend d3.select('#legend')
 
 chart
     .ordinal(true)
-    .margin({left: 50})
+    .margin({left: 90})
+    .xPadding(0)
     .xLabel('Date')
     .yLabel('Price')
-    .yTickFormat(d3.format(',.3f'))
+    .yTickFormat(d3.format(',.2f'))
     .xTickFormat((d)->
         if d?
             d3.time.format('%Y-%m-%d')(new Date d)
@@ -15,7 +16,7 @@ chart
     )
     .addPlugin(legend)
 
-getStocks = (startPrice, volatility, points=20)->
+getStocks = (startPrice, volatility, points=80)->
     result = []
     startDate = new Date 2012, 0, 1
 
@@ -38,20 +39,26 @@ data = [
     label: 'AAPL'
     type: 'line'
     interpolate: 'cardinal'
-    values: getStocks(0.75, 0.47)
+    values: getStocks(5.75, 0.47)
 ,
     key: 'series2'
     label: 'MSFT'
     type: 'line'
     area: true
-    values: getStocks(0.26, 0.2)
+    values: getStocks(5, 1.1)
 ,
     key: 'series3'
     label: 'FACEBOOK'
     type: 'line'
     area: true
     interpolate: 'cardinal'
-    values: getStocks(0.56, 0.13)
+    values: getStocks(6.56, 0.13)
+,
+    key: 'series4'
+    label: 'AMAZON'
+    type: 'line'
+    area: false
+    values: getStocks(7.89, 0.37)
 ,
     key: 'marker1'
     label: 'Profit'
@@ -60,7 +67,7 @@ data = [
     value: 0.2
 ,
     key: 'region1'
-    label: 'Election Season'
+    label: 'Earnings Season'
     type: 'region'
     axis: 'x'
     values: [5, 9]

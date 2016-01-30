@@ -14,6 +14,20 @@ It acts as a plugin to a main chart instance.
 
         @container.classed('forest-d3 legend', true)
 
+        ###
+        This is a technique to distinguish between single and double clicks.
+
+        When any kind of click happens, the last event handler gets stored in
+        @lastClickEvent.
+
+        After a brief delay of about 200 ms, the lastClickEvent is executed.
+        ###
+        @lastClickEvent = ->
+        processClickEvent = =>
+            @lastClickEvent.call @
+
+        @legendClickHandler = ForestD3.Utils.debounce processClickEvent, 200
+
     chart: (chart)->
         @chartInstance = chart
 
@@ -37,7 +51,17 @@ It acts as a plugin to a main chart instance.
             .append('div')
             .classed('item', true)
 
-        items.on 'click', (d)=> @chartInstance.data().toggle(d.key).render()
+        items
+            .on('click.legend', (d)=>
+                @lastClickEvent = =>
+                    @chartInstance.data().toggle(d.key).render()
+                @legendClickHandler()
+            )
+            .on('dblclick.legend', (d)=>
+                @lastClickEvent = =>
+                    @chartInstance.data().showOnly(d.key).render()
+                @legendClickHandler()
+            )
 
         items.classed('disabled', (d)-> d.hidden)
 
@@ -55,7 +79,7 @@ It acts as a plugin to a main chart instance.
             .append('span')
             .classed('show-only button', true)
             .text('only')
-            .on('click', (d)=>
+            .on('click.showOnly', (d)=>
                 d3.event.stopPropagation()
                 @chartInstance.data().showOnly(d.key).render()
             )
