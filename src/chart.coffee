@@ -36,7 +36,7 @@ chartProperties = [
         super domContainer
         @_setProperties chartProperties
 
-        @tooltip = new ForestD3.Tooltip @
+        @tooltip = new ForestD3.Tooltip()
         @guideline = new ForestD3.Guideline @
         @crosshairs = new ForestD3.Crosshairs @
         @xAxis = d3.svg.axis()

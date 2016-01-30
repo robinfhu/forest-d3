@@ -1282,8 +1282,7 @@ Library of tooltip rendering utilities
   var Tooltip;
 
   this.ForestD3.Tooltip = Tooltip = (function() {
-    function Tooltip(chart) {
-      this.chart = chart;
+    function Tooltip() {
       this.container = null;
     }
 
@@ -1310,9 +1309,6 @@ Library of tooltip rendering utilities
 
     Tooltip.prototype.render = function(content, clientMouse) {
       var containerCenter, dimensions, edgeThreshold, xPos, yPos;
-      if (!this.chart.showTooltip()) {
-        return;
-      }
       if (this.container == null) {
         this.container = document.createElement('div');
         document.body.appendChild(this.container);
@@ -1354,9 +1350,6 @@ Library of tooltip rendering utilities
     };
 
     Tooltip.prototype.hide = function() {
-      if (!this.chart.showTooltip()) {
-        return;
-      }
       return d3.select(this.container).transition().delay(250).style('opacity', 0).each('end', function() {
         return d3.select(this).style('left', '0px').style('top', '0px');
       });
@@ -1408,7 +1401,7 @@ You can combine lines, bars, areas and scatter points into one chart.
     function Chart(domContainer) {
       Chart.__super__.constructor.call(this, domContainer);
       this._setProperties(chartProperties);
-      this.tooltip = new ForestD3.Tooltip(this);
+      this.tooltip = new ForestD3.Tooltip();
       this.guideline = new ForestD3.Guideline(this);
       this.crosshairs = new ForestD3.Crosshairs(this);
       this.xAxis = d3.svg.axis();
