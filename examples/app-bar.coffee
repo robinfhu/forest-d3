@@ -145,6 +145,7 @@ chartSingleSeries
     .reduceXTicks(false)
     .chartLabel('Monthly Calculations')
     .data(dataSingleSeries)
+    .addPlugin(new ForestD3.Legend('#legend-single-series'))
     .render()
 
 # ******************** Stacked Bar Example ****************

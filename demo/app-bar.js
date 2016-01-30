@@ -151,7 +151,7 @@
     return d.month;
   }).getY(function(d) {
     return d.val;
-  }).reduceXTicks(false).chartLabel('Monthly Calculations').data(dataSingleSeries).render();
+  }).reduceXTicks(false).chartLabel('Monthly Calculations').data(dataSingleSeries).addPlugin(new ForestD3.Legend('#legend-single-series')).render();
 
   dataStacked = [
     {
