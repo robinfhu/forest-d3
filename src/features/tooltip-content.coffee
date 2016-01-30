@@ -26,8 +26,10 @@ Library of tooltip rendering utilities
             #{rows}
         </table>
         """
-    single: (chart, point)->
-        xValue = chart.xTickFormat()(point.xValue)
+    single: (chart, point, options={})->
+        getXValue = options.getXValue or ((d)-> d.xValue)
+
+        xValue = chart.xTickFormat()(getXValue(point))
         color = point.series.color
         bgColor = "background-color: #{color};"
         label = point.series.label or point.series.key
@@ -38,7 +40,7 @@ Library of tooltip rendering utilities
                 <td><div class='series-color' style='#{bgColor}'></div></td>
                 <td class='series-label'>#{label}</td>
                 <td class='series-value'>
-                    #{chart.yTickFormat()(point.y)}
+                    #{chart.yTickFormat()(chart.getYInternal(point))}
                 </td>
             </tr>
         </table>

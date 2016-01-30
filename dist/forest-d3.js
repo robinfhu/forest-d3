@@ -1026,22 +1026,14 @@ Some operations can mutate the original chart data.
         allPoints = this._getSliceable().filter(function(d) {
           return !d.hidden;
         }).map(function(s, i) {
-          return s.values.map(function(d, i) {
-            return {
-              x: chart.getXInternal(d, i),
-              y: chart.getYInternal(d, i),
-              xValue: chart.getX()(d.data, i),
-              series: s,
-              data: d
-            };
+          return s.values.map(function(point, i) {
+            point.series = s;
+            point.xValue = chart.getX()(point.data, i);
+            return point;
           });
         });
         allPoints = d3.merge(allPoints);
-        return d3.geom.quadtree().x(function(d) {
-          return d.x;
-        }).y(function(d) {
-          return d.y;
-        })(allPoints);
+        return d3.geom.quadtree().x(chart.getXInternal).y(chart.getYInternal)(allPoints);
       },
 
       /*
@@ -1268,13 +1260,19 @@ Library of tooltip rendering utilities
       rows = rows.join('');
       return "<div class='header'>" + xValue + "</div>\n<table>\n    " + rows + "\n</table>";
     },
-    single: function(chart, point) {
-      var bgColor, color, label, xValue;
-      xValue = chart.xTickFormat()(point.xValue);
+    single: function(chart, point, options) {
+      var bgColor, color, getXValue, label, xValue;
+      if (options == null) {
+        options = {};
+      }
+      getXValue = options.getXValue || (function(d) {
+        return d.xValue;
+      });
+      xValue = chart.xTickFormat()(getXValue(point));
       color = point.series.color;
       bgColor = "background-color: " + color + ";";
       label = point.series.label || point.series.key;
-      return "<div class='header'>" + xValue + "</div>\n<table>\n    <tr>\n        <td><div class='series-color' style='" + bgColor + "'></div></td>\n        <td class='series-label'>" + label + "</td>\n        <td class='series-value'>\n            " + (chart.yTickFormat()(point.y)) + "\n        </td>\n    </tr>\n</table>";
+      return "<div class='header'>" + xValue + "</div>\n<table>\n    <tr>\n        <td><div class='series-color' style='" + bgColor + "'></div></td>\n        <td class='series-label'>" + label + "</td>\n        <td class='series-value'>\n            " + (chart.yTickFormat()(chart.getYInternal(point))) + "\n        </td>\n    </tr>\n</table>";
     }
   };
 

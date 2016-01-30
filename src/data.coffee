@@ -122,18 +122,17 @@ Some operations can mutate the original chart data.
         allPoints = @._getSliceable()
         .filter((d)-> not d.hidden)
         .map (s, i)->
-            s.values.map (d,i)->
-                x: chart.getXInternal(d,i)
-                y: chart.getYInternal(d,i)
-                xValue: chart.getX()(d.data,i)
-                series: s
-                data: d
+            s.values.map (point,i)->
+                point.series = s
+                point.xValue = chart.getX()(point.data,i)
+
+                point
 
         allPoints = d3.merge allPoints
 
         d3.geom.quadtree()
-            .x((d)-> d.x)
-            .y((d)-> d.y)(allPoints)
+            .x(chart.getXInternal)
+            .y(chart.getYInternal)(allPoints)
 
     ###
     Alias to chart.render(). Allows you to do things like:
