@@ -60,6 +60,10 @@ describe 'Chart', ->
 
             chart.stacked(true).stackType('bar').data(data).render()
 
+            internal = chart.data().get()
+            for series in internal
+                series.type.should.equal 'bar'
+
             setTimeout ->
                 series = $(container).find('g.series')
                 series.length.should.equal 3, 'three series'

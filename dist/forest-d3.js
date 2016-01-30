@@ -2072,17 +2072,21 @@ Library of tooltip rendering utilities
     }
 
     StackedChart.prototype.preprocessData = function() {
-      var internalData, yOffsetVal;
+      var internalData, seriesType, yOffsetVal;
       internalData = this.data().visible();
       d3.layout.stack().offset('zero').values(function(d) {
         return d.values;
       })(internalData);
-      yOffsetVal = function(d) {
+      yOffsetVal = this.stacked() ? function(d) {
         return d.y + d.y0;
+      } : function(d) {
+        return d.y;
       };
+      seriesType = 'bar';
       return internalData.forEach(function(series) {
         var yVals;
         if (series.isDataSeries) {
+          series.type = seriesType;
           yVals = series.values.map(yOffsetVal);
           yVals = yVals.concat([0]);
           return series.extent.y = d3.extent(yVals);
@@ -2091,7 +2095,11 @@ Library of tooltip rendering utilities
     };
 
     StackedChart.prototype.getVisualization = function(series) {
-      return ForestD3.Visualizations.barStacked;
+      if (this.stacked()) {
+        return ForestD3.Visualizations.barStacked;
+      } else {
+        return ForestD3.Visualizations.bar;
+      }
     };
 
     return StackedChart;

@@ -197,6 +197,7 @@ legendStacked = new ForestD3.Legend '#legend-stacked'
 chartStackedBar
     .getX((d)-> d.month)
     .getY((d)-> d.val)
+    .chartLabel('Stacked Bar Example')
     .xPadding(0.2)
     .barPaddingPercent(0.0)
     .stacked(true)
@@ -204,3 +205,6 @@ chartStackedBar
     .addPlugin(legendStacked)
     .data(dataStacked)
     .render()
+
+document.getElementById('toggle-stacked-button').addEventListener 'click', ->
+    chartStackedBar.stacked(not chartStackedBar.stacked()).render()

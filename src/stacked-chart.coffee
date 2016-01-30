@@ -16,12 +16,24 @@ chartProperties = [
             .values((d)-> d.values)(internalData)
 
         # Calculate the y-extent for each series
-        yOffsetVal = (d)-> d.y + d.y0
+        yOffsetVal =
+            if @stacked()
+                (d)-> d.y + d.y0
+            else
+                (d)-> d.y
+
+        seriesType = 'bar'
         internalData.forEach (series)->
             if series.isDataSeries
+                # Set type=bar, so that data().barCount() returns valid length.
+                series.type = seriesType
+
                 yVals = series.values.map yOffsetVal
                 yVals = yVals.concat([0])
                 series.extent.y = d3.extent yVals
 
     getVisualization: (series)->
-        ForestD3.Visualizations.barStacked
+        if @stacked()
+            ForestD3.Visualizations.barStacked
+        else
+            ForestD3.Visualizations.bar

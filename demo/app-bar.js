@@ -209,6 +209,10 @@
     return d.month;
   }).getY(function(d) {
     return d.val;
-  }).xPadding(0.2).barPaddingPercent(0.0).stacked(true).stackType('bar').addPlugin(legendStacked).data(dataStacked).render();
+  }).chartLabel('Stacked Bar Example').xPadding(0.2).barPaddingPercent(0.0).stacked(true).stackType('bar').addPlugin(legendStacked).data(dataStacked).render();
+
+  document.getElementById('toggle-stacked-button').addEventListener('click', function() {
+    return chartStackedBar.stacked(!chartStackedBar.stacked()).render();
+  });
 
 }).call(this);
