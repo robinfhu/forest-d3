@@ -2,6 +2,16 @@
     rect
         &.bar
             fill-opacity 0.7
+            stroke-width 1
+            stroke $axisLineColor
+            stroke-opacity 0.1
+            transition all 0.25s
+
+    .highlight
+        rect
+            &.bar
+                fill-opacity 0.9
+                stroke-opacity 0.9
 
     &.bar-chart
         text

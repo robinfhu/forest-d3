@@ -65,6 +65,9 @@ It acts as a plugin to a main chart instance.
             .on('mouseover.legend', (d)=>
                 @chartInstance.highlightSeries d.key
             )
+            .on('mouseout.legend', (d)=>
+                @chartInstance.highlightSeries null
+            )
 
         items.classed('disabled', (d)-> d.hidden)
 

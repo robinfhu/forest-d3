@@ -51,6 +51,14 @@
                 fill-opacity 0.75
                 stroke $axisLineColor
                 stroke-opacity 0.5
+                transition all 0.25s
+
+        .highlight
+            path
+                &.point
+                    fill-opacity 0.9
+                    stroke-opacity 0.9
+                    stroke-width 1.5
 
         line
             &.guideline, &.crosshair-x, &.crosshair-y

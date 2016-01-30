@@ -1,5 +1,13 @@
 .forest-d3 rect.bar {
   fill-opacity: 0.7;
+  stroke-width: 1;
+  stroke: #000;
+  stroke-opacity: 0.1;
+  transition: all 0.25s;
+}
+.forest-d3 .highlight rect.bar {
+  fill-opacity: 0.9;
+  stroke-opacity: 0.9;
 }
 .forest-d3.bar-chart text {
   font-size: 20px;
@@ -55,6 +63,12 @@
   fill-opacity: 0.75;
   stroke: #000;
   stroke-opacity: 0.5;
+  transition: all 0.25s;
+}
+.forest-d3 .canvas .highlight path.point {
+  fill-opacity: 0.9;
+  stroke-opacity: 0.9;
+  stroke-width: 1.5;
 }
 .forest-d3 .canvas line.guideline,
 .forest-d3 .canvas line.crosshair-x,

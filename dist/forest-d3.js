@@ -1148,6 +1148,10 @@ It acts as a plugin to a main chart instance.
         return function(d) {
           return _this.chartInstance.highlightSeries(d.key);
         };
+      })(this)).on('mouseout.legend', (function(_this) {
+        return function(d) {
+          return _this.chartInstance.highlightSeries(null);
+        };
       })(this));
       items.classed('disabled', function(d) {
         return d.hidden;
