@@ -55,20 +55,34 @@ describe 'Chart', ->
             internal[1].extent.y.should.deep.equal [0, 7]
             internal[2].extent.y.should.deep.equal [0, 8]
 
-        it 'renders stacked bars', (done)->
+        it 'renders stacked bars and markers', (done)->
             chart = new ForestD3.StackedChart container
 
-            chart.stacked(true).stackType('bar').data(data).render()
+            data2 = data.concat [
+                type: 'marker'
+                label: 'Marker 1'
+                axis: 'y'
+                value: 4.5
+            ]
+
+            chart.stacked(true).stackType('bar').data(data2).render()
 
             internal = chart.data().get()
-            for series in internal
-                series.type.should.equal 'bar'
+            for series,i in internal
+                if i < 3
+                    series.type.should.equal 'bar'
+                else if i is 3
+                    series.type.should.equal 'marker'
 
             setTimeout ->
                 series = $(container).find('g.series')
-                series.length.should.equal 3, 'three series'
+                series.length.should.equal 4, '4 series'
 
                 series.eq(0).find('rect.bar').length.should.equal 3, '3 bars'
+                series.eq(1).find('rect.bar').length.should.equal 3, '3 bars'
+                series.eq(2).find('rect.bar').length.should.equal 3, '3 bars'
+
+                series.eq(3).find('line.marker').length.should.equal 1,'marker'
                 done()
             , 500
 

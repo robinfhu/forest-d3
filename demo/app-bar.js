@@ -166,6 +166,11 @@
     }, {
       label: 'Strawberries',
       values: getVals([1.9, 3, 4.6, 7.3, 5.5, 4.3, 0.6])
+    }, {
+      type: 'marker',
+      axis: 'y',
+      value: 7.1,
+      label: 'Threshold'
     }
   ];
 

@@ -2089,7 +2089,9 @@ allowed to combine it with lines and scatters.
 
     StackedChart.prototype.preprocessData = function() {
       var internalData, seriesType, yOffsetVal;
-      internalData = this.data().visible();
+      internalData = this.data().visible().filter(function(d) {
+        return d.isDataSeries;
+      });
       d3.layout.stack().offset('zero').values(function(d) {
         return d.values;
       })(internalData);
@@ -2121,10 +2123,16 @@ allowed to combine it with lines and scatters.
      */
 
     StackedChart.prototype.getVisualization = function(series) {
-      if (this.stacked()) {
-        return ForestD3.Visualizations.barStacked;
+      var renderFn;
+      renderFn = StackedChart.__super__.getVisualization.call(this, series);
+      if (series.type === 'bar') {
+        if (this.stacked()) {
+          return ForestD3.Visualizations.barStacked;
+        } else {
+          return ForestD3.Visualizations.bar;
+        }
       } else {
-        return ForestD3.Visualizations.bar;
+        return renderFn;
       }
     };
 

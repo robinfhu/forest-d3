@@ -17,7 +17,7 @@ chartProperties = [
 
     # Overrides parent class
     preprocessData: ->
-        internalData = @data().visible()
+        internalData = @data().visible().filter (d)-> d.isDataSeries
         d3.layout.stack()
             .offset('zero')
             .values((d)-> d.values)(internalData)
@@ -48,7 +48,12 @@ chartProperties = [
     Override the parent class' method.
     ###
     getVisualization: (series)->
-        if @stacked()
-            ForestD3.Visualizations.barStacked
+        renderFn = super series
+
+        if series.type is 'bar'
+            if @stacked()
+                ForestD3.Visualizations.barStacked
+            else
+                ForestD3.Visualizations.bar
         else
-            ForestD3.Visualizations.bar
+            renderFn
