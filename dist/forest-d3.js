@@ -1146,13 +1146,21 @@ Handles the guideline that moves along the x-axis
       });
     };
 
-    Crosshairs.prototype.render = function(x, y) {
+
+    /*
+    canvasMouse: the pixel coordinates on the chart canvas to draw the
+    cross hairs. Array of [x,y] values.
+     */
+
+    Crosshairs.prototype.render = function(canvasMouse) {
+      var x, y;
       if (!this.chart.showGuideline()) {
         return;
       }
       if (this.xLine == null) {
         return;
       }
+      x = canvasMouse[0], y = canvasMouse[1];
       this.xLine.transition().duration(50).attr('x1', x).attr('x2', x).style('stroke-opacity', 0.5);
       return this.yLine.transition().duration(50).attr('y1', y).attr('y2', y).style('stroke-opacity', 0.5);
     };
@@ -1309,13 +1317,21 @@ Library of tooltip rendering utilities
 
     Tooltip.prototype.render = function(content, clientMouse) {
       var containerCenter, dimensions, edgeThreshold, xPos, yPos;
+      if (!(clientMouse instanceof Array)) {
+        console.warn('ForestD3.Tooltip.render: clientMouse not present.');
+        return;
+      }
       if (this.container == null) {
         this.container = document.createElement('div');
         document.body.appendChild(this.container);
       }
-      if ((typeof content === 'string') || (typeof content === 'number')) {
-        d3.select(this.container).classed('forest-d3 tooltip-box', true).html(content);
+      if (content == null) {
+        content = '';
       }
+      if ((typeof content) !== 'string') {
+        content = content.toString();
+      }
+      d3.select(this.container).classed('forest-d3 tooltip-box', true).html(content);
 
       /*
       xPos and yPos are the relative coordinates of the mouse in the
@@ -1715,11 +1731,11 @@ You can combine lines, bars, areas and scatter points into one chart.
     /*
     Updates where the guideline and tooltip is.
     
-    mouse: [mouse x , mouse y] - location of mouse in canvas
-    clientMouse should be an array: [x,y] - location of mouse in browser
+    canvasMouse: array: [x,y] - location of mouse in canvas
+    clientMouse: array: [x,y] - location of mouse in browser
      */
 
-    Chart.prototype.updateTooltip = function(mouse, clientMouse) {
+    Chart.prototype.updateTooltip = function(canvasMouse, clientMouse) {
       var content, dist, idx, isHidden, point, threshold, x, xActual, xDiff, xPos, xValues, y, yActual, yDiff, yPos;
       if (!this.showTooltip()) {
         return;
@@ -1727,12 +1743,12 @@ You can combine lines, bars, areas and scatter points into one chart.
       if (this._tooltipFrozen) {
         return;
       }
-      if (mouse == null) {
+      if (canvasMouse == null) {
         this.guideline.hide();
         this.crosshairs.hide();
         return this.tooltip.hide();
       } else {
-        xPos = mouse[0], yPos = mouse[1];
+        xPos = canvasMouse[0], yPos = canvasMouse[1];
         if (this.tooltipType() === 'bisect') {
 
           /*
@@ -1786,13 +1802,45 @@ You can combine lines, bars, areas and scatter points into one chart.
           isHidden = point.series.hidden;
           if (dist < threshold && !isHidden) {
             content = ForestD3.TooltipContent.single(this, point);
-            this.crosshairs.render(xActual, yActual);
-            return this.tooltip.render(content, clientMouse);
+            return this.renderSpatialTooltip({
+              content: content,
+              clientMouse: clientMouse,
+              canvasMouse: [xActual, yActual]
+            });
           } else {
-            this.crosshairs.hide();
-            return this.tooltip.hide();
+            return this.renderSpatialTooltip({
+              hide: true
+            });
           }
         }
+      }
+    };
+
+
+    /*
+    Special function to show/hide a spatial tooltip.
+    This kind of tooltip has a crosshair as well as the floating tooltip box.
+    
+    Used for scatter charts primarily, but can be used for anything.
+    Best for showing a single point of data.
+    
+    Options you can pass in:
+        content - string representing the tooltip content body (HTML)
+        clientMouse - [x,y] coordinates of the mouse location in browser.
+        canvasMouse - [x,y] coordinates of mouse in chart canvas
+        hide - boolean. If true, the tooltips are removed.
+     */
+
+    Chart.prototype.renderSpatialTooltip = function(options) {
+      if (options == null) {
+        options = {};
+      }
+      if (options.hide) {
+        this.tooltip.hide();
+        return this.crosshairs.hide();
+      } else {
+        this.tooltip.render(options.content, options.clientMouse);
+        return this.crosshairs.render(options.canvasMouse);
       }
     };
 

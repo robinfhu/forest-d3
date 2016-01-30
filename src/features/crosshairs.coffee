@@ -32,10 +32,15 @@ Handles the guideline that moves along the x-axis
             .attr('x1', 0)
             .attr('x2', (d)-> d)
 
-    render: (x,y)->
+    ###
+    canvasMouse: the pixel coordinates on the chart canvas to draw the
+    cross hairs. Array of [x,y] values.
+    ###
+    render: (canvasMouse)->
         return unless @chart.showGuideline()
         return unless @xLine?
 
+        [x, y] = canvasMouse
         # Show the crosshairs and position it.
         @xLine
             .transition()

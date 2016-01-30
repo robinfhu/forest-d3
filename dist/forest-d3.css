@@ -52,9 +52,9 @@
   stroke-opacity: 0.2;
 }
 .forest-d3 .canvas path.point {
-  fill-opacity: 0.8;
+  fill-opacity: 0.75;
   stroke: #000;
-  stroke-opacity: 0.3;
+  stroke-opacity: 0.5;
 }
 .forest-d3 .canvas line.guideline,
 .forest-d3 .canvas line.crosshair-x,

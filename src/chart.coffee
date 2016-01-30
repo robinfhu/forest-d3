@@ -401,15 +401,15 @@ chartProperties = [
     ###
     Updates where the guideline and tooltip is.
 
-    mouse: [mouse x , mouse y] - location of mouse in canvas
-    clientMouse should be an array: [x,y] - location of mouse in browser
+    canvasMouse: array: [x,y] - location of mouse in canvas
+    clientMouse: array: [x,y] - location of mouse in browser
     ###
-    updateTooltip: (mouse, clientMouse)->
+    updateTooltip: (canvasMouse, clientMouse)->
         return unless @showTooltip()
 
         return if @_tooltipFrozen
 
-        unless mouse?
+        unless canvasMouse?
             # Hide guideline from view if 'null' passed in
             @guideline.hide()
             @crosshairs.hide()
@@ -417,7 +417,7 @@ chartProperties = [
         else
             # Contains the current pixel coordinates of the mouse, within the
             # canvas context (so [0,0] would be top left corner of canvas)
-            [xPos, yPos] = mouse
+            [xPos, yPos] = canvasMouse
 
             if @tooltipType() is 'bisect'
                 ###
@@ -480,12 +480,34 @@ chartProperties = [
                 isHidden = point.series.hidden
                 if dist < threshold and not isHidden
                     content = ForestD3.TooltipContent.single @, point
-
-                    @crosshairs.render xActual, yActual
-                    @tooltip.render content, clientMouse
+                    @renderSpatialTooltip {
+                        content
+                        clientMouse
+                        canvasMouse: [xActual, yActual]
+                    }
                 else
-                    @crosshairs.hide()
-                    @tooltip.hide()
+                    @renderSpatialTooltip {hide: true}
+
+    ###
+    Special function to show/hide a spatial tooltip.
+    This kind of tooltip has a crosshair as well as the floating tooltip box.
+
+    Used for scatter charts primarily, but can be used for anything.
+    Best for showing a single point of data.
+
+    Options you can pass in:
+        content - string representing the tooltip content body (HTML)
+        clientMouse - [x,y] coordinates of the mouse location in browser.
+        canvasMouse - [x,y] coordinates of mouse in chart canvas
+        hide - boolean. If true, the tooltips are removed.
+    ###
+    renderSpatialTooltip: (options={})->
+        if options.hide
+            @tooltip.hide()
+            @crosshairs.hide()
+        else
+            @tooltip.render options.content, options.clientMouse
+            @crosshairs.render options.canvasMouse
 
     addPlugin: (plugin)->
         @plugins[plugin.name] = plugin

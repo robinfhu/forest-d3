@@ -18,16 +18,23 @@
     clientMouse: Array of [mouse screen x, mouse screen y] positions
     ###
     render: (content, clientMouse)->
+        unless clientMouse instanceof Array
+            console.warn 'ForestD3.Tooltip.render: clientMouse not present.'
+            return
+
         unless @container?
             @container = document.createElement 'div'
             document.body.appendChild @container
 
         # Populate the tooltip container with content.
         # Needs to be done early on so we can do positioning calculations.
-        if (typeof content is 'string') or (typeof content is 'number')
-            d3.select(@container)
-                .classed('forest-d3 tooltip-box', true)
-                .html(content)
+        content ?= ''
+        unless (typeof content) is 'string'
+            content = content.toString()
+
+        d3.select(@container)
+            .classed('forest-d3 tooltip-box', true)
+            .html(content)
 
         ###
         xPos and yPos are the relative coordinates of the mouse in the
