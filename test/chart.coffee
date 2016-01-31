@@ -413,6 +413,30 @@ describe 'Chart', ->
                     done()
                 , 300
 
+        describe 'Changing Chart Type Dynamically', ->
+            it 'can switch a series type dynamically', (done)->
+                data =
+                    series:
+                        type: 'line'
+                        values: [0..20].map -> [Math.random(), Math.random()]
+
+                chart = new ForestD3.Chart container
+                chart.data(data).duration(0).render()
+
+                setTimeout ->
+                    data.series.type = 'bar'
+                    chart.data(data).render()
+
+                    setTimeout ->
+                        items = $(container).find('g.series')
+                        items.length.should.equal 1, 'one series'
+
+                        line = items.eq(0).find('path.line')
+                        line.length.should.equal 0, 'no line'
+                        done()
+                    , 200
+                , 200
+
         describe 'Chart Margins', ->
             it 'can set chart margins', ->
                 data = [

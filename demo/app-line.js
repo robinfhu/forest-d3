@@ -1,5 +1,5 @@
 (function() {
-  var chart, chartLog, chartNonOrdinal, chartRandom, chartUpdate, data, dataLog, dataNonOrdinal, dataRandom, dataUpdate, getRandom, getStocks, legend, rand;
+  var chart, chartLog, chartNonOrdinal, chartRandom, chartSwitcher, chartUpdate, data, dataLog, dataNonOrdinal, dataRandom, dataUpdate, getRandom, getStocks, legend, rand, switchData;
 
   chart = new ForestD3.Chart(d3.select('#example'));
 
@@ -193,6 +193,48 @@
   document.getElementById('update-x-sort').addEventListener('click', function() {
     chartRandom.autoSortXValues(!chartRandom.autoSortXValues());
     return chartRandom.data(dataRandom).render();
+  });
+
+  chartSwitcher = new ForestD3.Chart('#example-type-switch');
+
+  chartSwitcher.xTickFormat(function(d) {
+    if (d != null) {
+      return d3.time.format('%Y-%m-%d')(new Date(d));
+    } else {
+      return '';
+    }
+  });
+
+  switchData = {
+    series: {
+      color: 'springgreen',
+      type: 'line',
+      values: getStocks(345, 0.2)
+    }
+  };
+
+  chartSwitcher.data(switchData).render();
+
+  document.getElementById('switch-to-line').addEventListener('click', function() {
+    switchData.series.type = 'line';
+    switchData.series.area = false;
+    return chartSwitcher.data(switchData).render();
+  });
+
+  document.getElementById('switch-to-scatter').addEventListener('click', function() {
+    switchData.series.type = 'scatter';
+    return chartSwitcher.data(switchData).render();
+  });
+
+  document.getElementById('switch-to-bar').addEventListener('click', function() {
+    switchData.series.type = 'bar';
+    return chartSwitcher.data(switchData).render();
+  });
+
+  document.getElementById('switch-to-area').addEventListener('click', function() {
+    switchData.series.type = 'line';
+    switchData.series.area = true;
+    return chartSwitcher.data(switchData).render();
   });
 
 }).call(this);

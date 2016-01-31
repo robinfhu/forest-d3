@@ -85,7 +85,7 @@ chartProperties = [
 
         chartSeries = @canvas
             .selectAll('g.series')
-            .data(@data().visible(), (series)-> series.key)
+            .data(@data().visible(), (series)-> series._uniqueKey)
 
         chartSeries.enter()
             .append('g')

@@ -63,7 +63,7 @@
   fill-opacity: 0.75;
   stroke: #000;
   stroke-opacity: 0.5;
-  transition: all 0.25s;
+  transition: fill-opacity 0.25s, stroke-opacity 0.25s, stroke-width 0.25s;
 }
 .forest-d3 .canvas .highlight path.point {
   fill-opacity: 0.9;
@@ -131,11 +131,11 @@
   stroke-opacity: 0.8;
   stroke-width: 2;
   pointer-events: none;
-  transition: all 0.25s;
+  transition: stroke-opacity 0.25s, stroke-width 0.25s;
 }
 .forest-d3 path.area {
   fill-opacity: 0.3;
-  transition: all 0.25s;
+  transition: fill-opacity 0.25s;
 }
 .forest-d3 .highlight path.line {
   stroke-opacity: 1;

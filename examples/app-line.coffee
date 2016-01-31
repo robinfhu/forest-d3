@@ -191,3 +191,39 @@ chartNonOrdinal.data(dataNonOrdinal).render()
 document.getElementById('update-x-sort').addEventListener 'click', ->
     chartRandom.autoSortXValues(not chartRandom.autoSortXValues())
     chartRandom.data(dataRandom).render()
+
+# ********************* Switching series type example ***************
+chartSwitcher = new ForestD3.Chart '#example-type-switch'
+chartSwitcher
+    .xTickFormat((d)->
+        if d?
+            d3.time.format('%Y-%m-%d')(new Date d)
+        else
+            ''
+    )
+
+switchData =
+    series:
+        color: 'springgreen'
+        type: 'line'
+        values: getStocks(345,0.2)
+
+chartSwitcher.data(switchData).render()
+
+document.getElementById('switch-to-line').addEventListener 'click', ->
+    switchData.series.type = 'line'
+    switchData.series.area = false
+    chartSwitcher.data(switchData).render()
+
+document.getElementById('switch-to-scatter').addEventListener 'click', ->
+    switchData.series.type = 'scatter'
+    chartSwitcher.data(switchData).render()
+
+document.getElementById('switch-to-bar').addEventListener 'click', ->
+    switchData.series.type = 'bar'
+    chartSwitcher.data(switchData).render()
+
+document.getElementById('switch-to-area').addEventListener 'click', ->
+    switchData.series.type = 'line'
+    switchData.series.area = true
+    chartSwitcher.data(switchData).render()

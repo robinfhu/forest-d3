@@ -287,6 +287,13 @@
             series.label ?= "Series ##{i}"
             series.type ?= if series.value? then 'marker' else 'scatter'
 
+            ###
+            An internal only unique identifier.
+            This is necessary to ensure each chart series has a
+            unique key when doing a d3.selectAll.data join.
+            ###
+            series._uniqueKey = "#{series.key}_#{series.type}_#{i}"
+
             if series.type is 'region'
                 series.extent =
                     x: if series.axis is 'x' then series.values else []

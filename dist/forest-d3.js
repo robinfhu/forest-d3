@@ -220,7 +220,7 @@ Author:  Robin Hu
     barIndex = chart.data().barIndex(selectionData.key);
     barWidth = fullSpace / barCount;
     return bars.transition().duration(selectionData.duration || chart.duration()).delay(function(d, i) {
-      return i * 20;
+      return i * 10;
     }).attr('x', function(d, i) {
 
       /*
@@ -840,6 +840,13 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
           if (series.type == null) {
             series.type = series.value != null ? 'marker' : 'scatter';
           }
+
+          /*
+          An internal only unique identifier.
+          This is necessary to ensure each chart series has a
+          unique key when doing a d3.selectAll.data join.
+           */
+          series._uniqueKey = series.key + "_" + series.type + "_" + i;
           if (series.type === 'region') {
             series.extent = {
               x: series.axis === 'x' ? series.values : [],
@@ -1584,7 +1591,7 @@ You can combine lines, bars, areas and scatter points into one chart.
       this.updateChartScale();
       this.updateChartFrame();
       chartSeries = this.canvas.selectAll('g.series').data(this.data().visible(), function(series) {
-        return series.key;
+        return series._uniqueKey;
       });
       chartSeries.enter().append('g').attr('class', function(series, i) {
         return "series series-" + series.key;

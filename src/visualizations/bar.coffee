@@ -59,7 +59,7 @@
     bars
         .transition()
         .duration(selectionData.duration or chart.duration())
-        .delay((d,i)-> i * 20)
+        .delay((d,i)-> i * 10)
         .attr('x', (d,i)->
             ###
             Calculates the x position of each bar. Shifts the bar along x-axis
