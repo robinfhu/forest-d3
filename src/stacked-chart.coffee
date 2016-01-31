@@ -20,6 +20,7 @@ chartProperties = [
         internalData = @data().visible().filter (d)-> d.isDataSeries
         d3.layout.stack()
             .offset('zero')
+            .order('reverse')
             .values((d)-> d.values)(internalData)
 
         # Calculate the y-extent for each series

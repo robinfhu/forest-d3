@@ -2250,7 +2250,7 @@ allowed to combine it with lines and scatters.
       internalData = this.data().visible().filter(function(d) {
         return d.isDataSeries;
       });
-      d3.layout.stack().offset('zero').values(function(d) {
+      d3.layout.stack().offset('zero').order('reverse').values(function(d) {
         return d.values;
       })(internalData);
       yOffsetVal = this.stacked() ? function(d) {
