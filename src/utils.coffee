@@ -284,8 +284,7 @@
             This is necessary to ensure each chart series has a
             unique key when doing a d3.selectAll.data join.
             ###
-            rand = Math.floor (Math.random() * 1000000)
-            series._uniqueKey = "#{series.key}_#{i}_#{rand}"
+            series._uniqueKey = "#{series.key}_#{series.type}_#{i}"
 
             if series.type is 'region'
                 series.extent =

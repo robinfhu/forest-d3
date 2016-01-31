@@ -832,7 +832,6 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
         colorIndex = 0;
         seriesIndex = 0;
         data.forEach(function(series, i) {
-          var rand;
           if (series.key == null) {
             series.key = "series" + i;
           }
@@ -848,8 +847,7 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
           This is necessary to ensure each chart series has a
           unique key when doing a d3.selectAll.data join.
            */
-          rand = Math.floor(Math.random() * 1000000);
-          series._uniqueKey = series.key + "_" + i + "_" + rand;
+          series._uniqueKey = series.key + "_" + series.type + "_" + i;
           if (series.type === 'region') {
             series.extent = {
               x: series.axis === 'x' ? series.values : [],
