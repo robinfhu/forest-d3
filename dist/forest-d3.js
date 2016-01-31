@@ -540,7 +540,7 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
       }
        */
       extent: function(data, force) {
-        var defaultExtent, roundOff, xExt, yExt;
+        var clearNaN, defaultExtent, xExt, yExt;
         defaultExtent = [-1, 1];
         if (!data || data.length === 0) {
           return {
@@ -575,26 +575,19 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
         yExt = yExt.concat(force.y);
         xExt = d3.extent(xExt);
         yExt = d3.extent(yExt);
-        roundOff = function(d, i) {
-          if (Math.abs(d) < 1) {
-            return d;
-          }
-          if (i === 0) {
-            if (isNaN(d)) {
+        clearNaN = function(d, i) {
+          if (isNaN(d)) {
+            if (i === 0) {
               return -1;
             } else {
-              return Math.floor(d);
+              return 1;
             }
           } else {
-            if (isNaN(d)) {
-              return 1;
-            } else {
-              return Math.ceil(d);
-            }
+            return d;
           }
         };
-        xExt = xExt.map(roundOff);
-        yExt = yExt.map(roundOff);
+        xExt = xExt.map(clearNaN);
+        yExt = yExt.map(clearNaN);
         return {
           x: xExt,
           y: yExt

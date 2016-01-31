@@ -48,18 +48,6 @@ describe 'Utilities', ->
                 x: [-1, 9]
                 y: [-2, 30]
 
-        it 'rounds extent to nearest integer', ->
-            data = [
-                extent:
-                    x: [4.1, 5.1]
-                    y: [8.9, 11.7]
-            ]
-
-            result = extent data
-            result.should.deep.equal
-                x: [4, 6]
-                y: [8, 12]
-
         it 'skips the integer rounding if extent range is small', ->
             data = [
                 extent:

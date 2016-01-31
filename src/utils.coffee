@@ -67,22 +67,14 @@
         xExt = d3.extent xExt
         yExt = d3.extent yExt
 
-        roundOff = (d,i)->
-            return d if Math.abs(d) < 1
-
-            if i is 0
-                if isNaN d
-                    return -1
-                else
-                    return Math.floor(d)
+        clearNaN = (d,i)->
+            if isNaN d
+                return if i is 0 then -1 else 1
             else
-                if isNaN d
-                    return 1
-                else
-                    return Math.ceil(d)
+                return d
 
-        xExt = xExt.map roundOff
-        yExt = yExt.map roundOff
+        xExt = xExt.map clearNaN
+        yExt = yExt.map clearNaN
 
         x: xExt
         y: yExt
