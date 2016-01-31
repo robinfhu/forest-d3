@@ -226,29 +226,12 @@ Author:  Robin Hu
 
 }).call(this);
 
-
-/*
-Draws a simple line graph.
-If you set area=true, turns it into an area graph
- */
-
 (function() {
-  this.ForestD3.Visualizations.line = function(selection, selectionData) {
-    var area, areaBase, areaFn, chart, duration, interpolate, lineFn, path, x, y;
+  var renderArea;
+
+  renderArea = function(selection, selectionData) {
+    var area, areaBase, areaFn, chart;
     chart = this;
-    selection.style('stroke', selectionData.color);
-    interpolate = selectionData.interpolate || 'linear';
-    x = chart.getXInternal;
-    y = chart.getYInternal;
-    lineFn = d3.svg.line().interpolate(interpolate).x(function(d, i) {
-      return chart.xScale(x(d, i));
-    });
-    path = selection.selectAll('path.line').data([selectionData.values]);
-    path.enter().append('path').classed('line', true).attr('d', lineFn.y(chart.canvasHeight));
-    duration = selectionData.duration || chart.duration();
-    path.transition().duration(duration).attr('d', lineFn.y(function(d, i) {
-      return chart.yScale(y(d, i));
-    }));
     if (selectionData.area) {
       areaBase = chart.yScale(0);
       if (areaBase > chart.canvasHeight) {
@@ -256,17 +239,40 @@ If you set area=true, turns it into an area graph
       } else if (areaBase < 0) {
         areaBase = 0;
       }
-      areaFn = d3.svg.area().interpolate(interpolate).x(function(d, i) {
-        return chart.xScale(x(d, i));
+      areaFn = d3.svg.area().interpolate(selectionData.interpolate || 'linear').x(function(d) {
+        return chart.xScale(d.x);
       }).y0(areaBase);
       area = selection.selectAll('path.area').data([selectionData.values]);
       area.enter().append('path').classed('area', true).attr('d', areaFn.y1(areaBase));
-      return area.transition().duration(duration).style('fill', selectionData.color).attr('d', areaFn.y1(function(d, i) {
-        return chart.yScale(y(d, i));
+      return area.transition().duration(selectionData.duration || chart.duration()).style('fill', selectionData.color).attr('d', areaFn.y1(function(d) {
+        return chart.yScale(d.y);
       }));
     } else {
       return selection.selectAll('path.area').remove();
     }
+  };
+
+
+  /*
+  Draws a simple line graph.
+  If you set area=true, turns it into an area graph
+   */
+
+  this.ForestD3.Visualizations.line = function(selection, selectionData) {
+    var chart, duration, interpolate, lineFn, path;
+    chart = this;
+    selection.style('stroke', selectionData.color);
+    interpolate = selectionData.interpolate || 'linear';
+    lineFn = d3.svg.line().interpolate(interpolate).x(function(d) {
+      return chart.xScale(d.x);
+    });
+    path = selection.selectAll('path.line').data([selectionData.values]);
+    path.enter().append('path').classed('line', true).attr('d', lineFn.y(chart.canvasHeight));
+    duration = selectionData.duration || chart.duration();
+    path.transition().duration(duration).attr('d', lineFn.y(function(d) {
+      return chart.yScale(d.y);
+    }));
+    return renderArea.call(this, selection, selectionData);
   };
 
 }).call(this);
