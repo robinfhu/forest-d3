@@ -63,7 +63,7 @@ module.exports = (grunt)->
             examples:
                 expand: true
                 flatten: true
-                src: 'examples/*.coffee'
+                src: 'examples/src/*.coffee'
                 dest: 'demo/'
                 ext: '.js'
 
