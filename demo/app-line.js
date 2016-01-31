@@ -1,5 +1,5 @@
 (function() {
-  var chart, chartLog, chartUpdate, data, dataLog, dataUpdate, getStocks, legend;
+  var chart, chartLog, chartNonOrdinal, chartRandom, chartUpdate, data, dataLog, dataNonOrdinal, dataRandom, dataUpdate, getRandom, getStocks, legend, rand;
 
   chart = new ForestD3.Chart(d3.select('#example'));
 
@@ -119,10 +119,80 @@
       label: 'AAPL',
       type: 'line',
       color: '#efefef',
-      values: getStocks(200, 0.4, 100)
+      values: getStocks(200, 0.4, 100).map(function(p) {
+        if (p[1] <= 0) {
+          p[1] = 1;
+        }
+        return p;
+      })
     }
   ];
 
   chartLog.data(dataLog).render();
+
+  chartRandom = new ForestD3.Chart('#example-random');
+
+  chartRandom.ordinal(false).getX(function(d) {
+    return d.x;
+  }).getY(function(d) {
+    return d.y;
+  }).chartLabel('Random Data Points');
+
+  getRandom = function() {
+    var j, points, rand, results;
+    rand = d3.random.normal(0, 0.6);
+    points = (function() {
+      results = [];
+      for (j = 0; j < 50; j++){ results.push(j); }
+      return results;
+    }).apply(this).map(function(i) {
+      return {
+        x: i,
+        y: rand()
+      };
+    });
+    return d3.shuffle(points);
+  };
+
+  dataRandom = {
+    series1: {
+      type: 'line',
+      values: getRandom()
+    },
+    series2: {
+      type: 'line',
+      values: getRandom()
+    }
+  };
+
+  chartRandom.data(dataRandom).render();
+
+  chartNonOrdinal = new ForestD3.Chart('#example-non-ordinal');
+
+  chartNonOrdinal.ordinal(false).tooltipType('spatial').xTickFormat(d3.format('.2f')).chartLabel('Non-Ordinal Chart');
+
+  rand = d3.random.normal(0, 0.6);
+
+  dataNonOrdinal = [
+    {
+      type: 'scatter',
+      symbol: 'circle',
+      color: 'yellow',
+      values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map(function(d) {
+        return [rand(), rand()];
+      })
+    }, {
+      type: 'line',
+      color: 'white',
+      values: [[-1, -1], [-0.8, -0.7], [-0.3, -0.56], [0.4, 0.7], [0.2, 0.5], [0.5, 0.8], [1, 1.1]]
+    }
+  ];
+
+  chartNonOrdinal.data(dataNonOrdinal).render();
+
+  document.getElementById('update-x-sort').addEventListener('click', function() {
+    chartRandom.autoSortXValues(!chartRandom.autoSortXValues());
+    return chartRandom.data(dataRandom).render();
+  });
 
 }).call(this);

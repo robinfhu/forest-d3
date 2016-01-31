@@ -410,6 +410,38 @@ describe 'Data API', ->
         internalData[4].index.should.equal 3
         internalData[5].index.should.equal 4
 
+    it 'auto sorts data by x value ascending', ->
+        getPoints = ->
+            points = [0...50].map (i)->
+                x: i
+                y: Math.random()
+
+            d3.shuffle points
+            points
+        data =
+            series1:
+                type: 'line'
+                values: getPoints()
+            series2:
+                type: 'line'
+                values: getPoints()
+
+        chart = new ForestD3.Chart()
+        chart
+            .getX((d)->d.x)
+            .getY((d)->d.y)
+            .ordinal(false)
+            .autoSortXValues(true)
+            .data(data)
+
+        internal = chart.data().get()
+
+        internalXVals = internal[0].values.map (d)-> d.x
+        internalXVals.should.deep.equal [0...50]
+
+        internalXVals = internal[1].values.map (d)-> d.x
+        internalXVals.should.deep.equal [0...50]
+
     describe 'Data Slice', ->
         it 'can get a slice of data at an index', ->
             data = [

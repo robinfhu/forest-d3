@@ -123,7 +123,71 @@ dataLog = [
     label: 'AAPL'
     type: 'line'
     color: '#efefef'
-    values: getStocks(200, 0.4, 100)
+    values: getStocks(200, 0.4, 100).map (p)->
+        if p[1] <= 0
+            p[1] = 1
+
+        p
 ]
 
 chartLog.data(dataLog).render()
+
+# ****************** Randomized data points and auto sort ***********
+chartRandom = new ForestD3.Chart '#example-random'
+chartRandom
+    .ordinal(false)
+    .getX((d)-> d.x)
+    .getY((d)-> d.y)
+    .chartLabel('Random Data Points')
+
+getRandom = ->
+    rand = d3.random.normal(0, 0.6)
+    points = [0...50].map (i)->
+        x: i
+        y: rand()
+
+    d3.shuffle points
+
+dataRandom =
+    series1:
+        type: 'line'
+        values: getRandom()
+    series2:
+        type: 'line'
+        values: getRandom()
+
+chartRandom.data(dataRandom).render()
+
+# ********************** Non Ordinal Line and scatter **************
+chartNonOrdinal = new ForestD3.Chart '#example-non-ordinal'
+chartNonOrdinal
+    .ordinal(false)
+    .tooltipType('spatial')
+    .xTickFormat(d3.format('.2f'))
+    .chartLabel('Non-Ordinal Chart')
+
+rand = d3.random.normal(0, 0.6)
+dataNonOrdinal = [
+    type: 'scatter'
+    symbol: 'circle'
+    color: 'yellow'
+    values: [0..20].map (d)-> [rand(), rand()]
+,
+    type: 'line'
+    color: 'white'
+    values: [
+        [-1, -1]
+        [-0.8, -0.7]
+        [-0.3, -0.56]
+        [0.4, 0.7]
+        [0.2, 0.5]
+        [0.5, 0.8]
+        [1, 1.1]
+    ]
+]
+
+chartNonOrdinal.data(dataNonOrdinal).render()
+
+document.getElementById('update-x-sort').addEventListener 'click', ->
+    chartRandom.autoSortXValues(not chartRandom.autoSortXValues())
+    chartRandom.data(dataRandom).render()

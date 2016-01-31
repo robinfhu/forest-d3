@@ -277,6 +277,7 @@
         getY = options.getY
         ordinal = options.ordinal
         colorPalette = options.colorPalette or colors20
+        autoSortXValues = options.autoSortXValues
 
         colorIndex = 0
         seriesIndex = 0
@@ -310,21 +311,29 @@
                 series.values = series.values.map (d,i)->
                     x: if ordinal then i else getX(d,i)
                     y: getY(d,i)
+                    xValueRaw: getX(d,i)
                     data: d
 
-        ###
-        Calculates the extent (in x and y directions) of the data in each
-        series. The 'extent' is basically the highest and lowest values, used
-        to figure out the chart's scale.
-
-        Special attention is given when 'stackable' is true. In that case,
-        we need to add y0 to y, because the data is stacked, therefore the
-        extent must be bigger.
-        ###
-        data.forEach (series)->
-            if series.isDataSeries
+                ###
+                Calculates the extent (in x and y directions) of the data in
+                each series.
+                The 'extent' is basically the highest and lowest values,
+                used to figure out the chart's scale.
+                ###
                 series.extent =
                     x: d3.extent(series.values, (d)-> d.x)
                     y: d3.extent(series.values, (d)-> d.y)
+
+                ###
+                Sort all the data points in ascending order, by x-value.
+                This prevents any scrambled lines being drawn.
+
+                This only needs to happen for
+                non-ordinal data series (scatter plots for example).
+                Ordinal data is always sorted by default.
+                ###
+                if autoSortXValues and not ordinal
+                    series.values.sort (a,b)->
+                        d3.ascending a.xValueRaw, b.xValueRaw
 
         data

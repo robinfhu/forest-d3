@@ -818,7 +818,7 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
               on the x-axis or not.
        */
       normalize: function(data, options) {
-        var colorIndex, colorPalette, getX, getY, ordinal, seriesIndex;
+        var autoSortXValues, colorIndex, colorPalette, getX, getY, ordinal, seriesIndex;
         if (options == null) {
           options = {};
         }
@@ -827,6 +827,7 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
         getY = options.getY;
         ordinal = options.ordinal;
         colorPalette = options.colorPalette || colors20;
+        autoSortXValues = options.autoSortXValues;
         colorIndex = 0;
         seriesIndex = 0;
         data.forEach(function(series, i) {
@@ -861,28 +862,22 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
           seriesIndex++;
           if (series.values instanceof Array) {
             series.isDataSeries = true;
-            return series.values = series.values.map(function(d, i) {
+            series.values = series.values.map(function(d, i) {
               return {
                 x: ordinal ? i : getX(d, i),
                 y: getY(d, i),
+                xValueRaw: getX(d, i),
                 data: d
               };
             });
-          }
-        });
 
-        /*
-        Calculates the extent (in x and y directions) of the data in each
-        series. The 'extent' is basically the highest and lowest values, used
-        to figure out the chart's scale.
-        
-        Special attention is given when 'stackable' is true. In that case,
-        we need to add y0 to y, because the data is stacked, therefore the
-        extent must be bigger.
-         */
-        data.forEach(function(series) {
-          if (series.isDataSeries) {
-            return series.extent = {
+            /*
+            Calculates the extent (in x and y directions) of the data in
+            each series.
+            The 'extent' is basically the highest and lowest values,
+            used to figure out the chart's scale.
+             */
+            series.extent = {
               x: d3.extent(series.values, function(d) {
                 return d.x;
               }),
@@ -890,6 +885,20 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
                 return d.y;
               })
             };
+
+            /*
+            Sort all the data points in ascending order, by x-value.
+            This prevents any scrambled lines being drawn.
+            
+            This only needs to happen for
+            non-ordinal data series (scatter plots for example).
+            Ordinal data is always sorted by default.
+             */
+            if (autoSortXValues && !ordinal) {
+              return series.values.sort(function(a, b) {
+                return d3.ascending(a.xValueRaw, b.xValueRaw);
+              });
+            }
           }
         });
         return data;
@@ -1505,7 +1514,7 @@ You can combine lines, bars, areas and scatter points into one chart.
       'xTickFormat', function(d) {
         return d;
       }
-    ], ['yTickFormat', d3.format(',.2f')], ['reduceXTicks', true], ['yTicks', null], ['showXAxis', true], ['showYAxis', true], ['showTooltip', true], ['showGuideline', true], ['tooltipType', 'bisect'], ['barPaddingPercent', 0.1]
+    ], ['yTickFormat', d3.format(',.2f')], ['reduceXTicks', true], ['yTicks', null], ['showXAxis', true], ['showYAxis', true], ['showTooltip', true], ['showGuideline', true], ['tooltipType', 'bisect'], ['barPaddingPercent', 0.1], ['autoSortXValues', true]
   ];
 
   this.ForestD3.Chart = Chart = (function(superClass) {
@@ -1547,7 +1556,8 @@ You can combine lines, bars, areas and scatter points into one chart.
           getX: this.getX(),
           getY: this.getY(),
           ordinal: this.ordinal(),
-          colorPalette: this.colorPalette()
+          colorPalette: this.colorPalette(),
+          autoSortXValues: this.autoSortXValues()
         });
         if (this.tooltipType() === 'spatial') {
           this.quadtree = this.data().quadtree();

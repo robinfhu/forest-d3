@@ -29,6 +29,7 @@ chartProperties = [
     ['showGuideline', true]
     ['tooltipType', 'bisect']  # Can be 'bisect', 'spatial' or 'hover'
     ['barPaddingPercent', 0.1]
+    ['autoSortXValues', true]
 ]
 
 @ForestD3.Chart = class Chart extends ForestD3.BaseChart
@@ -63,6 +64,7 @@ chartProperties = [
                 getY: @getY()
                 ordinal: @ordinal()
                 colorPalette: @colorPalette()
+                autoSortXValues: @autoSortXValues()
             }
 
             if @tooltipType() is 'spatial'
