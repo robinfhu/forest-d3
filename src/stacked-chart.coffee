@@ -42,7 +42,7 @@ chartProperties = [
                 Add 0 to the extent always, because stacked bar charts
                 should be based on the zero axis
                 ###
-                yVals = yVals.concat([0])
+                yVals = yVals.concat [0]
                 series.extent.y = d3.extent yVals
 
     ###

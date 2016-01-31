@@ -39,21 +39,21 @@ describe 'Chart', ->
 
             internal = chart.data().get()
 
-            internal[0].values[0].y0.should.equal 0
-            internal[0].values[1].y0.should.equal 0
-            internal[0].values[2].y0.should.equal 0
+            internal[2].values[0].y0.should.equal 0
+            internal[2].values[1].y0.should.equal 0
+            internal[2].values[2].y0.should.equal 0
 
-            internal[1].values[0].y0.should.equal 3
-            internal[1].values[1].y0.should.equal 2
-            internal[1].values[2].y0.should.equal 6
+            internal[1].values[0].y0.should.equal 1
+            internal[1].values[1].y0.should.equal 1
+            internal[1].values[2].y0.should.equal 1
 
-            internal[2].values[0].y0.should.equal 4
-            internal[2].values[1].y0.should.equal 5
-            internal[2].values[2].y0.should.equal 7
+            internal[0].values[0].y0.should.equal 2
+            internal[0].values[1].y0.should.equal 4
+            internal[0].values[2].y0.should.equal 2
 
-            internal[0].extent.y.should.deep.equal [0, 6]
-            internal[1].extent.y.should.deep.equal [0, 7]
-            internal[2].extent.y.should.deep.equal [0, 8]
+            internal[2].extent.y.should.deep.equal [0, 1]
+            internal[1].extent.y.should.deep.equal [0, 4]
+            internal[0].extent.y.should.deep.equal [0, 8]
 
         it 'negative stacked values', (done)->
             chart = new ForestD3.StackedChart container
@@ -72,27 +72,27 @@ describe 'Chart', ->
 
             internal = chart.data().get()
 
-            internal[0].values[0].y0.should.equal 0
-            internal[1].values[0].y0.should.equal -1
-            internal[2].values[0].y0.should.equal -3
-            internal[3].values[0].y0.should.equal -6
+            internal[3].values[0].y0.should.equal 0
+            internal[2].values[0].y0.should.equal -2
+            internal[1].values[0].y0.should.equal -5
+            internal[0].values[0].y0.should.equal -7
 
             setTimeout ->
                 series = $(container).find('g.series').eq(0)
                 bar = series.find('rect')
-                parseInt(bar.attr('y')).should.equal(parseInt(chart.yScale(0)))
+                parseInt(bar.attr('y')).should.equal(parseInt(chart.yScale(-7)))
 
                 series = $(container).find('g.series').eq(1)
                 bar = series.find('rect')
-                parseInt(bar.attr('y')).should.equal(parseInt(chart.yScale(-1)))
+                parseInt(bar.attr('y')).should.equal(parseInt(chart.yScale(-5)))
 
                 series = $(container).find('g.series').eq(2)
                 bar = series.find('rect')
-                parseInt(bar.attr('y')).should.equal(parseInt(chart.yScale(-3)))
+                parseInt(bar.attr('y')).should.equal(parseInt(chart.yScale(-2)))
 
                 series = $(container).find('g.series').eq(3)
                 bar = series.find('rect')
-                parseInt(bar.attr('y')).should.equal(parseInt(chart.yScale(-6)))
+                parseInt(bar.attr('y')).should.equal(parseInt(chart.yScale(0)))
 
                 done()
             , 300
@@ -137,4 +137,4 @@ describe 'Chart', ->
 
             internal = chart.data().visible()
 
-            internal[1].values[0].y0.should.equal 3
+            internal[0].values[0].y0.should.equal 1
