@@ -34,10 +34,13 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
 
     points.exit().remove()
 
+    delayFactor = 150 / selectionData.values.length
+    delayFactor = d3.max [3, delayFactor]
+
     points
         .transition()
         .duration(selectionData.duration or chart.duration())
-        .delay((d,i)-> i * 10)
+        .delay((d,i)-> i * delayFactor)
         .ease('quad')
         .attr('transform', (d)->
             "translate(#{chart.xScale(d.x)},#{chart.yScale(d.y)})"

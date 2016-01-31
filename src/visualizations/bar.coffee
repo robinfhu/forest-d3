@@ -84,10 +84,13 @@ renderBars = (selection, selectionData, options={})->
                 else
                     chart.yScale(d.y)
 
+    delayFactor = 150 / selectionData.values.length
+    delayFactor = d3.max [3, delayFactor]
+
     bars
         .transition()
         .duration(selectionData.duration or chart.duration())
-        .delay((d,i)-> i * 10)
+        .delay((d,i)-> i * delayFactor)
         .attr('x', (d)->
             ###
             Calculates the x position of each bar. Shifts the bar along x-axis

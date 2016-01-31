@@ -44,7 +44,7 @@ data = [
 chart
     .stacked(true)
     .stackType('area')
-    .xPadding(0.02)
+    .xPadding(0)
     .xTickFormat((d)->
         if d?
             d3.time.format('%Y-%m-%d')(new Date d)
@@ -52,5 +52,20 @@ chart
             ''
     )
     .addPlugin(new ForestD3.Legend('#legend'))
+    .data(data)
+    .render()
+
+# ******************** A stacked bar ********************
+chartBar = new ForestD3.StackedChart '#example-bar'
+chartBar
+    .stacked(true)
+    .stackType('bar')
+    .xTickFormat((d)->
+        if d?
+            d3.time.format('%Y-%m-%d')(new Date d)
+        else
+            ''
+    )
+    .addPlugin(new ForestD3.Legend('#legend-bar'))
     .data(data)
     .render()

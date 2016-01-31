@@ -119,7 +119,7 @@ Author:  Robin Hu
   var renderBars;
 
   renderBars = function(selection, selectionData, options) {
-    var barBase, barCount, barIndex, barOffset, barWidth, barYPosition, bars, chart, fullSpace, maxFullSpace, maxPadding, stacked, xCentered;
+    var barBase, barCount, barIndex, barOffset, barWidth, barYPosition, bars, chart, delayFactor, fullSpace, maxFullSpace, maxPadding, stacked, xCentered;
     if (options == null) {
       options = {};
     }
@@ -176,8 +176,10 @@ Author:  Robin Hu
         return chart.yScale(d.y);
       }
     };
+    delayFactor = 150 / selectionData.values.length;
+    delayFactor = d3.max([3, delayFactor]);
     bars.transition().duration(selectionData.duration || chart.duration()).delay(function(d, i) {
-      return i * 10;
+      return i * delayFactor;
     }).attr('x', function(d) {
 
       /*
@@ -444,7 +446,7 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
 
 (function() {
   this.ForestD3.Visualizations.scatter = function(selection, selectionData) {
-    var all, base, chart, points, seriesIndex, shape, symbol;
+    var all, base, chart, delayFactor, points, seriesIndex, shape, symbol;
     chart = this;
     selection.style('fill', selectionData.color);
     all = d3.svg.symbolTypes;
@@ -459,8 +461,10 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
       return "translate(" + (chart.xScale(d.x)) + "," + base + ")";
     }).attr('d', symbol.size(0));
     points.exit().remove();
+    delayFactor = 150 / selectionData.values.length;
+    delayFactor = d3.max([3, delayFactor]);
     points.transition().duration(selectionData.duration || chart.duration()).delay(function(d, i) {
-      return i * 10;
+      return i * delayFactor;
     }).ease('quad').attr('transform', function(d) {
       return "translate(" + (chart.xScale(d.x)) + "," + (chart.yScale(d.y)) + ")";
     }).attr('d', symbol.size(selectionData.size || 96));

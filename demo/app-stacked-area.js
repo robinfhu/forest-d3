@@ -1,5 +1,5 @@
 (function() {
-  var chart, data, getStocks;
+  var chart, chartBar, data, getStocks;
 
   getStocks = function(startPrice, volatility) {
     var changePct, i, j, result, startDate;
@@ -44,12 +44,22 @@
     }
   ];
 
-  chart.stacked(true).stackType('area').xPadding(0.02).xTickFormat(function(d) {
+  chart.stacked(true).stackType('area').xPadding(0).xTickFormat(function(d) {
     if (d != null) {
       return d3.time.format('%Y-%m-%d')(new Date(d));
     } else {
       return '';
     }
   }).addPlugin(new ForestD3.Legend('#legend')).data(data).render();
+
+  chartBar = new ForestD3.StackedChart('#example-bar');
+
+  chartBar.stacked(true).stackType('bar').xTickFormat(function(d) {
+    if (d != null) {
+      return d3.time.format('%Y-%m-%d')(new Date(d));
+    } else {
+      return '';
+    }
+  }).addPlugin(new ForestD3.Legend('#legend-bar')).data(data).render();
 
 }).call(this);
