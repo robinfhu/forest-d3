@@ -122,10 +122,7 @@ Some operations can mutate the original chart data.
     quadtree: ->
         allPoints = @._getSliceable()
         .filter((d)-> not d.hidden)
-        .map (s, i)->
-            s.values.map (point,i)->
-                point.series = s
-                point
+        .map (s, i)-> s.values
 
         allPoints = d3.merge allPoints
 

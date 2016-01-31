@@ -316,6 +316,7 @@
                     xValueRaw: xRaw
                     yValueRaw: yRaw
                     data: d
+                    series: series
 
                 ###
                 Calculates the extent (in x and y directions) of the data in

@@ -54,9 +54,7 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
             .on('mouseover.tooltipHover', (d,i)->
                 clientMouse = [d3.event.clientX, d3.event.clientY]
                 canvasMouse = [chart.xScale(x(d,i)), chart.yScale(y(d,i))]
-                content = ForestD3.TooltipContent.single chart, d, {
-                    series: selectionData
-                }
+                content = ForestD3.TooltipContent.single chart, d
 
                 chart.renderSpatialTooltip {
                     content

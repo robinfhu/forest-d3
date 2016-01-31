@@ -27,8 +27,8 @@ Library of tooltip rendering utilities
         </table>
         """
 
-    single: (chart, point, options={})->
-        series = options.series or {}
+    single: (chart, point)->
+        series = point.series
         color = series.color
         bgColor = "background-color: #{color};"
         label = series.label or series.key

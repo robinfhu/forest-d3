@@ -199,9 +199,7 @@ Author:  Robin Hu
       return bars.on('mousemove.tooltip', function(d, i) {
         var clientMouse, content;
         clientMouse = [d3.event.clientX, d3.event.clientY];
-        content = ForestD3.TooltipContent.single(chart, d, {
-          series: selectionData
-        });
+        content = ForestD3.TooltipContent.single(chart, d);
         return chart.renderSpatialTooltip({
           content: content,
           clientMouse: clientMouse
@@ -447,9 +445,7 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
         var canvasMouse, clientMouse, content;
         clientMouse = [d3.event.clientX, d3.event.clientY];
         canvasMouse = [chart.xScale(x(d, i)), chart.yScale(y(d, i))];
-        content = ForestD3.TooltipContent.single(chart, d, {
-          series: selectionData
-        });
+        content = ForestD3.TooltipContent.single(chart, d);
         return chart.renderSpatialTooltip({
           content: content,
           clientMouse: clientMouse,
@@ -854,7 +850,8 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
                 y: yRaw,
                 xValueRaw: xRaw,
                 yValueRaw: yRaw,
-                data: d
+                data: d,
+                series: series
               };
             });
 
@@ -1059,10 +1056,7 @@ Some operations can mutate the original chart data.
         allPoints = this._getSliceable().filter(function(d) {
           return !d.hidden;
         }).map(function(s, i) {
-          return s.values.map(function(point, i) {
-            point.series = s;
-            return point;
-          });
+          return s.values;
         });
         allPoints = d3.merge(allPoints);
         return d3.geom.quadtree().x(chart.getXInternal).y(chart.getYInternal)(allPoints);
@@ -1354,12 +1348,9 @@ Library of tooltip rendering utilities
       rows = rows.join('');
       return "<div class='header'>" + xValue + "</div>\n<table>\n    " + rows + "\n</table>";
     },
-    single: function(chart, point, options) {
+    single: function(chart, point) {
       var bgColor, color, label, series;
-      if (options == null) {
-        options = {};
-      }
-      series = options.series || {};
+      series = point.series;
       color = series.color;
       bgColor = "background-color: " + color + ";";
       label = series.label || series.key;
@@ -1899,9 +1890,7 @@ You can combine lines, bars, areas and scatter points into one chart.
            */
           isHidden = point.series.hidden;
           if (dist < threshold && !isHidden) {
-            content = ForestD3.TooltipContent.single(this, point, {
-              series: point.series
-            });
+            content = ForestD3.TooltipContent.single(this, point);
             return this.renderSpatialTooltip({
               content: content,
               clientMouse: clientMouse,

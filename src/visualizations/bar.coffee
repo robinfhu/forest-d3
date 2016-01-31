@@ -121,9 +121,7 @@ renderBars = (selection, selectionData, options={})->
         bars
             .on('mousemove.tooltip', (d,i)->
                 clientMouse = [d3.event.clientX, d3.event.clientY]
-                content = ForestD3.TooltipContent.single chart, d, {
-                    series: selectionData
-                }
+                content = ForestD3.TooltipContent.single chart, d
 
                 chart.renderSpatialTooltip {
                     content
