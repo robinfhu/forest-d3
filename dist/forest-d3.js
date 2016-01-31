@@ -285,6 +285,8 @@ If you set area=true, turns it into an area graph
       return area.transition().duration(duration).style('fill', selectionData.color).attr('d', areaFn.y1(function(d, i) {
         return chart.yScale(y(d, i));
       }));
+    } else {
+      return selection.selectAll('path.area').remove();
     }
   };
 

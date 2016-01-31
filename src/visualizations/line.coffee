@@ -57,4 +57,6 @@ If you set area=true, turns it into an area graph
             .duration(duration)
             .style('fill', selectionData.color)
             .attr('d', areaFn.y1((d,i)-> chart.yScale(y(d,i))))
+    else
+        selection.selectAll('path.area').remove()
 
