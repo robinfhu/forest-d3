@@ -1,5 +1,7 @@
-@ForestD3.Visualizations.bar = (selection, selectionData)->
+renderBars = (selection, selectionData, options={})->
     chart = @
+    stacked = options.stacked
+
     bars = selection.selectAll('rect.bar').data(selectionData.values)
 
     x = chart.getXInternal
@@ -20,9 +22,6 @@
     # Calculates how much available space there is between each x-axis tick mark
     fullSpace = chart.canvasWidth / selectionData.values.length
 
-    # Gets total number of visible bars
-    barCount = chart.data().barCount()
-
     # Ensure the bars don't get too wide either.
     maxFullSpace = chart.xScale(1) / 2
 
@@ -34,7 +33,7 @@
     fullSpace -= d3.min [(fullSpace * chart.barPaddingPercent()), maxPadding]
 
     # Ensure we don't get negative bar widths
-    fullSpace = d3.max [barCount, fullSpace]
+    fullSpace = d3.max [1, fullSpace]
 
     ###
     This is used to ensure that the bar group is centered around the x-axis
@@ -54,8 +53,40 @@
         .exit()
         .remove()
 
+    # Gets total number of visible bars and figures out bar width (if grouped)
+    barCount = chart.data().barCount()
     barIndex = chart.data().barIndex selectionData.key
-    barWidth = fullSpace / barCount
+    barWidth =
+        if stacked
+            fullSpace
+        else
+            fullSpace / barCount
+
+    barOffset =
+        if stacked
+            0
+        else
+            barWidth * barIndex
+
+    barYPosition =
+        if stacked
+            (d)->
+                ###
+                For negative stacked bars, place the top of the <rect> at y0.
+
+                For positive bars, place the top of the <rect> at y0 + y
+                ###
+                if d.y0 <= 0 and d.y < 0
+                    chart.yScale d.y0
+                else
+                    chart.yScale(d.y0 + d.y)
+        else
+            (d)->
+                if d.y < 0
+                    barBase
+                else
+                    chart.yScale(d.y)
+
     bars
         .transition()
         .duration(selectionData.duration or chart.duration())
@@ -65,15 +96,9 @@
             Calculates the x position of each bar. Shifts the bar along x-axis
             depending on which series index the bar belongs to.
             ###
-            chart.xScale(x(d,i)) - xCentered + barWidth*barIndex
+            chart.xScale(x(d,i)) - xCentered + barOffset
         )
-        .attr('y', (d,i)->
-            yVal = y(d,i)
-            if yVal < 0
-                barBase
-            else
-                chart.yScale(y(d,i))
-        )
+        .attr('y', barYPosition)
         .attr('height', (d,i)->
             Math.abs(chart.yScale(y(d,i)) - barBase)
         )
@@ -88,3 +113,9 @@
 
             "bar #{additionalClass}"
         )
+
+ForestD3.Visualizations.bar = (selection, selectionData)->
+    renderBars.call @, selection, selectionData, {stacked: false}
+
+ForestD3.Visualizations.barStacked = (selection, selectionData)->
+    renderBars.call @, selection, selectionData, {stacked: true}

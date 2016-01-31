@@ -116,9 +116,15 @@ Author:  Robin Hu
 }).call(this);
 
 (function() {
-  this.ForestD3.Visualizations.barStacked = function(selection, selectionData) {
-    var barBase, barWidth, bars, chart, fullSpace, maxFullSpace, maxPadding, x, xCentered, y;
+  var renderBars;
+
+  renderBars = function(selection, selectionData, options) {
+    var barBase, barCount, barIndex, barOffset, barWidth, barYPosition, bars, chart, fullSpace, maxFullSpace, maxPadding, stacked, x, xCentered, y;
+    if (options == null) {
+      options = {};
+    }
     chart = this;
+    stacked = options.stacked;
     bars = selection.selectAll('rect.bar').data(selectionData.values);
     x = chart.getXInternal;
     y = chart.getYInternal;
@@ -149,17 +155,11 @@ Author:  Robin Hu
       return chart.xScale(x(d, i)) - xCentered;
     }).attr('y', barBase).attr('height', 0);
     bars.exit().remove();
-    barWidth = fullSpace;
-    return bars.transition().duration(selectionData.duration || chart.duration()).delay(function(d, i) {
-      return i * 20;
-    }).attr('x', function(d, i) {
-
-      /*
-      Calculates the x position of each bar. Shifts the bar along x-axis
-      depending on which series index the bar belongs to.
-       */
-      return chart.xScale(x(d, i)) - xCentered;
-    }).attr('y', function(d, i) {
+    barCount = chart.data().barCount();
+    barIndex = chart.data().barIndex(selectionData.key);
+    barWidth = stacked ? fullSpace : fullSpace / barCount;
+    barOffset = stacked ? 0 : barWidth * barIndex;
+    barYPosition = stacked ? function(d) {
 
       /*
       For negative stacked bars, place the top of the <rect> at y0.
@@ -171,54 +171,13 @@ Author:  Robin Hu
       } else {
         return chart.yScale(d.y0 + d.y);
       }
-    }).attr('height', function(d, i) {
-      return Math.abs(chart.yScale(d.y) - barBase);
-    }).attr('width', barWidth).style('fill', selectionData.color).attr('class', function(d, i) {
-      var additionalClass;
-      additionalClass = (typeof selectionData.classed) === 'function' ? selectionData.classed(d.data, i, selectionData) : '';
-      return "bar " + additionalClass;
-    });
-  };
-
-}).call(this);
-
-(function() {
-  this.ForestD3.Visualizations.bar = function(selection, selectionData) {
-    var barBase, barCount, barIndex, barWidth, bars, chart, fullSpace, maxFullSpace, maxPadding, x, xCentered, y;
-    chart = this;
-    bars = selection.selectAll('rect.bar').data(selectionData.values);
-    x = chart.getXInternal;
-    y = chart.getYInternal;
-
-    /*
-    Ensure the bars are based at the zero line, but does not extend past
-    canvas boundaries.
-     */
-    barBase = chart.yScale(0);
-    if (barBase > chart.canvasHeight) {
-      barBase = chart.canvasHeight;
-    } else if (barBase < 0) {
-      barBase = 0;
-    }
-    fullSpace = chart.canvasWidth / selectionData.values.length;
-    barCount = chart.data().barCount();
-    maxFullSpace = chart.xScale(1) / 2;
-    fullSpace = d3.min([maxFullSpace, fullSpace]);
-    maxPadding = 35;
-    fullSpace -= d3.min([fullSpace * chart.barPaddingPercent(), maxPadding]);
-    fullSpace = d3.max([barCount, fullSpace]);
-
-    /*
-    This is used to ensure that the bar group is centered around the x-axis
-    tick mark.
-     */
-    xCentered = fullSpace / 2;
-    bars.enter().append('rect').classed('bar', true).attr('x', function(d, i) {
-      return chart.xScale(x(d, i)) - xCentered;
-    }).attr('y', barBase).attr('height', 0);
-    bars.exit().remove();
-    barIndex = chart.data().barIndex(selectionData.key);
-    barWidth = fullSpace / barCount;
+    } : function(d) {
+      if (d.y < 0) {
+        return barBase;
+      } else {
+        return chart.yScale(d.y);
+      }
+    };
     return bars.transition().duration(selectionData.duration || chart.duration()).delay(function(d, i) {
       return i * 10;
     }).attr('x', function(d, i) {
@@ -227,21 +186,25 @@ Author:  Robin Hu
       Calculates the x position of each bar. Shifts the bar along x-axis
       depending on which series index the bar belongs to.
        */
-      return chart.xScale(x(d, i)) - xCentered + barWidth * barIndex;
-    }).attr('y', function(d, i) {
-      var yVal;
-      yVal = y(d, i);
-      if (yVal < 0) {
-        return barBase;
-      } else {
-        return chart.yScale(y(d, i));
-      }
-    }).attr('height', function(d, i) {
+      return chart.xScale(x(d, i)) - xCentered + barOffset;
+    }).attr('y', barYPosition).attr('height', function(d, i) {
       return Math.abs(chart.yScale(y(d, i)) - barBase);
     }).attr('width', barWidth).style('fill', selectionData.color).attr('class', function(d, i) {
       var additionalClass;
       additionalClass = (typeof selectionData.classed) === 'function' ? selectionData.classed(d.data, i, selectionData) : '';
       return "bar " + additionalClass;
+    });
+  };
+
+  ForestD3.Visualizations.bar = function(selection, selectionData) {
+    return renderBars.call(this, selection, selectionData, {
+      stacked: false
+    });
+  };
+
+  ForestD3.Visualizations.barStacked = function(selection, selectionData) {
+    return renderBars.call(this, selection, selectionData, {
+      stacked: true
     });
   };
 
