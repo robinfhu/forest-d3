@@ -988,7 +988,9 @@ Some operations can mutate the original chart data.
         return dataObjs[0].values.map(getX);
       },
       xValues: function() {
-        return this._xValues(chart.getXInternal);
+        return this._xValues(function(d) {
+          return d.x;
+        });
       },
       xValuesRaw: function() {
         return this._xValues(function(d) {
@@ -1061,7 +1063,11 @@ Some operations can mutate the original chart data.
           return s.values;
         });
         allPoints = d3.merge(allPoints);
-        return d3.geom.quadtree().x(chart.getXInternal).y(chart.getYInternal)(allPoints);
+        return d3.geom.quadtree().x(function(d) {
+          return d.x;
+        }).y(function(d) {
+          return d.y;
+        })(allPoints);
       },
 
       /*

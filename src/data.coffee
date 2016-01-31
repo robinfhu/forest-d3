@@ -72,7 +72,7 @@ Some operations can mutate the original chart data.
     # Get array of all X-axis data points
     # Returns natural ordered indices if chart.ordinal is true
     xValues: ->
-        @._xValues chart.getXInternal
+        @._xValues (d)-> d.x
 
     # Get array of all X-axis data points, returning the raw x value
     xValuesRaw: ->
@@ -127,8 +127,8 @@ Some operations can mutate the original chart data.
         allPoints = d3.merge allPoints
 
         d3.geom.quadtree()
-            .x(chart.getXInternal)
-            .y(chart.getYInternal)(allPoints)
+            .x((d)-> d.x)
+            .y((d)-> d.y)(allPoints)
 
     ###
     Alias to chart.render(). Allows you to do things like:
