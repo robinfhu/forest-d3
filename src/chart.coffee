@@ -58,9 +58,9 @@ chartProperties = [
     ###
     data: (d)->
         if arguments.length is 0
-            return ForestD3.DataAPI.call @, @chartData
+            return ForestD3.DataAPI.call @, @_internalData
         else
-            @chartData = ForestD3.Utils.normalize d, {
+            @_internalData = ForestD3.Utils.normalize d, {
                 getX: @getX()
                 getY: @getY()
                 ordinal: @ordinal()
@@ -89,7 +89,7 @@ chartProperties = [
     ###
     render: ->
         return @ unless @svg?
-        return @ unless @chartData?
+        return @ unless @data().get()?
         @init()
         @updateDimensions()
         @updateChartScale()

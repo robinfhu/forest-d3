@@ -900,6 +900,11 @@ Returns an API object that performs calculations and operations on a chart
 data object.
 
 Some operations can mutate the original chart data.
+
+Example usage:
+api = ForestD3.DataAPI.call chart, myData
+api.show('key1').render()
+internal = api.get()
  */
 
 (function() {
@@ -1527,9 +1532,9 @@ You can combine lines, bars, areas and scatter points into one chart.
 
     Chart.prototype.data = function(d) {
       if (arguments.length === 0) {
-        return ForestD3.DataAPI.call(this, this.chartData);
+        return ForestD3.DataAPI.call(this, this._internalData);
       } else {
-        this.chartData = ForestD3.Utils.normalize(d, {
+        this._internalData = ForestD3.Utils.normalize(d, {
           getX: this.getX(),
           getY: this.getY(),
           ordinal: this.ordinal(),
@@ -1566,7 +1571,7 @@ You can combine lines, bars, areas and scatter points into one chart.
       if (this.svg == null) {
         return this;
       }
-      if (this.chartData == null) {
+      if (this.data().get() == null) {
         return this;
       }
       this.init();

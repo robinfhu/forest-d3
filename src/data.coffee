@@ -3,6 +3,11 @@ Returns an API object that performs calculations and operations on a chart
 data object.
 
 Some operations can mutate the original chart data.
+
+Example usage:
+api = ForestD3.DataAPI.call chart, myData
+api.show('key1').render()
+internal = api.get()
 ###
 @ForestD3.DataAPI = (data)->
     chart = @
