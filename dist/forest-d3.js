@@ -1510,7 +1510,8 @@ You can combine lines, bars, areas and scatter points into one chart.
 
 
     /*
-    Set chart data.
+    Set chart data. Will attempt to 'normalize' the data for internal chart
+    use.
      */
 
     Chart.prototype.data = function(d) {
@@ -1533,6 +1534,18 @@ You can combine lines, bars, areas and scatter points into one chart.
 
 
     /*
+    Gives sub-charts a chance to pre-process the data.
+    
+    For example, stacked charts will want to call d3.layout.stack() before
+    calculating the extent.
+    
+    Defaults to no-op.
+     */
+
+    Chart.prototype.init = function() {};
+
+
+    /*
     Main rendering logic.  Here we should update the chart frame, axes
     and series points.
      */
@@ -1545,6 +1558,7 @@ You can combine lines, bars, areas and scatter points into one chart.
       if (this.chartData == null) {
         return this;
       }
+      this.init();
       this.updateDimensions();
       this.updateChartScale();
       this.updateChartFrame();
@@ -1785,24 +1799,11 @@ You can combine lines, bars, areas and scatter points into one chart.
 
 
     /*
-    Gives sub-charts a chance to pre-process the data.
-    
-    For example, stacked charts will want to call d3.layout.stack() before
-    calculating the extent.
-    
-    Defaults to no-op.
-     */
-
-    Chart.prototype.preprocessData = function() {};
-
-
-    /*
     Creates an x and y scale, setting the domain and ranges.
      */
 
     Chart.prototype.updateChartScale = function() {
       var extent;
-      this.preprocessData();
       extent = ForestD3.Utils.extent(this.data().visible(), this.forceDomain());
       extent = ForestD3.Utils.extentPadding(extent, {
         x: this.xPadding(),
@@ -2231,7 +2232,7 @@ allowed to combine it with lines and scatters.
       this._setProperties(chartProperties);
     }
 
-    StackedChart.prototype.preprocessData = function() {
+    StackedChart.prototype.init = function() {
       var internalData, seriesType, yOffsetVal;
       internalData = this.data().visible().filter(function(d) {
         return d.isDataSeries;

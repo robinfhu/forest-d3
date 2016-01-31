@@ -53,7 +53,8 @@ chartProperties = [
         @destroyPlugins()
 
     ###
-    Set chart data.
+    Set chart data. Will attempt to 'normalize' the data for internal chart
+    use.
     ###
     data: (d)->
         if arguments.length is 0
@@ -73,12 +74,23 @@ chartProperties = [
             return @
 
     ###
+    Gives sub-charts a chance to pre-process the data.
+
+    For example, stacked charts will want to call d3.layout.stack() before
+    calculating the extent.
+
+    Defaults to no-op.
+    ###
+    init: ->
+
+    ###
     Main rendering logic.  Here we should update the chart frame, axes
     and series points.
     ###
     render: ->
         return @ unless @svg?
         return @ unless @chartData?
+        @init()
         @updateDimensions()
         @updateChartScale()
         @updateChartFrame()
@@ -389,20 +401,9 @@ chartProperties = [
             .attr('x', @canvasWidth)
 
     ###
-    Gives sub-charts a chance to pre-process the data.
-
-    For example, stacked charts will want to call d3.layout.stack() before
-    calculating the extent.
-
-    Defaults to no-op.
-    ###
-    preprocessData: ->
-
-    ###
     Creates an x and y scale, setting the domain and ranges.
     ###
     updateChartScale: ->
-        @preprocessData()
         extent = ForestD3.Utils.extent @data().visible(), @forceDomain()
         extent = ForestD3.Utils.extentPadding extent, {
             x: @xPadding()

@@ -16,7 +16,7 @@ chartProperties = [
         @_setProperties chartProperties
 
     # Overrides parent class
-    preprocessData: ->
+    init: ->
         internalData = @data().visible().filter (d)-> d.isDataSeries
         d3.layout.stack()
             .offset('zero')
