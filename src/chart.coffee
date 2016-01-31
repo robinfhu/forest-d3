@@ -495,7 +495,6 @@ chartProperties = [
                 isHidden = point.series.hidden
                 if dist < threshold and not isHidden
                     content = ForestD3.TooltipContent.single @, point, {
-                        getXValue: (d)-> d.xValue
                         series: point.series
                     }
 
@@ -526,7 +525,8 @@ chartProperties = [
             @crosshairs.hide()
         else
             @tooltip.render options.content, options.clientMouse
-            @crosshairs.render options.canvasMouse
+            if options.canvasMouse?
+                @crosshairs.render options.canvasMouse
 
     addPlugin: (plugin)->
         @plugins[plugin.name] = plugin

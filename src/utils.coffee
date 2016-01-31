@@ -308,9 +308,13 @@
             if series.values instanceof Array
                 series.isDataSeries = true
                 series.values = series.values.map (d,i)->
-                    x: if ordinal then i else getX(d,i)
-                    y: getY(d,i)
-                    xValueRaw: getX(d,i)
+                    xRaw = getX(d,i)
+                    yRaw = getY(d,i)
+
+                    x: if ordinal then i else xRaw
+                    y: yRaw
+                    xValueRaw: xRaw
+                    yValueRaw: yRaw
                     data: d
 
                 ###

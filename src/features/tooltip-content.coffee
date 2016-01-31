@@ -26,22 +26,21 @@ Library of tooltip rendering utilities
             #{rows}
         </table>
         """
-    single: (chart, point, options={})->
-        getXValue = options.getXValue or chart.getXInternal
-        series = options.series or {}
 
-        xValue = chart.xTickFormat()(getXValue(point))
+    single: (chart, point, options={})->
+        series = options.series or {}
         color = series.color
         bgColor = "background-color: #{color};"
         label = series.label or series.key
+
         """
-        <div class='header'>#{xValue}</div>
+        <div class='header'>#{chart.xTickFormat()(point.xValueRaw)}</div>
         <table>
             <tr>
                 <td><div class='series-color' style='#{bgColor}'></div></td>
                 <td class='series-label'>#{label}</td>
                 <td class='series-value'>
-                    #{chart.yTickFormat()(chart.getYInternal(point))}
+                    #{chart.yTickFormat()(point.yValueRaw)}
                 </td>
             </tr>
         </table>

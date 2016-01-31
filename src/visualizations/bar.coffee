@@ -114,6 +114,27 @@ renderBars = (selection, selectionData, options={})->
             "bar #{additionalClass}"
         )
 
+    # Add hover events, but only if tooltipType is 'hover'
+    if chart.tooltipType() is 'hover'
+        selection.classed 'interactive', true
+
+        bars
+            .on('mousemove.tooltip', (d,i)->
+                clientMouse = [d3.event.clientX, d3.event.clientY]
+                content = ForestD3.TooltipContent.single chart, d, {
+                    series: selectionData
+                }
+
+                chart.renderSpatialTooltip {
+                    content
+                    clientMouse
+                }
+            )
+            .on('mouseout.tooltip', (d,i)->
+                chart.renderSpatialTooltip {hide: true}
+            )
+
+
 ForestD3.Visualizations.bar = (selection, selectionData)->
     renderBars.call @, selection, selectionData, {stacked: false}
 

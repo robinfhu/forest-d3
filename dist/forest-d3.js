@@ -178,7 +178,7 @@ Author:  Robin Hu
         return chart.yScale(d.y);
       }
     };
-    return bars.transition().duration(selectionData.duration || chart.duration()).delay(function(d, i) {
+    bars.transition().duration(selectionData.duration || chart.duration()).delay(function(d, i) {
       return i * 10;
     }).attr('x', function(d, i) {
 
@@ -194,6 +194,24 @@ Author:  Robin Hu
       additionalClass = (typeof selectionData.classed) === 'function' ? selectionData.classed(d.data, i, selectionData) : '';
       return "bar " + additionalClass;
     });
+    if (chart.tooltipType() === 'hover') {
+      selection.classed('interactive', true);
+      return bars.on('mousemove.tooltip', function(d, i) {
+        var clientMouse, content;
+        clientMouse = [d3.event.clientX, d3.event.clientY];
+        content = ForestD3.TooltipContent.single(chart, d, {
+          series: selectionData
+        });
+        return chart.renderSpatialTooltip({
+          content: content,
+          clientMouse: clientMouse
+        });
+      }).on('mouseout.tooltip', function(d, i) {
+        return chart.renderSpatialTooltip({
+          hide: true
+        });
+      });
+    }
   };
 
   ForestD3.Visualizations.bar = function(selection, selectionData) {
@@ -828,10 +846,14 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
           if (series.values instanceof Array) {
             series.isDataSeries = true;
             series.values = series.values.map(function(d, i) {
+              var xRaw, yRaw;
+              xRaw = getX(d, i);
+              yRaw = getY(d, i);
               return {
-                x: ordinal ? i : getX(d, i),
-                y: getY(d, i),
-                xValueRaw: getX(d, i),
+                x: ordinal ? i : xRaw,
+                y: yRaw,
+                xValueRaw: xRaw,
+                yValueRaw: yRaw,
                 data: d
               };
             });
@@ -970,29 +992,22 @@ Some operations can mutate the original chart data.
         return this._xValues(chart.getXInternal);
       },
       xValuesRaw: function() {
-        var getX;
-        getX = function(d, i) {
-          return chart.getX()(d.data, i);
-        };
-        return this._xValues(getX);
+        return this._xValues(function(d) {
+          return d.xValueRaw;
+        });
       },
       xValueAt: function(i) {
-        var dataObjs, point;
-        dataObjs = this._getSliceable();
-        if (dataObjs[0] == null) {
+        var point, ref, series;
+        series = this._getSliceable();
+        if (series[0] == null) {
           return null;
         }
-        point = dataObjs[0].values[i];
-        if (point != null) {
-          return chart.getX()(point.data);
-        } else {
-          return null;
-        }
+        return point = (ref = series[0].values[i]) != null ? ref.xValueRaw : void 0;
       },
 
       /*
       For a set of data series, grabs a slice of the data at a certain index.
-      Useful for making the tooltip.
+      Useful for making the 'bisect' tooltip.
        */
       sliced: function(idx) {
         return this._getSliceable().filter(function(d) {
@@ -1001,8 +1016,8 @@ Some operations can mutate the original chart data.
           var point;
           point = d.values[idx];
           return {
-            x: chart.getX()(point.data, idx),
-            y: chart.getY()(point.data, idx),
+            x: point.xValueRaw,
+            y: point.yValueRaw,
             key: d.key,
             label: d.label,
             color: d.color
@@ -1046,7 +1061,6 @@ Some operations can mutate the original chart data.
         }).map(function(s, i) {
           return s.values.map(function(point, i) {
             point.series = s;
-            point.xValue = chart.getX()(point.data, i);
             return point;
           });
         });
@@ -1341,17 +1355,15 @@ Library of tooltip rendering utilities
       return "<div class='header'>" + xValue + "</div>\n<table>\n    " + rows + "\n</table>";
     },
     single: function(chart, point, options) {
-      var bgColor, color, getXValue, label, series, xValue;
+      var bgColor, color, label, series;
       if (options == null) {
         options = {};
       }
-      getXValue = options.getXValue || chart.getXInternal;
       series = options.series || {};
-      xValue = chart.xTickFormat()(getXValue(point));
       color = series.color;
       bgColor = "background-color: " + color + ";";
       label = series.label || series.key;
-      return "<div class='header'>" + xValue + "</div>\n<table>\n    <tr>\n        <td><div class='series-color' style='" + bgColor + "'></div></td>\n        <td class='series-label'>" + label + "</td>\n        <td class='series-value'>\n            " + (chart.yTickFormat()(chart.getYInternal(point))) + "\n        </td>\n    </tr>\n</table>";
+      return "<div class='header'>" + (chart.xTickFormat()(point.xValueRaw)) + "</div>\n<table>\n    <tr>\n        <td><div class='series-color' style='" + bgColor + "'></div></td>\n        <td class='series-label'>" + label + "</td>\n        <td class='series-value'>\n            " + (chart.yTickFormat()(point.yValueRaw)) + "\n        </td>\n    </tr>\n</table>";
     }
   };
 
@@ -1888,9 +1900,6 @@ You can combine lines, bars, areas and scatter points into one chart.
           isHidden = point.series.hidden;
           if (dist < threshold && !isHidden) {
             content = ForestD3.TooltipContent.single(this, point, {
-              getXValue: function(d) {
-                return d.xValue;
-              },
               series: point.series
             });
             return this.renderSpatialTooltip({
@@ -1931,7 +1940,9 @@ You can combine lines, bars, areas and scatter points into one chart.
         return this.crosshairs.hide();
       } else {
         this.tooltip.render(options.content, options.clientMouse);
-        return this.crosshairs.render(options.canvasMouse);
+        if (options.canvasMouse != null) {
+          return this.crosshairs.render(options.canvasMouse);
+        }
       }
     };
 

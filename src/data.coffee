@@ -76,30 +76,25 @@ Some operations can mutate the original chart data.
 
     # Get array of all X-axis data points, returning the raw x value
     xValuesRaw: ->
-        getX = (d,i)-> chart.getX()(d.data,i)
-        @._xValues getX
+        @._xValues (d)-> d.xValueRaw
 
     # Get the x raw value at a certain position
     xValueAt: (i)->
-        dataObjs = @._getSliceable()
-        return null unless dataObjs[0]?
+        series = @._getSliceable()
+        return null unless series[0]?
 
-        point = dataObjs[0].values[i]
-        if point?
-            chart.getX()(point.data)
-        else
-            null
+        point = series[0].values[i]?.xValueRaw
 
     ###
     For a set of data series, grabs a slice of the data at a certain index.
-    Useful for making the tooltip.
+    Useful for making the 'bisect' tooltip.
     ###
     sliced: (idx)->
         @._getSliceable().filter((d)-> not d.hidden).map (d)->
             point = d.values[idx]
 
-            x: chart.getX()(point.data, idx)
-            y: chart.getY()(point.data, idx)
+            x: point.xValueRaw
+            y: point.yValueRaw
             key: d.key
             label: d.label
             color: d.color
@@ -130,8 +125,6 @@ Some operations can mutate the original chart data.
         .map (s, i)->
             s.values.map (point,i)->
                 point.series = s
-                point.xValue = chart.getX()(point.data,i)
-
                 point
 
         allPoints = d3.merge allPoints

@@ -58,7 +58,15 @@ describe 'Tooltip and Guideline', ->
         , 200
 
     it 'adds "interactive" class to series when tooltipType=="hover"', (done)->
-        chart.ordinal(false).tooltipType('hover').data(data).render()
+        data2 = [
+            type: 'scatter'
+            values: []
+        ,
+            type: 'bar'
+            values: []
+        ]
+
+        chart.ordinal(false).tooltipType('hover').data(data2).render()
 
         setTimeout ->
             series = $(container).find('g.series.interactive')

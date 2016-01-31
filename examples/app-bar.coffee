@@ -6,6 +6,7 @@ chart
     .xLabel('Date')
     .yLabel('Volume')
     .yTickFormat(d3.format(',.3f'))
+    .tooltipType('hover')
     .xTickFormat((d)->
         if d?
             d3.time.format('%Y-%m-%d')(new Date d)
