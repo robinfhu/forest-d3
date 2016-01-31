@@ -1,5 +1,5 @@
 describe 'Chart', ->
-    describe 'Stackable Charts', ->
+    describe 'Stacked Charts', ->
         chart = null
         container = null
 
@@ -138,3 +138,23 @@ describe 'Chart', ->
             internal = chart.data().visible()
 
             internal[0].values[0].y0.should.equal 1
+            internal[0].values[1].y0.should.equal 1
+            internal[0].values[2].y0.should.equal 1
+
+        it 'renders stacked area chart', (done)->
+            chart = new ForestD3.StackedChart container
+            data = [
+                values: [0...20].map (i)-> [i, Math.random()]
+            ,
+                values: [0...20].map (i)-> [i, Math.random()]
+            ,
+                values: [0...20].map (i)-> [i, Math.random()]
+            ]
+
+            chart.stacked(true).stackType('area').data(data).render()
+
+            setTimeout ->
+                series = $(container).find('g.series path.area')
+                series.length.should.equal 3, 'three area paths'
+                done()
+            , 300

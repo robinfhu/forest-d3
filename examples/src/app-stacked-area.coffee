@@ -44,6 +44,7 @@ data = [
 chart
     .stacked(true)
     .stackType('area')
+    .xPadding(0.02)
     .xTickFormat((d)->
         if d?
             d3.time.format('%Y-%m-%d')(new Date d)

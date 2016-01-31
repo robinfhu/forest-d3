@@ -1,8 +1,10 @@
-renderArea = (selection, selectionData)->
+renderArea = (selection, selectionData, options={})->
     chart = @
 
+    drawArea = options.area
+    stacked = options.stacked
     # Draw an area graph if area option is turned on
-    if selectionData.area
+    if drawArea
         # Ensure the base of the area doesn't extend outside the cavnas bounds.
         areaBase = chart.yScale 0
         if areaBase > chart.canvasHeight
@@ -13,21 +15,38 @@ renderArea = (selection, selectionData)->
         areaFn = d3.svg.area()
             .interpolate(selectionData.interpolate or 'linear')
             .x((d)-> chart.xScale(d.x))
-            .y0(areaBase)
 
-        area = selection.selectAll('path.area').data([selectionData.values])
+        area = selection
+            .selectAll('path.area')
+            .data([selectionData.values])
+
+        areaOffsetEnter =
+            if stacked
+                areaFn
+                    .y0((d)-> chart.yScale(d.y0))
+                    .y1((d)-> chart.yScale(d.y0))
+            else
+                areaFn
+                    .y0(areaBase)
+                    .y1(areaBase)
 
         area
             .enter()
             .append('path')
             .classed('area', true)
-            .attr('d', areaFn.y1(areaBase))
+            .attr('d', areaOffsetEnter)
+
+        areaOffset =
+            if stacked
+                areaOffsetEnter.y1((d)-> chart.yScale(d.y + d.y0))
+            else
+                areaOffsetEnter.y1((d)-> chart.yScale(d.y))
 
         area
             .transition()
             .duration(selectionData.duration or chart.duration())
             .style('fill', selectionData.color)
-            .attr('d', areaFn.y1((d)-> chart.yScale(d.y)))
+            .attr('d', areaOffset)
     else
         selection.selectAll('path.area').remove()
 ###
@@ -60,4 +79,9 @@ If you set area=true, turns it into an area graph
         .duration(duration)
         .attr('d', lineFn.y((d)-> chart.yScale(d.y)))
 
-    renderArea.call @, selection, selectionData
+    renderArea.call @, selection, selectionData, {area: selectionData.area}
+
+@ForestD3.Visualizations.areaStacked = (selection, selectionData)->
+    selection.style 'stroke', selectionData.color
+
+    renderArea.call @, selection, selectionData, {area: true, stacked: true}

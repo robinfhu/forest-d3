@@ -30,7 +30,12 @@ chartProperties = [
             else
                 (d)-> d.y
 
-        seriesType = 'bar'
+        seriesType =
+            if @stackType() is 'bar'
+                'bar'
+            else
+                'area'
+
         internalData.forEach (series)->
             if series.isDataSeries
                 # Set type=bar, so that data().barCount() returns valid length.
@@ -56,5 +61,10 @@ chartProperties = [
                 ForestD3.Visualizations.barStacked
             else
                 ForestD3.Visualizations.bar
+        else if series.type is 'area'
+            if @stacked()
+                ForestD3.Visualizations.areaStacked
+            else
+                ForestD3.Visualizations.line
         else
             renderFn

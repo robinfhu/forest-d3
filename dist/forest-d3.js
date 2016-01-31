@@ -227,10 +227,15 @@ Author:  Robin Hu
 (function() {
   var renderArea;
 
-  renderArea = function(selection, selectionData) {
-    var area, areaBase, areaFn, chart;
+  renderArea = function(selection, selectionData, options) {
+    var area, areaBase, areaFn, areaOffset, areaOffsetEnter, chart, drawArea, stacked;
+    if (options == null) {
+      options = {};
+    }
     chart = this;
-    if (selectionData.area) {
+    drawArea = options.area;
+    stacked = options.stacked;
+    if (drawArea) {
       areaBase = chart.yScale(0);
       if (areaBase > chart.canvasHeight) {
         areaBase = chart.canvasHeight;
@@ -239,12 +244,20 @@ Author:  Robin Hu
       }
       areaFn = d3.svg.area().interpolate(selectionData.interpolate || 'linear').x(function(d) {
         return chart.xScale(d.x);
-      }).y0(areaBase);
+      });
       area = selection.selectAll('path.area').data([selectionData.values]);
-      area.enter().append('path').classed('area', true).attr('d', areaFn.y1(areaBase));
-      return area.transition().duration(selectionData.duration || chart.duration()).style('fill', selectionData.color).attr('d', areaFn.y1(function(d) {
+      areaOffsetEnter = stacked ? areaFn.y0(function(d) {
+        return chart.yScale(d.y0);
+      }).y1(function(d) {
+        return chart.yScale(d.y0);
+      }) : areaFn.y0(areaBase).y1(areaBase);
+      area.enter().append('path').classed('area', true).attr('d', areaOffsetEnter);
+      areaOffset = stacked ? areaOffsetEnter.y1(function(d) {
+        return chart.yScale(d.y + d.y0);
+      }) : areaOffsetEnter.y1(function(d) {
         return chart.yScale(d.y);
-      }));
+      });
+      return area.transition().duration(selectionData.duration || chart.duration()).style('fill', selectionData.color).attr('d', areaOffset);
     } else {
       return selection.selectAll('path.area').remove();
     }
@@ -270,7 +283,17 @@ Author:  Robin Hu
     path.transition().duration(duration).attr('d', lineFn.y(function(d) {
       return chart.yScale(d.y);
     }));
-    return renderArea.call(this, selection, selectionData);
+    return renderArea.call(this, selection, selectionData, {
+      area: selectionData.area
+    });
+  };
+
+  this.ForestD3.Visualizations.areaStacked = function(selection, selectionData) {
+    selection.style('stroke', selectionData.color);
+    return renderArea.call(this, selection, selectionData, {
+      area: true,
+      stacked: true
+    });
   };
 
 }).call(this);
@@ -2258,7 +2281,7 @@ allowed to combine it with lines and scatters.
       } : function(d) {
         return d.y;
       };
-      seriesType = 'bar';
+      seriesType = this.stackType() === 'bar' ? 'bar' : 'area';
       return internalData.forEach(function(series) {
         var yVals;
         if (series.isDataSeries) {
@@ -2288,6 +2311,12 @@ allowed to combine it with lines and scatters.
           return ForestD3.Visualizations.barStacked;
         } else {
           return ForestD3.Visualizations.bar;
+        }
+      } else if (series.type === 'area') {
+        if (this.stacked()) {
+          return ForestD3.Visualizations.areaStacked;
+        } else {
+          return ForestD3.Visualizations.line;
         }
       } else {
         return renderFn;
