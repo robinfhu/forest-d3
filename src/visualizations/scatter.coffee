@@ -11,9 +11,6 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
 
     selection.style('fill', selectionData.color)
 
-    x = chart.getXInternal
-    y = chart.getYInternal
-
     all = d3.svg.symbolTypes
     seriesIndex = selectionData.index
     shape =
@@ -30,8 +27,8 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
     points.enter()
         .append('path')
         .classed('point', true)
-        .attr('transform', (d,i)->
-            "translate(#{chart.xScale(x(d,i))},#{base})"
+        .attr('transform', (d)->
+            "translate(#{chart.xScale(d.x)},#{base})"
         )
         .attr('d', symbol.size(0))
 
@@ -42,8 +39,8 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
         .duration(selectionData.duration or chart.duration())
         .delay((d,i)-> i * 10)
         .ease('quad')
-        .attr('transform', (d,i)->
-            "translate(#{chart.xScale(x(d,i))},#{chart.yScale(y(d,i))})"
+        .attr('transform', (d)->
+            "translate(#{chart.xScale(d.x)},#{chart.yScale(d.y)})"
         )
         .attr('d', symbol.size(selectionData.size or 96))
 
@@ -51,9 +48,9 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
     if chart.tooltipType() is 'hover'
         selection.classed 'interactive', true
         points
-            .on('mouseover.tooltipHover', (d,i)->
+            .on('mouseover.tooltipHover', (d)->
                 clientMouse = [d3.event.clientX, d3.event.clientY]
-                canvasMouse = [chart.xScale(x(d,i)), chart.yScale(y(d,i))]
+                canvasMouse = [chart.xScale(d.x), chart.yScale(d.y)]
                 content = ForestD3.TooltipContent.single chart, d
 
                 chart.renderSpatialTooltip {
@@ -62,6 +59,6 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
                     canvasMouse
                 }
             )
-            .on('mouseout.tooltipHover', (d,i)->
+            .on('mouseout.tooltipHover', ->
                 chart.renderSpatialTooltip {hide: true}
             )

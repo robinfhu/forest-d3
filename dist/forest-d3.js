@@ -119,15 +119,13 @@ Author:  Robin Hu
   var renderBars;
 
   renderBars = function(selection, selectionData, options) {
-    var barBase, barCount, barIndex, barOffset, barWidth, barYPosition, bars, chart, fullSpace, maxFullSpace, maxPadding, stacked, x, xCentered, y;
+    var barBase, barCount, barIndex, barOffset, barWidth, barYPosition, bars, chart, fullSpace, maxFullSpace, maxPadding, stacked, xCentered;
     if (options == null) {
       options = {};
     }
     chart = this;
     stacked = options.stacked;
     bars = selection.selectAll('rect.bar').data(selectionData.values);
-    x = chart.getXInternal;
-    y = chart.getYInternal;
 
     /*
     Ensure the bars are based at the zero line, but does not extend past
@@ -151,8 +149,8 @@ Author:  Robin Hu
     tick mark.
      */
     xCentered = fullSpace / 2;
-    bars.enter().append('rect').classed('bar', true).attr('x', function(d, i) {
-      return chart.xScale(x(d, i)) - xCentered;
+    bars.enter().append('rect').classed('bar', true).attr('x', function(d) {
+      return chart.xScale(d.x) - xCentered;
     }).attr('y', barBase).attr('height', 0);
     bars.exit().remove();
     barCount = chart.data().barCount();
@@ -180,15 +178,15 @@ Author:  Robin Hu
     };
     bars.transition().duration(selectionData.duration || chart.duration()).delay(function(d, i) {
       return i * 10;
-    }).attr('x', function(d, i) {
+    }).attr('x', function(d) {
 
       /*
       Calculates the x position of each bar. Shifts the bar along x-axis
       depending on which series index the bar belongs to.
        */
-      return chart.xScale(x(d, i)) - xCentered + barOffset;
-    }).attr('y', barYPosition).attr('height', function(d, i) {
-      return Math.abs(chart.yScale(y(d, i)) - barBase);
+      return chart.xScale(d.x) - xCentered + barOffset;
+    }).attr('y', barYPosition).attr('height', function(d) {
+      return Math.abs(chart.yScale(d.y) - barBase);
     }).attr('width', barWidth).style('fill', selectionData.color).attr('class', function(d, i) {
       var additionalClass;
       additionalClass = (typeof selectionData.classed) === 'function' ? selectionData.classed(d.data, i, selectionData) : '';
@@ -196,7 +194,7 @@ Author:  Robin Hu
     });
     if (chart.tooltipType() === 'hover') {
       selection.classed('interactive', true);
-      return bars.on('mousemove.tooltip', function(d, i) {
+      return bars.on('mousemove.tooltip', function(d) {
         var clientMouse, content;
         clientMouse = [d3.event.clientX, d3.event.clientY];
         content = ForestD3.TooltipContent.single(chart, d);
@@ -204,7 +202,7 @@ Author:  Robin Hu
           content: content,
           clientMouse: clientMouse
         });
-      }).on('mouseout.tooltip', function(d, i) {
+      }).on('mouseout.tooltip', function() {
         return chart.renderSpatialTooltip({
           hide: true
         });
@@ -423,11 +421,9 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
 
 (function() {
   this.ForestD3.Visualizations.scatter = function(selection, selectionData) {
-    var all, base, chart, points, seriesIndex, shape, symbol, x, y;
+    var all, base, chart, points, seriesIndex, shape, symbol;
     chart = this;
     selection.style('fill', selectionData.color);
-    x = chart.getXInternal;
-    y = chart.getYInternal;
     all = d3.svg.symbolTypes;
     seriesIndex = selectionData.index;
     shape = selectionData.shape || all[seriesIndex % all.length];
@@ -436,28 +432,28 @@ ForestD3.Visualizations.scatter.call chartInstance, d3.select(this)
       return d.values;
     });
     base = Math.min(chart.yScale(0), chart.canvasHeight);
-    points.enter().append('path').classed('point', true).attr('transform', function(d, i) {
-      return "translate(" + (chart.xScale(x(d, i))) + "," + base + ")";
+    points.enter().append('path').classed('point', true).attr('transform', function(d) {
+      return "translate(" + (chart.xScale(d.x)) + "," + base + ")";
     }).attr('d', symbol.size(0));
     points.exit().remove();
     points.transition().duration(selectionData.duration || chart.duration()).delay(function(d, i) {
       return i * 10;
-    }).ease('quad').attr('transform', function(d, i) {
-      return "translate(" + (chart.xScale(x(d, i))) + "," + (chart.yScale(y(d, i))) + ")";
+    }).ease('quad').attr('transform', function(d) {
+      return "translate(" + (chart.xScale(d.x)) + "," + (chart.yScale(d.y)) + ")";
     }).attr('d', symbol.size(selectionData.size || 96));
     if (chart.tooltipType() === 'hover') {
       selection.classed('interactive', true);
-      return points.on('mouseover.tooltipHover', function(d, i) {
+      return points.on('mouseover.tooltipHover', function(d) {
         var canvasMouse, clientMouse, content;
         clientMouse = [d3.event.clientX, d3.event.clientY];
-        canvasMouse = [chart.xScale(x(d, i)), chart.yScale(y(d, i))];
+        canvasMouse = [chart.xScale(d.x), chart.yScale(d.y)];
         content = ForestD3.TooltipContent.single(chart, d);
         return chart.renderSpatialTooltip({
           content: content,
           clientMouse: clientMouse,
           canvasMouse: canvasMouse
         });
-      }).on('mouseout.tooltipHover', function(d, i) {
+      }).on('mouseout.tooltipHover', function() {
         return chart.renderSpatialTooltip({
           hide: true
         });

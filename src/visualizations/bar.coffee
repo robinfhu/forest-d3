@@ -4,9 +4,6 @@ renderBars = (selection, selectionData, options={})->
 
     bars = selection.selectAll('rect.bar').data(selectionData.values)
 
-    x = chart.getXInternal
-    y = chart.getYInternal
-
     ###
     Ensure the bars are based at the zero line, but does not extend past
     canvas boundaries.
@@ -45,7 +42,7 @@ renderBars = (selection, selectionData, options={})->
         .enter()
         .append('rect')
         .classed('bar', true)
-        .attr('x', (d,i)-> chart.xScale(x(d,i)) - xCentered)
+        .attr('x', (d)-> chart.xScale(d.x) - xCentered)
         .attr('y', barBase)
         .attr('height', 0)
 
@@ -91,16 +88,16 @@ renderBars = (selection, selectionData, options={})->
         .transition()
         .duration(selectionData.duration or chart.duration())
         .delay((d,i)-> i * 10)
-        .attr('x', (d,i)->
+        .attr('x', (d)->
             ###
             Calculates the x position of each bar. Shifts the bar along x-axis
             depending on which series index the bar belongs to.
             ###
-            chart.xScale(x(d,i)) - xCentered + barOffset
+            chart.xScale(d.x) - xCentered + barOffset
         )
         .attr('y', barYPosition)
-        .attr('height', (d,i)->
-            Math.abs(chart.yScale(y(d,i)) - barBase)
+        .attr('height', (d)->
+            Math.abs(chart.yScale(d.y) - barBase)
         )
         .attr('width', barWidth)
         .style('fill', selectionData.color)
@@ -119,7 +116,7 @@ renderBars = (selection, selectionData, options={})->
         selection.classed 'interactive', true
 
         bars
-            .on('mousemove.tooltip', (d,i)->
+            .on('mousemove.tooltip', (d)->
                 clientMouse = [d3.event.clientX, d3.event.clientY]
                 content = ForestD3.TooltipContent.single chart, d
 
@@ -128,7 +125,7 @@ renderBars = (selection, selectionData, options={})->
                     clientMouse
                 }
             )
-            .on('mouseout.tooltip', (d,i)->
+            .on('mouseout.tooltip', ->
                 chart.renderSpatialTooltip {hide: true}
             )
 
