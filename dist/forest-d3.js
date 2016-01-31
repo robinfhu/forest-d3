@@ -14,7 +14,7 @@ Author:  Robin Hu
   }
 
   this.ForestD3 = {
-    version: '0.3.0-beta'
+    version: '0.4.0-beta'
   };
 
   this.ForestD3.Visualizations = {};

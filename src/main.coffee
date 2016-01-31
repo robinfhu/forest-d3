@@ -12,6 +12,6 @@ unless d3?
     """
 
 @ForestD3 =
-    version: '0.3.0-beta'
+    version: '0.4.0-beta'
 
 @ForestD3.Visualizations = {}
