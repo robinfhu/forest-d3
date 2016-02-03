@@ -457,7 +457,7 @@ describe 'Data API', ->
                 key: 'series2'
                 label: 'Bar'
                 values: [
-                    [70, 10]
+                    [70, 11]
                     [80, 800]
                     [90, 709]
                 ]
@@ -479,13 +479,11 @@ describe 'Data API', ->
 
             slice.length.should.equal 3, '3 items'
 
-            slice[0].should.deep.equal
-                x: 70
-                y: 10
-                key: 'series1'
-                label: 'Foo'
-                color: '#000'
+            slice[0].y.should.equal 10
+            slice[0].series.label.should.equal 'Foo'
+            slice[0].series.color.should.equal '#000'
 
+            slice[1].y.should.equal 11
             slice[2].y.should.equal 12
 
             slice = chart.data().sliced(2)

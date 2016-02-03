@@ -60,7 +60,7 @@ Handles the guideline that moves along the x-axis
         markers
             .attr('cx', xPosition)
             .attr('cy', (d)=> @chart.yScale d.y)
-            .style('fill', (d)-> d.color)
+            .style('fill', (d)-> d.series.color)
 
     hide: ->
         return unless @chart.showGuideline()

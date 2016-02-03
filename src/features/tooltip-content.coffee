@@ -9,11 +9,13 @@ Library of tooltip rendering utilities
         slice = chart.data().sliced xIndex
 
         rows = slice.map (d)->
-            bgColor = "background-color: #{d.color};"
+            bgColor = "background-color: #{d.series.color};"
             """
                 <tr>
                     <td><div class='series-color' style='#{bgColor}'></div></td>
-                    <td class='series-label'>#{d.label or d.key}</td>
+                    <td class='series-label'>
+                        #{d.series.label or d.series.key}
+                    </td>
                     <td class='series-value'>#{chart.yTickFormat()(d.y)}</td>
                 </tr>
             """

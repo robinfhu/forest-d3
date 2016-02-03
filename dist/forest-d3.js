@@ -1048,13 +1048,7 @@ internal = api.get()
         }).map(function(d) {
           var point;
           point = d.values[idx];
-          return {
-            x: point.xValueRaw,
-            y: point.yValueRaw,
-            key: d.key,
-            label: d.label,
-            color: d.color
-          };
+          return point;
         });
       },
       _barItems: function() {
@@ -1347,7 +1341,7 @@ Handles the guideline that moves along the x-axis
           return _this.chart.yScale(d.y);
         };
       })(this)).style('fill', function(d) {
-        return d.color;
+        return d.series.color;
       });
     };
 
@@ -1382,8 +1376,8 @@ Library of tooltip rendering utilities
       slice = chart.data().sliced(xIndex);
       rows = slice.map(function(d) {
         var bgColor;
-        bgColor = "background-color: " + d.color + ";";
-        return "<tr>\n    <td><div class='series-color' style='" + bgColor + "'></div></td>\n    <td class='series-label'>" + (d.label || d.key) + "</td>\n    <td class='series-value'>" + (chart.yTickFormat()(d.y)) + "</td>\n</tr>";
+        bgColor = "background-color: " + d.series.color + ";";
+        return "<tr>\n    <td><div class='series-color' style='" + bgColor + "'></div></td>\n    <td class='series-label'>\n        " + (d.series.label || d.series.key) + "\n    </td>\n    <td class='series-value'>" + (chart.yTickFormat()(d.y)) + "</td>\n</tr>";
       });
       rows = rows.join('');
       return "<div class='header'>" + xValue + "</div>\n<table>\n    " + rows + "\n</table>";

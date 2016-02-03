@@ -97,12 +97,7 @@ internal = api.get()
     sliced: (idx)->
         @._getSliceable().filter((d)-> not d.hidden).map (d)->
             point = d.values[idx]
-
-            x: point.xValueRaw
-            y: point.yValueRaw
-            key: d.key
-            label: d.label
-            color: d.color
+            point
 
     _barItems: -> @.visible().filter((d)-> d.type is 'bar')
     ###
