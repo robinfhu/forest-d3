@@ -73,3 +73,18 @@ describe 'Tooltip and Guideline', ->
             series.length.should.equal 2, 'two interactive series'
             done()
         , 200
+
+    it 'emits event when a bisect guideline is shown', (done)->
+        data2 =
+            series1:
+                type: 'line'
+                values: [0..50].map (i)-> [i, Math.random()]
+
+        chart.tooltipType('bisect').data(data2).render()
+
+        chart.on 'tooltipBisect', (idx, clientMouse)->
+            idx.should.equal 32, 'index val found through testing'
+            clientMouse.should.deep.equal [10,10]
+            done()
+
+        chart.updateTooltip [250, 400], [10, 10]

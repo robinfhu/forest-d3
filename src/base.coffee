@@ -5,7 +5,12 @@
         @container domContainer
 
         @_metadata = {}
-        @_dispatch = d3.dispatch 'rendered', 'stateUpdate'
+        @_dispatch = d3.dispatch(
+            'rendered',
+            'stateUpdate',
+            'tooltipBisect'
+        )
+
         @plugins = {}
 
         ###
@@ -32,8 +37,12 @@
     on: (type, listener)->
         @_dispatch.on type, listener
 
+        @
+
     trigger: (type)->
         @_dispatch[type].apply @, Array.prototype.slice.call(arguments, 1)
+
+        @
 
     _attachStateHandlers: ->
 

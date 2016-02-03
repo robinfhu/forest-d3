@@ -455,6 +455,8 @@ chartProperties = [
 
                 @renderBisectGuideline xValues[idx], idx
 
+                @trigger 'tooltipBisect', idx, clientMouse
+
                 content = ForestD3.TooltipContent.multiple @, idx
                 @tooltip.render content, clientMouse
 

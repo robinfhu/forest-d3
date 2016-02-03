@@ -57,6 +57,9 @@ lineChart
     .showXAxis(false)
     .duration(500)
     .addPlugin(legend)
+    .on('tooltipBisect.test', (i, clientMouse)->
+        console.log i, clientMouse, @
+    )
     .data(lineData)
     .render()
 
@@ -81,6 +84,9 @@ barChart
             d3.time.format('%Y-%m-%d')(new Date d)
         else
             ''
+    )
+    .on('tooltipBisect.test', (i, clientMouse)->
+        console.log i, clientMouse, @
     )
     .data(barData)
     .render()

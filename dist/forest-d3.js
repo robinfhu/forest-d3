@@ -29,7 +29,7 @@ Author:  Robin Hu
       this.properties = {};
       this.container(domContainer);
       this._metadata = {};
-      this._dispatch = d3.dispatch('rendered', 'stateUpdate');
+      this._dispatch = d3.dispatch('rendered', 'stateUpdate', 'tooltipBisect');
       this.plugins = {};
 
       /*
@@ -62,11 +62,13 @@ Author:  Robin Hu
     };
 
     BaseChart.prototype.on = function(type, listener) {
-      return this._dispatch.on(type, listener);
+      this._dispatch.on(type, listener);
+      return this;
     };
 
     BaseChart.prototype.trigger = function(type) {
-      return this._dispatch[type].apply(this, Array.prototype.slice.call(arguments, 1));
+      this._dispatch[type].apply(this, Array.prototype.slice.call(arguments, 1));
+      return this;
     };
 
     BaseChart.prototype._attachStateHandlers = function() {};
@@ -1890,6 +1892,7 @@ You can combine lines, bars, areas and scatter points into one chart.
             return d;
           });
           this.renderBisectGuideline(xValues[idx], idx);
+          this.trigger('tooltipBisect', idx, clientMouse);
           content = ForestD3.TooltipContent.multiple(this, idx);
           return this.tooltip.render(content, clientMouse);
         } else if (this.tooltipType() === 'spatial') {

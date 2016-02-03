@@ -63,7 +63,9 @@
     } else {
       return '';
     }
-  }).showXAxis(false).duration(500).addPlugin(legend).data(lineData).render();
+  }).showXAxis(false).duration(500).addPlugin(legend).on('tooltipBisect.test', function(i, clientMouse) {
+    return console.log(i, clientMouse, this);
+  }).data(lineData).render();
 
   barData = [
     {
@@ -86,6 +88,8 @@
     } else {
       return '';
     }
+  }).on('tooltipBisect.test', function(i, clientMouse) {
+    return console.log(i, clientMouse, this);
   }).data(barData).render();
 
 }).call(this);
