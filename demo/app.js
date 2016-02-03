@@ -63,8 +63,11 @@
     } else {
       return '';
     }
-  }).showXAxis(false).duration(500).addPlugin(legend).on('tooltipBisect.test', function(i, clientMouse) {
-    return console.log(i, clientMouse, this);
+  }).showXAxis(false).duration(500).addPlugin(legend).on('tooltipBisect.test', function(evt) {
+    var mouse;
+    mouse = evt.clientMouse.slice();
+    mouse[1] += 300;
+    return barChart.renderBisectTooltipAt(evt.index, mouse);
   }).data(lineData).render();
 
   barData = [
@@ -88,8 +91,6 @@
     } else {
       return '';
     }
-  }).on('tooltipBisect.test', function(i, clientMouse) {
-    return console.log(i, clientMouse, this);
-  }).data(barData).render();
+  }).on('tooltipBisect.test', function(evt) {}).data(barData).render();
 
 }).call(this);

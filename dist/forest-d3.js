@@ -1372,15 +1372,12 @@ Library of tooltip rendering utilities
 
 (function() {
   this.ForestD3.TooltipContent = {
-    multiple: function(chart, xIndex) {
-      var rows, slice, xValue;
-      xValue = chart.data().xValueAt(xIndex);
-      xValue = chart.xTickFormat()(xValue);
-      slice = chart.data().sliced(xIndex);
-      rows = slice.map(function(d) {
+    multiple: function(xValue, points) {
+      var rows;
+      rows = points.map(function(d) {
         var bgColor;
         bgColor = "background-color: " + d.series.color + ";";
-        return "<tr>\n    <td><div class='series-color' style='" + bgColor + "'></div></td>\n    <td class='series-label'>\n        " + (d.series.label || d.series.key) + "\n    </td>\n    <td class='series-value'>" + (chart.yTickFormat()(d.y)) + "</td>\n</tr>";
+        return "<tr>\n    <td><div class='series-color' style='" + bgColor + "'></div></td>\n    <td class='series-label'>\n        " + (d.series.label || d.series.key) + "\n    </td>\n    <td class='series-value'>" + d.yFormatted + "</td>\n</tr>";
       });
       rows = rows.join('');
       return "<div class='header'>" + xValue + "</div>\n<table>\n    " + rows + "\n</table>";
@@ -1519,7 +1516,7 @@ You can combine lines, bars, areas and scatter points into one chart.
       'xTickFormat', function(d) {
         return d;
       }
-    ], ['yTickFormat', d3.format(',.2f')], ['reduceXTicks', true], ['yTicks', null], ['showXAxis', true], ['showYAxis', true], ['showTooltip', true], ['showGuideline', true], ['tooltipType', 'bisect'], ['barPaddingPercent', 0.1], ['autoSortXValues', true]
+    ], ['yTickFormat', d3.format(',.2f')], ['reduceXTicks', true], ['yTicks', null], ['showXAxis', true], ['showYAxis', true], ['showTooltip', true], ['showGuideline', true], ['tooltipType', 'bisect'], ['tooltipContentMultiple', ForestD3.TooltipContent.multiple], ['barPaddingPercent', 0.1], ['autoSortXValues', true]
   ];
 
   this.ForestD3.Chart = Chart = (function(superClass) {
@@ -1891,10 +1888,12 @@ You can combine lines, bars, areas and scatter points into one chart.
           idx = ForestD3.Utils.smartBisect(xValues, this.xScale.invert(xPos), function(d) {
             return d;
           });
-          this.renderBisectGuideline(xValues[idx], idx);
-          this.trigger('tooltipBisect', idx, clientMouse);
-          content = ForestD3.TooltipContent.multiple(this, idx);
-          return this.tooltip.render(content, clientMouse);
+          this.trigger('tooltipBisect', {
+            index: idx,
+            canvasMouse: canvasMouse,
+            clientMouse: clientMouse
+          });
+          return this.renderBisectTooltipAt(idx, clientMouse);
         } else if (this.tooltipType() === 'spatial') {
 
           /*
@@ -1940,6 +1939,25 @@ You can combine lines, bars, areas and scatter points into one chart.
           }
         }
       }
+    };
+
+    Chart.prototype.renderBisectTooltipAt = function(xIndex, clientMouse) {
+      var content, dataSlice, idx, xValue, xValues;
+      if (clientMouse == null) {
+        clientMouse = null;
+      }
+      idx = xIndex;
+      xValues = this.data().xValues();
+      this.renderBisectGuideline(xValues[idx], idx);
+      xValue = this.xTickFormat()(this.data().xValueAt(idx), idx);
+      dataSlice = this.data().sliced(idx).map((function(_this) {
+        return function(d, i) {
+          d.yFormatted = _this.yTickFormat()(d.y, i);
+          return d;
+        };
+      })(this));
+      content = this.tooltipContentMultiple()(xValue, dataSlice);
+      return this.tooltip.render(content, clientMouse);
     };
 
     Chart.prototype.renderBisectGuideline = function(xValue, xIndex) {

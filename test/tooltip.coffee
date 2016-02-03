@@ -82,9 +82,10 @@ describe 'Tooltip and Guideline', ->
 
         chart.tooltipType('bisect').data(data2).render()
 
-        chart.on 'tooltipBisect', (idx, clientMouse)->
-            idx.should.equal 32, 'index val found through testing'
-            clientMouse.should.deep.equal [10,10]
+        chart.on 'tooltipBisect', (e)->
+            e.index.should.equal 32, 'index val found through testing'
+            e.clientMouse.should.deep.equal [10,10]
+            e.canvasMouse.should.deep.equal [250, 400]
             done()
 
         chart.updateTooltip [250, 400], [10, 10]

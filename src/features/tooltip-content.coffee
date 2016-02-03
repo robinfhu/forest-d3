@@ -2,13 +2,8 @@
 Library of tooltip rendering utilities
 ###
 @ForestD3.TooltipContent =
-    multiple: (chart, xIndex)->
-        xValue = chart.data().xValueAt xIndex
-        xValue = chart.xTickFormat()(xValue)
-
-        slice = chart.data().sliced xIndex
-
-        rows = slice.map (d)->
+    multiple: (xValue, points)->
+        rows = points.map (d)->
             bgColor = "background-color: #{d.series.color};"
             """
                 <tr>
@@ -16,7 +11,7 @@ Library of tooltip rendering utilities
                     <td class='series-label'>
                         #{d.series.label or d.series.key}
                     </td>
-                    <td class='series-value'>#{chart.yTickFormat()(d.y)}</td>
+                    <td class='series-value'>#{d.yFormatted}</td>
                 </tr>
             """
 

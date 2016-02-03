@@ -28,6 +28,7 @@ chartProperties = [
     ['showTooltip', true]
     ['showGuideline', true]
     ['tooltipType', 'bisect']  # Can be 'bisect', 'spatial' or 'hover'
+    ['tooltipContentMultiple', ForestD3.TooltipContent.multiple]
     ['barPaddingPercent', 0.1]
     ['autoSortXValues', true]
 ]
@@ -453,12 +454,13 @@ chartProperties = [
                     (d)-> d
                 )
 
-                @renderBisectGuideline xValues[idx], idx
+                @trigger 'tooltipBisect', {
+                    index: idx
+                    canvasMouse
+                    clientMouse
+                }
 
-                @trigger 'tooltipBisect', idx, clientMouse
-
-                content = ForestD3.TooltipContent.multiple @, idx
-                @tooltip.render content, clientMouse
+                @renderBisectTooltipAt idx, clientMouse
 
             else if @tooltipType() is 'spatial'
                 ###
@@ -503,6 +505,20 @@ chartProperties = [
                     }
                 else
                     @renderSpatialTooltip {hide: true}
+
+    renderBisectTooltipAt: (xIndex, clientMouse=null)->
+        idx = xIndex
+        xValues = @data().xValues()
+
+        @renderBisectGuideline xValues[idx], idx
+
+        xValue = @xTickFormat()(@data().xValueAt(idx), idx) #raw x value
+        dataSlice = @data().sliced(idx).map (d,i)=>
+            d.yFormatted = @yTickFormat()(d.y, i)
+            d
+
+        content = @tooltipContentMultiple()(xValue, dataSlice)
+        @tooltip.render content, clientMouse
 
     renderBisectGuideline: (xValue, xIndex)->
         xPosition = @xScale xValue

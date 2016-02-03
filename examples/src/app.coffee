@@ -57,8 +57,10 @@ lineChart
     .showXAxis(false)
     .duration(500)
     .addPlugin(legend)
-    .on('tooltipBisect.test', (i, clientMouse)->
-        console.log i, clientMouse, @
+    .on('tooltipBisect.test', (evt)->
+        mouse = evt.clientMouse.slice()
+        mouse[1] += 300
+        barChart.renderBisectTooltipAt evt.index, mouse
     )
     .data(lineData)
     .render()
@@ -85,8 +87,8 @@ barChart
         else
             ''
     )
-    .on('tooltipBisect.test', (i, clientMouse)->
-        console.log i, clientMouse, @
+    .on('tooltipBisect.test', (evt)->
+
     )
     .data(barData)
     .render()
