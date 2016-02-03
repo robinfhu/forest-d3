@@ -1298,7 +1298,8 @@ Handles the guideline that moves along the x-axis
 
 
 /*
-Handles the guideline that moves along the x-axis
+Handles the guideline that moves along the x-axis.
+This likely only works for ordinal charts.
  */
 
 (function() {
@@ -1322,8 +1323,11 @@ Handles the guideline that moves along the x-axis
       return this.markerContainer.enter().append('g').classed('guideline-markers', true);
     };
 
-    Guideline.prototype.render = function(xPosition, xIndex) {
-      var markers, slice;
+    Guideline.prototype.render = function(xPosition, markerPoints) {
+      var markers;
+      if (markerPoints == null) {
+        markerPoints = [];
+      }
       if (!this.chart.showGuideline()) {
         return;
       }
@@ -1331,17 +1335,14 @@ Handles the guideline that moves along the x-axis
         return;
       }
       this.line.attr('x1', xPosition).attr('x2', xPosition).transition().style('opacity', 0.5);
-      slice = this.chart.data().sliced(xIndex);
       this.markerContainer.transition().style('opacity', 1);
-      markers = this.markerContainer.selectAll('circle.marker').data(slice);
+      markers = this.markerContainer.selectAll('circle.marker').data(markerPoints);
       markers.enter().append('circle').classed('marker', true).attr('r', 3);
       markers.exit().remove();
-      return markers.attr('cx', xPosition).attr('cy', (function(_this) {
-        return function(d) {
-          return _this.chart.yScale(d.y);
-        };
-      })(this)).style('fill', function(d) {
-        return d.series.color;
+      return markers.attr('cx', xPosition).attr('cy', function(d) {
+        return d.y;
+      }).style('fill', function(d) {
+        return d.color;
       });
     };
 
@@ -1888,8 +1889,7 @@ You can combine lines, bars, areas and scatter points into one chart.
           idx = ForestD3.Utils.smartBisect(xValues, this.xScale.invert(xPos), function(d) {
             return d;
           });
-          xPos = this.xScale(xValues[idx]);
-          this.guideline.render(xPos, idx);
+          this.renderBisectGuideline(xValues[idx], idx);
           content = ForestD3.TooltipContent.multiple(this, idx);
           return this.tooltip.render(content, clientMouse);
         } else if (this.tooltipType() === 'spatial') {
@@ -1937,6 +1937,20 @@ You can combine lines, bars, areas and scatter points into one chart.
           }
         }
       }
+    };
+
+    Chart.prototype.renderBisectGuideline = function(xValue, xIndex) {
+      var markerPoints, xPosition;
+      xPosition = this.xScale(xValue);
+      markerPoints = this.data().sliced(xIndex).map((function(_this) {
+        return function(d) {
+          return {
+            y: _this.yScale(d.y),
+            color: d.series.color
+          };
+        };
+      })(this));
+      return this.guideline.render(xPosition, markerPoints);
     };
 
 
@@ -2319,6 +2333,25 @@ allowed to combine it with lines and scatters.
       } else {
         return renderFn;
       }
+    };
+
+
+    /*
+    Override parent method, to add the 'y0' base value.
+     */
+
+    StackedChart.prototype.renderBisectGuideline = function(xValue, xIndex) {
+      var markerPoints, xPosition;
+      xPosition = this.xScale(xValue);
+      markerPoints = this.data().sliced(xIndex).map((function(_this) {
+        return function(d) {
+          return {
+            y: _this.yScale(d.y + d.y0),
+            color: d.series.color
+          };
+        };
+      })(this));
+      return this.guideline.render(xPosition, markerPoints);
     };
 
     return StackedChart;

@@ -68,3 +68,14 @@ chartProperties = [
                 ForestD3.Visualizations.line
         else
             renderFn
+
+    ###
+    Override parent method, to add the 'y0' base value.
+    ###
+    renderBisectGuideline: (xValue, xIndex)->
+        xPosition = @xScale xValue
+        markerPoints = @data().sliced(xIndex).map (d)=>
+            y: @yScale(d.y + d.y0)
+            color: d.series.color
+
+        @guideline.render xPosition, markerPoints

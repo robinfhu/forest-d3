@@ -453,9 +453,7 @@ chartProperties = [
                     (d)-> d
                 )
 
-                xPos = @xScale xValues[idx]
-
-                @guideline.render xPos, idx
+                @renderBisectGuideline xValues[idx], idx
 
                 content = ForestD3.TooltipContent.multiple @, idx
                 @tooltip.render content, clientMouse
@@ -503,6 +501,14 @@ chartProperties = [
                     }
                 else
                     @renderSpatialTooltip {hide: true}
+
+    renderBisectGuideline: (xValue, xIndex)->
+        xPosition = @xScale xValue
+        markerPoints = @data().sliced(xIndex).map (d)=>
+            y: @yScale(d.y)
+            color: d.series.color
+
+        @guideline.render xPosition, markerPoints
 
     ###
     Special function to show/hide a spatial tooltip.

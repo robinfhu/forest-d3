@@ -1,5 +1,6 @@
 ###
-Handles the guideline that moves along the x-axis
+Handles the guideline that moves along the x-axis.
+This likely only works for ordinal charts.
 ###
 @ForestD3.Guideline = class Guideline
     constructor: (@chart)->
@@ -27,7 +28,7 @@ Handles the guideline that moves along the x-axis
             .append('g')
             .classed('guideline-markers', true)
 
-    render: (xPosition, xIndex)->
+    render: (xPosition, markerPoints=[])->
         return unless @chart.showGuideline()
         return unless @line?
 
@@ -38,16 +39,13 @@ Handles the guideline that moves along the x-axis
             .transition()
             .style('opacity', 0.5)
 
-        # Render some markers, placed at the Y position at the current slice.
-        slice = @chart.data().sliced xIndex
-
         @markerContainer
             .transition()
             .style('opacity', 1)
 
         markers = @markerContainer
             .selectAll('circle.marker')
-            .data(slice)
+            .data(markerPoints)
 
         markers
             .enter()
@@ -59,8 +57,8 @@ Handles the guideline that moves along the x-axis
 
         markers
             .attr('cx', xPosition)
-            .attr('cy', (d)=> @chart.yScale d.y)
-            .style('fill', (d)-> d.series.color)
+            .attr('cy', (d)-> d.y)
+            .style('fill', (d)-> d.color)
 
     hide: ->
         return unless @chart.showGuideline()
