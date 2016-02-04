@@ -34,7 +34,9 @@ describe 'Tooltip and Guideline', ->
     it 'renders tooltip onto document.body', ->
         chart.data(data).render()
         chart.tooltip.id 'my-tooltip'
-        chart.updateTooltip [0,0], [10,10]
+        chart.updateTooltip
+            canvasMouse: [0,0]
+            clientMouse: [10,10]
 
         tooltip = $('.forest-d3.tooltip-box')
         tooltip.length.should.equal 1, 'tooltip exists'
@@ -44,12 +46,16 @@ describe 'Tooltip and Guideline', ->
     it 'can render spatial tooltips', (done)->
         chart.ordinal(false).tooltipType('spatial').data(data).render()
 
-        chart.updateTooltip [40, 400], [10, 10]
+        chart.updateTooltip
+            canvasMouse: [40, 400]
+            clientMouse: [10, 10]
 
         x = chart.xScale 1
         y = chart.yScale 1
 
-        chart.updateTooltip [x,y], [10,10]
+        chart.updateTooltip
+            canvasMouse: [x,y]
+            clientMouse: [10,10]
 
         setTimeout ->
             crosshair = $(container).find('line.crosshair-x')
@@ -88,4 +94,13 @@ describe 'Tooltip and Guideline', ->
             e.canvasMouse.should.deep.equal [250, 400]
             done()
 
-        chart.updateTooltip [250, 400], [10, 10]
+        chart.updateTooltip
+            canvasMouse: [250, 400]
+            clientMouse: [10, 10]
+
+    it 'emits event when tooltip hidden', (done)->
+        chart.tooltipType('bisect').data(data).render()
+        chart.on 'tooltipHidden', (e)->
+            done()
+
+        chart.updateTooltip {hide: true}

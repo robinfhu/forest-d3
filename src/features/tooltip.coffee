@@ -1,6 +1,7 @@
 @ForestD3.Tooltip = class Tooltip
-    constructor: ->
+    constructor: (chart)->
         @container = null
+        @chart = chart
 
     ###
     Lets you define a DOM id for the tooltip. Makes it so that
@@ -18,10 +19,6 @@
     clientMouse: Array of [mouse screen x, mouse screen y] positions
     ###
     render: (content, clientMouse)->
-        unless clientMouse instanceof Array
-            console.warn 'ForestD3.Tooltip.render: clientMouse not present.'
-            return
-
         unless @container?
             @container = document.createElement 'div'
             document.body.appendChild @container
@@ -45,7 +42,18 @@
         Because the tooltip DIV is placed on document.body, this should give
         us the absolute correct position.
         ###
-        [xPos, yPos] = clientMouse
+        [xPos, yPos] = do (clientMouse)=>
+            if (typeof clientMouse) is 'number'
+                # put the tooltip at the top of the chart container
+                chartClient = @chart.container().getBoundingClientRect().top
+                return [clientMouse, chartClient]
+            else if clientMouse instanceof Array
+                return clientMouse
+            else
+                throw new Error """
+                Tooltip.render: no valid client mouse coordinates.
+                """
+
         xPos += window.pageXOffset
         yPos += window.pageYOffset
 

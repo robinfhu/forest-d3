@@ -38,7 +38,7 @@ chartProperties = [
         super domContainer
         @_setProperties chartProperties
 
-        @tooltip = new ForestD3.Tooltip()
+        @tooltip = new ForestD3.Tooltip @
         @guideline = new ForestD3.Guideline @
         @crosshairs = new ForestD3.Crosshairs @
         @xAxis = d3.svg.axis()
@@ -345,12 +345,12 @@ chartProperties = [
             .attr('height', @canvasHeight)
             # Attach mouse handlers to update the guideline and tooltip
             .on('mousemove', ->
-                chart.updateTooltip(
-                    d3.mouse(@),
-                    [d3.event.clientX, d3.event.clientY]
-                )
+                chart.updateTooltip
+                    canvasMouse: d3.mouse(@)
+                    clientMouse: [d3.event.clientX, d3.event.clientY]
+
             )
-            .on('mouseout', -> chart.updateTooltip null)
+            .on('mouseout', -> chart.updateTooltip {hide: true})
             .on('click', -> chart._tooltipFrozen = not chart._tooltipFrozen)
 
         # Add a guideline
@@ -420,17 +420,17 @@ chartProperties = [
     canvasMouse: array: [x,y] - location of mouse in canvas
     clientMouse: array: [x,y] - location of mouse in browser
     ###
-    updateTooltip: (canvasMouse, clientMouse)->
+    updateTooltip: (options={})->
         return unless @showTooltip()
 
         return if @_tooltipFrozen
 
-        unless canvasMouse?
-            # Hide guideline from view if 'null' passed in
-            @guideline.hide()
-            @crosshairs.hide()
-            @tooltip.hide()
+        if options.hide
+            @hideTooltips()
+            @trigger 'tooltipHidden'
         else
+            canvasMouse = options.canvasMouse
+            clientMouse = options.clientMouse
             # Contains the current pixel coordinates of the mouse, within the
             # canvas context (so [0,0] would be top left corner of canvas)
             [xPos, yPos] = canvasMouse
@@ -505,6 +505,11 @@ chartProperties = [
                     }
                 else
                     @renderSpatialTooltip {hide: true}
+
+    hideTooltips: ->
+        @guideline.hide()
+        @crosshairs.hide()
+        @tooltip.hide()
 
     renderBisectTooltipAt: (xIndex, clientMouse=null)->
         idx = xIndex

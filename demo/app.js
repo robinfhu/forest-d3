@@ -64,10 +64,9 @@
       return '';
     }
   }).showXAxis(false).duration(500).addPlugin(legend).on('tooltipBisect.test', function(evt) {
-    var mouse;
-    mouse = evt.clientMouse.slice();
-    mouse[1] += 300;
-    return barChart.renderBisectTooltipAt(evt.index, mouse);
+    return barChart.renderBisectTooltipAt(evt.index, evt.clientMouse[0]);
+  }).on('tooltipHidden.test', function() {
+    return barChart.hideTooltips();
   }).data(lineData).render();
 
   barData = [
@@ -91,6 +90,10 @@
     } else {
       return '';
     }
-  }).on('tooltipBisect.test', function(evt) {}).data(barData).render();
+  }).on('tooltipBisect.test', function(evt) {
+    return lineChart.renderBisectTooltipAt(evt.index, evt.clientMouse[0]);
+  }).on('tooltipHidden.test', function() {
+    return lineChart.hideTooltips();
+  }).data(barData).render();
 
 }).call(this);

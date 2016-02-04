@@ -38,7 +38,10 @@ describe 'Chart', ->
             chart.destroy()
 
         it 'can render a guideline', ->
-            chart.updateTooltip [250, 200], [0,0]
+            chart.updateTooltip
+                canvasMouse: [250, 200]
+                clientMouse: [0,0]
+
             line = $(container).find('g.canvas line.guideline')
 
             line.length.should.equal 1, 'line exists'
@@ -49,7 +52,9 @@ describe 'Chart', ->
             line.getAttribute('x1').should.equal line.getAttribute('x2')
 
         it 'renders guideline marker circles along the guideline', ->
-            chart.updateTooltip [250, 200], [0,0]
+            chart.updateTooltip
+                canvasMouse: [250, 200]
+                clientMouse: [0,0]
 
             markerContainer = $(container).find('g.canvas g.guideline-markers')
             markerContainer.length.should.equal 1, 'container exists'
@@ -58,9 +63,12 @@ describe 'Chart', ->
             markers.length.should.equal 2, 'two markers'
 
         it 'can hide guideline', (done)->
-            chart.updateTooltip [250, 200], [0,0]
+            chart.updateTooltip
+                canvasMouse: [250, 200]
+                clientMouse: [0,0]
 
-            chart.updateTooltip null
+            chart.updateTooltip
+                hide: true
 
             setTimeout ->
                 line = $(container).find('line.guideline')

@@ -9,6 +9,7 @@
             'rendered',
             'stateUpdate',
             'tooltipBisect'
+            'tooltipHidden'
         )
 
         @plugins = {}
@@ -35,7 +36,10 @@
         window.removeEventListener 'resize', @resize
 
     on: (type, listener)->
-        @_dispatch.on type, listener
+        try
+            @_dispatch.on type, listener
+        catch e
+            throw new Error "Chart does not recognize the event '#{type}'."
 
         @
 

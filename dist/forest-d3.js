@@ -29,7 +29,7 @@ Author:  Robin Hu
       this.properties = {};
       this.container(domContainer);
       this._metadata = {};
-      this._dispatch = d3.dispatch('rendered', 'stateUpdate', 'tooltipBisect');
+      this._dispatch = d3.dispatch('rendered', 'stateUpdate', 'tooltipBisect', 'tooltipHidden');
       this.plugins = {};
 
       /*
@@ -62,7 +62,13 @@ Author:  Robin Hu
     };
 
     BaseChart.prototype.on = function(type, listener) {
-      this._dispatch.on(type, listener);
+      var e;
+      try {
+        this._dispatch.on(type, listener);
+      } catch (_error) {
+        e = _error;
+        throw new Error("Chart does not recognize the event '" + type + "'.");
+      }
       return this;
     };
 
@@ -1398,8 +1404,9 @@ Library of tooltip rendering utilities
   var Tooltip;
 
   this.ForestD3.Tooltip = Tooltip = (function() {
-    function Tooltip() {
+    function Tooltip(chart) {
       this.container = null;
+      this.chart = chart;
     }
 
 
@@ -1424,11 +1431,7 @@ Library of tooltip rendering utilities
      */
 
     Tooltip.prototype.render = function(content, clientMouse) {
-      var containerCenter, dimensions, edgeThreshold, xPos, yPos;
-      if (!(clientMouse instanceof Array)) {
-        console.warn('ForestD3.Tooltip.render: clientMouse not present.');
-        return;
-      }
+      var containerCenter, dimensions, edgeThreshold, ref, xPos, yPos;
       if (this.container == null) {
         this.container = document.createElement('div');
         document.body.appendChild(this.container);
@@ -1450,7 +1453,19 @@ Library of tooltip rendering utilities
       Because the tooltip DIV is placed on document.body, this should give
       us the absolute correct position.
        */
-      xPos = clientMouse[0], yPos = clientMouse[1];
+      ref = (function(_this) {
+        return function(clientMouse) {
+          var chartClient;
+          if ((typeof clientMouse) === 'number') {
+            chartClient = _this.chart.container().getBoundingClientRect().top;
+            return [clientMouse, chartClient];
+          } else if (clientMouse instanceof Array) {
+            return clientMouse;
+          } else {
+            throw new Error("Tooltip.render: no valid client mouse coordinates.");
+          }
+        };
+      })(this)(clientMouse), xPos = ref[0], yPos = ref[1];
       xPos += window.pageXOffset;
       yPos += window.pageYOffset;
 
@@ -1525,7 +1540,7 @@ You can combine lines, bars, areas and scatter points into one chart.
     function Chart(domContainer) {
       Chart.__super__.constructor.call(this, domContainer);
       this._setProperties(chartProperties);
-      this.tooltip = new ForestD3.Tooltip();
+      this.tooltip = new ForestD3.Tooltip(this);
       this.guideline = new ForestD3.Guideline(this);
       this.crosshairs = new ForestD3.Crosshairs(this);
       this.xAxis = d3.svg.axis();
@@ -1807,9 +1822,14 @@ You can combine lines, bars, areas and scatter points into one chart.
       canvasEnter.append('rect').classed('canvas-backdrop', true);
       chart = this;
       this.canvas.select('rect.canvas-backdrop').attr('width', this.canvasWidth).attr('height', this.canvasHeight).on('mousemove', function() {
-        return chart.updateTooltip(d3.mouse(this), [d3.event.clientX, d3.event.clientY]);
+        return chart.updateTooltip({
+          canvasMouse: d3.mouse(this),
+          clientMouse: [d3.event.clientX, d3.event.clientY]
+        });
       }).on('mouseout', function() {
-        return chart.updateTooltip(null);
+        return chart.updateTooltip({
+          hide: true
+        });
       }).on('click', function() {
         return chart._tooltipFrozen = !chart._tooltipFrozen;
       });
@@ -1858,19 +1878,23 @@ You can combine lines, bars, areas and scatter points into one chart.
     clientMouse: array: [x,y] - location of mouse in browser
      */
 
-    Chart.prototype.updateTooltip = function(canvasMouse, clientMouse) {
-      var content, dist, idx, isHidden, point, threshold, x, xActual, xDiff, xPos, xValues, y, yActual, yDiff, yPos;
+    Chart.prototype.updateTooltip = function(options) {
+      var canvasMouse, clientMouse, content, dist, idx, isHidden, point, threshold, x, xActual, xDiff, xPos, xValues, y, yActual, yDiff, yPos;
+      if (options == null) {
+        options = {};
+      }
       if (!this.showTooltip()) {
         return;
       }
       if (this._tooltipFrozen) {
         return;
       }
-      if (canvasMouse == null) {
-        this.guideline.hide();
-        this.crosshairs.hide();
-        return this.tooltip.hide();
+      if (options.hide) {
+        this.hideTooltips();
+        return this.trigger('tooltipHidden');
       } else {
+        canvasMouse = options.canvasMouse;
+        clientMouse = options.clientMouse;
         xPos = canvasMouse[0], yPos = canvasMouse[1];
         if (this.tooltipType() === 'bisect') {
 
@@ -1939,6 +1963,12 @@ You can combine lines, bars, areas and scatter points into one chart.
           }
         }
       }
+    };
+
+    Chart.prototype.hideTooltips = function() {
+      this.guideline.hide();
+      this.crosshairs.hide();
+      return this.tooltip.hide();
     };
 
     Chart.prototype.renderBisectTooltipAt = function(xIndex, clientMouse) {

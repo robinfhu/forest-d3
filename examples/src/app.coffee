@@ -58,9 +58,10 @@ lineChart
     .duration(500)
     .addPlugin(legend)
     .on('tooltipBisect.test', (evt)->
-        mouse = evt.clientMouse.slice()
-        mouse[1] += 300
-        barChart.renderBisectTooltipAt evt.index, mouse
+        barChart.renderBisectTooltipAt evt.index, evt.clientMouse[0]
+    )
+    .on('tooltipHidden.test', ->
+        barChart.hideTooltips()
     )
     .data(lineData)
     .render()
@@ -88,7 +89,10 @@ barChart
             ''
     )
     .on('tooltipBisect.test', (evt)->
-
+        lineChart.renderBisectTooltipAt evt.index, evt.clientMouse[0]
+    )
+    .on('tooltipHidden.test', ->
+        lineChart.hideTooltips()
     )
     .data(barData)
     .render()
