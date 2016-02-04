@@ -2410,3 +2410,107 @@ allowed to combine it with lines and scatters.
   })(ForestD3.Chart);
 
 }).call(this);
+
+(function() {
+  var PieChart, chartProperties,
+    extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    hasProp = {}.hasOwnProperty;
+
+  chartProperties = [
+    [
+      'getLabel', function(d) {
+        return d.label;
+      }
+    ], [
+      'getValue', function(d) {
+        return d.value;
+      }
+    ]
+  ];
+
+  this.ForestD3.PieChart = PieChart = (function(superClass) {
+    extend(PieChart, superClass);
+
+    function PieChart(domContainer) {
+      PieChart.__super__.constructor.call(this, domContainer);
+      d3.select(this.container()).classed('pie-chart', true);
+      this._setProperties(chartProperties);
+    }
+
+    PieChart.prototype.data = function(d) {
+      if (arguments.length === 0) {
+        return ForestD3.DataAPI.call(this, this._internalData);
+      } else {
+        this._internalData = d.slice();
+        this._internalData.sort((function(_this) {
+          return function(a, b) {
+            return d3.ascending(_this.getValue()(a), _this.getValue()(b));
+          };
+        })(this));
+        return this;
+      }
+    };
+
+    PieChart.prototype.render = function() {
+      var arc, pieData, radius, slices, slicesContainer;
+      if (this.svg == null) {
+        return this;
+      }
+      if (this.data().get() == null) {
+        return this;
+      }
+      this.updateDimensions();
+      this.updateChartFrame();
+      radius = d3.min([this.canvasWidth, this.canvasHeight]) / 2;
+      arc = d3.svg.arc().outerRadius(radius).innerRadius(0);
+      pieData = d3.layout.pie().sort(null).value(this.getValue())(this.data().get());
+      slicesContainer = this.canvas.selectAll('g.slices-container').data([0]);
+      slicesContainer.enter().append('g').classed('slices-container');
+      slicesContainer.attr('transform', "translate(" + (this.canvasWidth / 2) + ", " + (this.canvasHeight / 2) + ")");
+      slices = slicesContainer.selectAll('path.slice').data(pieData);
+      slices.enter().append('path').classed('slice', true);
+      return slices.attr('d', arc).style('fill', function(d, i) {
+        return ForestD3.Utils.defaultColor(i);
+      });
+    };
+
+    PieChart.prototype.updateChartFrame = function() {
+      var canvasEnter;
+      this.canvas = this.svg.selectAll('g.canvas').data([0]);
+      canvasEnter = this.canvas.enter().append('g').classed('canvas', true);
+      this.canvas.attr('transform', "translate(" + this.margin + ", " + this.margin + ")");
+      canvasEnter.append('rect').classed('canvas-backdrop', true);
+      return this.canvas.select('rect.canvas-backdrop').attr('width', this.canvasWidth).attr('height', this.canvasHeight);
+    };
+
+
+    /*
+    Get the chart's dimensions, based on the parent container <div>.
+    Calculate chart margins and canvas dimensions.
+     */
+
+    PieChart.prototype.updateDimensions = function() {
+      var bounds, container;
+      container = this.container();
+      if (container != null) {
+        bounds = container.getBoundingClientRect();
+        this.height = bounds.height;
+        this.width = bounds.width;
+        this.margin = 30;
+
+        /*
+        Calculates the chart canvas dimensions. Uses the parent
+        container's dimensions, and subtracts off any margins.
+         */
+        this.canvasHeight = this.height - this.margin * 2;
+        this.canvasWidth = this.width - this.margin * 2;
+        this.canvasWidth = d3.max([this.canvasWidth, 50]);
+        return this.canvasHeight = d3.max([this.canvasHeight, 50]);
+      }
+    };
+
+    return PieChart;
+
+  })(ForestD3.BaseChart);
+
+}).call(this);

@@ -59,6 +59,7 @@ module.exports = (grunt)->
                         'src/chart.coffee'
                         'src/bar-chart.coffee'
                         'src/stacked-chart.coffee'
+                        'src/pie-chart.coffee'
                     ]
             examples:
                 expand: true
