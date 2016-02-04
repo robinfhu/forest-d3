@@ -2468,8 +2468,13 @@ allowed to combine it with lines and scatters.
       slicesContainer.enter().append('g').classed('slices-container');
       slicesContainer.attr('transform', "translate(" + (this.canvasWidth / 2) + ", " + (this.canvasHeight / 2) + ")");
       slices = slicesContainer.selectAll('path.slice').data(pieData);
-      slices.enter().append('path').classed('slice', true);
-      return slices.attr('d', arc).style('fill', function(d, i) {
+      slices.enter().append('path').classed('slice', true).attr('d', function(d) {
+        return arc({
+          startAngle: d.startAngle,
+          endAngle: d.startAngle
+        });
+      });
+      return slices.transition().duration(1000).attr('d', arc).style('fill', function(d, i) {
         return ForestD3.Utils.defaultColor(i);
       });
     };

@@ -50,8 +50,13 @@ chartProperties = [
             .enter()
             .append('path')
             .classed('slice', true)
+            .attr('d', (d)->
+                arc({startAngle: d.startAngle, endAngle: d.startAngle})
+            )
 
         slices
+            .transition()
+            .duration(1000)
             .attr('d', arc)
             .style('fill', (d,i)-> ForestD3.Utils.defaultColor(i))
 
